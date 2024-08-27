@@ -20,7 +20,10 @@ const MainContent = () => {
   };
 
   return (
-    <Box sx={{ padding: 2 }}>
+    <Box sx={{ padding: 2,
+      height: '85vh', 
+      overflowY: 'scroll'
+     }}>
       <PostForm onSubmit={handlePostSubmit} />
       {posts.map((post, index) => (
         <Post key={index} content={post.content} imageUrls={post.imageUrls} />

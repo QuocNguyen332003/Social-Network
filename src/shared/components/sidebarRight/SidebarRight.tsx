@@ -23,7 +23,7 @@ const SidebarRight = () => {
   const contacts = ['Nguyễn Bảo Quốc', 'Nguyễn Bảo Quốc', 'Nguyễn Bảo Quốc'];
 
   return (
-    <Box sx={{ padding: '16px' }}>
+    <Box sx={{ padding: '16px', borderLeft: '1px solid #e0e0e0', height: '85vh' }}>
       <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
         Người liên hệ
       </Typography>

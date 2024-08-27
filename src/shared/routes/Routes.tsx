@@ -3,6 +3,7 @@ import Login from '../../features/user-authentication/containers/login/Login'
 import Register from '../../features/user-authentication/containers/register/Register'
 import Forgot from '../../features/user-authentication/containers/forgot/Forgot'
 import NewFeeds from '../../features/new-feeds/containers/new-feeds/NewFeeds'
+import Group from '../../features/group/containers/group/Group'
 
 const Routes = () => {
 
@@ -27,6 +28,10 @@ const Routes = () => {
     {
       path: '/new-feeds',
       element: <NewFeeds />
+    },
+    {
+      path: '/groups',
+      element: <Group />
     }
   ]
 
