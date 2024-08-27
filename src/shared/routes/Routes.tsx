@@ -2,6 +2,7 @@ import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom'
 import Login from '../../features/user-authentication/containers/login/Login'
 import Register from '../../features/user-authentication/containers/register/Register'
 import Forgot from '../../features/user-authentication/containers/forgot/Forgot'
+import NewFeeds from '../../features/new-feeds/containers/new-feeds/NewFeeds'
 
 const Routes = () => {
 
@@ -22,6 +23,10 @@ const Routes = () => {
     {
       path: '/forgot',
       element: <Forgot />
+    },
+    {
+      path: '/new-feeds',
+      element: <NewFeeds />
     }
   ]
 

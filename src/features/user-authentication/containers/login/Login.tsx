@@ -34,7 +34,7 @@ const Login: React.FC = () => {
           sm={7}
           md={8}
           sx={{
-            backgroundImage: 'url(./src/assets/images/background-login.png)', // Sử dụng đường dẫn đến ảnh bạn tải lên
+            backgroundImage: 'url(/src/assets/images/background-login.png)', // Sử dụng đường dẫn đến ảnh bạn tải lên
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
@@ -103,6 +103,7 @@ const Login: React.FC = () => {
                   fullWidth
                   variant="contained"
                   sx={{ mt: 2, mb: 2, bgcolor: '#1976d2', ':hover': { bgcolor: '#1565c0' } }}
+                  onClick={() => navigate('/new-feeds')}
                 >
                   Đăng nhập
                 </Button>
