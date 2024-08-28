@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
-import PostForm from '../../../shared/components/postForm/PostForm';
-import Post from '../../../shared/components/post/Post';
+import GroupHeader from '../../components/GroupHeader';
+import GroupTabs from '../../components/GroupTabs';
+import PostForm from '../../../../shared/components/postForm/PostForm';
+import Post from '../../../../shared/components/post/Post';
 
 const MainContent = () => {
   const [posts, setPosts] = useState<Array<{ content: string; imageUrls?: string[] }>>([
@@ -20,10 +22,9 @@ const MainContent = () => {
   };
 
   return (
-    <Box sx={{ padding: 2,
-      height: '85vh', 
-      overflowY: 'scroll'
-     }}>
+    <Box sx={{ padding: 2, height: '85vh', overflowY: 'scroll' }}>
+      <GroupHeader />
+      <GroupTabs />
       <PostForm onSubmit={handlePostSubmit} />
       {posts.map((post, index) => (
         <Post key={index} content={post.content} imageUrls={post.imageUrls} />

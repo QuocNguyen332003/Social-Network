@@ -21,7 +21,7 @@ const Header = () => {
         {/* Logo */}
         <Box display="flex" alignItems="center">
           <img
-            src="./src/assets/images/logoSocialNetwork.png"
+            src="src/assets/images/logoSocialNetwork.png"
             alt="Lotus"
             style={{ marginRight: '24px', height: '40px' }} // Điều chỉnh chiều cao logo và khoảng cách
           />

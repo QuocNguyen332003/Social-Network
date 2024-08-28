@@ -4,6 +4,7 @@ import Register from '../../features/user-authentication/containers/register/Reg
 import Forgot from '../../features/user-authentication/containers/forgot/Forgot'
 import NewFeeds from '../../features/new-feeds/containers/new-feeds/NewFeeds'
 import Group from '../../features/group/containers/group/Group'
+import GroupDetail from '../../features/group/containers/detail-group/DetailGroup'
 
 const Routes = () => {
 
@@ -32,6 +33,10 @@ const Routes = () => {
     {
       path: '/groups',
       element: <Group />
+    },
+    {
+      path: '/groups/:groupName', 
+      element: <GroupDetail/> // Protect this route
     }
   ]
 

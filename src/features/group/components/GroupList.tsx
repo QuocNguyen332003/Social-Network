@@ -3,16 +3,20 @@ import { Box, Typography, Button } from '@mui/material';
 import GroupCard from './GroupCard';
 import CreateGroupForm from './CreateGroupForm';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const GroupList = () => {
+  const navigate = useNavigate();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [joinedGroups, setJoinedGroups] = useState([
-    { groupName: 'Cat Lover Universe', groupDescription: 'A group for cat lovers', groupImage: 'path_to_image1', isJoined: true },
-    { groupName: 'Cooking Group', groupDescription: 'Share your cooking recipes', groupImage: 'path_to_image2', isJoined: true }
+    { groupName: 'Cat Lover Universe', groupDescription: 'A group for cat lovers', groupImage: '../../../assets/images/background-group-test.jpg', isJoined: true },
+    { groupName: 'Cooking Group', groupDescription: 'Share your cooking recipes', groupImage: '../../../assets/images/background-group-test.jpg', isJoined: true }
   ]);
 
   const [notJoinedGroups, setNotJoinedGroups] = useState([
-    { groupName: 'Tech Enthusiasts', groupDescription: 'Technology and Gadgets', groupImage: 'path_to_image3', isJoined: false },
-    { groupName: 'Traveling Lovers', groupDescription: 'Explore the world', groupImage: 'path_to_image4', isJoined: false }
+    { groupName: 'Tech Enthusiasts', groupDescription: 'Technology and Gadgets', groupImage: '../../../assets/images/background-group-test.jpg', isJoined: false },
+    { groupName: 'Traveling Lovers', groupDescription: 'Explore the world', groupImage: '../../../assets/images/background-group-test.jpg', isJoined: false }
   ]);
 
   const [isCreateGroupFormOpen, setCreateGroupFormOpen] = useState(false);
@@ -22,6 +26,10 @@ const GroupList = () => {
       ...notJoinedGroups,
       { groupName, groupDescription, groupImage, isJoined: false }
     ]);
+  };
+
+  const handleGroupClick = (groupName: string) => {
+    navigate(`/groups/${groupName}`);
   };
 
   return (
@@ -51,6 +59,7 @@ const GroupList = () => {
           groupDescription={group.groupDescription}
           groupImage={group.groupImage}
           isJoined={group.isJoined}
+          onClick={() => handleGroupClick(group.groupName)}
         />
       ))}
 
@@ -65,6 +74,7 @@ const GroupList = () => {
           groupDescription={group.groupDescription}
           groupImage={group.groupImage}
           isJoined={group.isJoined}
+          onClick={() => handleGroupClick(group.groupName)}
         />
       ))}
 
