@@ -1,5 +1,5 @@
 import React from 'react';
-import GroupList from './GroupList'; // Đảm bảo đường dẫn đúng đến GroupList
+import GroupList from '../../components/GroupList'; // Đảm bảo đường dẫn đúng đến GroupList
 
 function App() {
   return (

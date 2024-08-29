@@ -2,9 +2,11 @@ import { Grid } from '@mui/material';
 import  Header  from '../../../../shared/components/header/Header';
 import  SidebarLeft  from '../../../../shared/components/sidebarLeft/SidebarLeft';
 import  SidebarRight  from '../../../../shared/components/sidebarRight/SidebarRight';
-import MainContent from './MainContent';
+import GroupHeader from '../../components/GroupHeader';
+import GroupTabs from '../../components/GroupTabs';
+import { Outlet } from 'react-router-dom'; // Import Outlet
 
-const NewFeeds = () => {
+const ApprovalGroup = () => {
   return (
     <>
       <Header />
@@ -13,7 +15,9 @@ const NewFeeds = () => {
           <SidebarLeft />
         </Grid>
         <Grid item xs={7}>
-          <MainContent />
+          <GroupHeader />
+          <GroupTabs groupName="Cat Lover Universe" />
+          <Outlet/>  
         </Grid>
         <Grid item xs={3}>
           <SidebarRight />
@@ -23,4 +27,4 @@ const NewFeeds = () => {
   );
 };
 
-export default NewFeeds;
+export default ApprovalGroup;
