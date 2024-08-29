@@ -5,6 +5,7 @@ import Forgot from '../../features/user-authentication/containers/forgot/Forgot'
 import NewFeeds from '../../features/new-feeds/containers/new-feeds/NewFeeds'
 import Group from '../../features/group/containers/group/Group'
 import GroupDetail from '../../features/group/containers/detail-group/DetailGroup'
+import Messages from '../../features/conversations/containers/Messages'
 
 const Routes = () => {
 
@@ -37,6 +38,10 @@ const Routes = () => {
     {
       path: '/groups/:groupName', 
       element: <GroupDetail/> // Protect this route
+    },
+    {
+      path: '/messages', 
+      element: <Messages/> // Protect this route
     }
   ]
 
