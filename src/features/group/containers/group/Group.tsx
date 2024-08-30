@@ -2,9 +2,9 @@ import { Grid } from '@mui/material';
 import  Header  from '../../../../shared/components/header/Header';
 import  SidebarLeft  from '../../../../shared/components/sidebarLeft/SidebarLeft';
 import  SidebarRight  from '../../../../shared/components/sidebarRight/SidebarRight';
-import MainContent from '../../components/MainContent';
+import MainContent from './MainContent';
 
-const NewFeeds = () => {
+const Group = () => {
   return (
     <>
       <Header />
@@ -23,4 +23,4 @@ const NewFeeds = () => {
   );
 };
 
-export default NewFeeds;
+export default Group;

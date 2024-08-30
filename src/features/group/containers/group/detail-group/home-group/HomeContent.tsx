@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box } from '@mui/material';
-import GroupHeader from '../../components/GroupHeader';
-import GroupTabs from '../../components/GroupTabs';
-import PostForm from '../../../../shared/components/postForm/PostForm';
-import Post from '../../../../shared/components/post/Post';
+import PostForm from '../../../../../../shared/components/postForm/PostForm';
+import Post from '../../../../../../shared/components/post/Post';
 
-const MainContent = () => {
+const DetailContent = () => {
   const [posts, setPosts] = useState<Array<{ content: string; imageUrls?: string[] }>>([
     {
       content:
@@ -23,8 +21,6 @@ const MainContent = () => {
 
   return (
     <Box sx={{ padding: 2, height: '85vh', overflowY: 'scroll' }}>
-      <GroupHeader />
-      <GroupTabs />
       <PostForm onSubmit={handlePostSubmit} />
       {posts.map((post, index) => (
         <Post key={index} content={post.content} imageUrls={post.imageUrls} />
@@ -33,4 +29,4 @@ const MainContent = () => {
   );
 };
 
-export default MainContent;
+export default DetailContent;
