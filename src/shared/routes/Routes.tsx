@@ -10,6 +10,7 @@ import RulesContent from '../../features/group/containers/group/detail-group/rul
 import ApprovalContent from '../../features/group/containers/approval-group/ApprovalContent';
 import AdminContent from '../../features/group/containers/group/detail-group/admin-group/AdminContent';
 import MainContent from '../../features/group/containers/group/detail-group/MainContent';
+import Messages from '../../features/conversations/containers/Messages'
 
 const Routes = () => {
   const router = createBrowserRouter([
@@ -36,6 +37,10 @@ const Routes = () => {
     {
       path: '/groups',
       element: <Group />,
+    },
+    {
+      path: '/messages', 
+      element: <Messages/> // Protect this route
     },
     {
       path: '/groups/:groupName',
