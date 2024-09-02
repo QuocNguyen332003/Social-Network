@@ -2,7 +2,6 @@ import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/mat
 import PeopleIcon from '@mui/icons-material/People';
 import GroupIcon from '@mui/icons-material/Group';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
-import LiveTvIcon from '@mui/icons-material/LiveTv';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useNavigate } from 'react-router-dom'; // Thêm hook useNavigate
