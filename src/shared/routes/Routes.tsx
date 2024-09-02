@@ -11,6 +11,9 @@ import ApprovalContent from '../../features/group/containers/approval-group/Appr
 import AdminContent from '../../features/group/containers/group/detail-group/admin-group/AdminContent';
 import MainContent from '../../features/group/containers/group/detail-group/MainContent';
 import Messages from '../../features/conversations/containers/Messages'
+import AllFriends from '../../features/friends/containers/friends/AllFriends';
+import FriendsRequest from '../../features/friends/containers/friends-request/FriendsRequest';
+import FriendsSuggest from '../../features/friends/containers/friends-suggest/FriendsSuggest';
 
 const Routes = () => {
   const router = createBrowserRouter([
@@ -67,6 +70,23 @@ const Routes = () => {
           element: <ApprovalContent />, // Component for "Duyệt bài viết"
         },
         // Define other routes here for rules, admins, pending, etc.
+      ],
+    },
+    {
+      path: '/friends/',
+      children: [
+        {
+          path: '',
+          element: <AllFriends />,
+        },
+        {
+          path: 'friends-request',
+          element: <FriendsRequest />,
+        },
+        {
+          path: 'friends-suggest',
+          element: <FriendsSuggest />,
+        },
       ],
     },
   ]);

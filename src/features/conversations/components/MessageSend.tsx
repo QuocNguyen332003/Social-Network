@@ -25,8 +25,8 @@ function MessageSend({avt, date, text, link, displayAvt, positionMessage}: Messa
             {text != "" && (
                 <Typography variant="subtitle2" component="h2" color='#333' fontWeight='regular'
                     sx={[{ 
-                    fontWeight: '400',
-                    backgroundColor: '#dbdbdb', padding: '10px', margin: ' 1px 0',
+                    fontWeight: '400', color: '#fff',
+                    backgroundColor: '#333', padding: '10px', margin: ' 1px 0',
                     borderBottomLeftRadius: 20, borderTopLeftRadius: 20,
                     }, positionMessage===Position.Top?{borderTopRightRadius: 20}: 
                        positionMessage===Position.Bottom?{borderBottomRightRadius: 20}:

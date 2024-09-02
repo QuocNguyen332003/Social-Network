@@ -1,4 +1,3 @@
-import React from 'react';
 import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import PeopleIcon from '@mui/icons-material/People';
