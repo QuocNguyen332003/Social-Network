@@ -1,5 +1,4 @@
 import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import PeopleIcon from '@mui/icons-material/People';
 import GroupIcon from '@mui/icons-material/Group';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
@@ -17,12 +16,6 @@ const SidebarLeft = () => {
         Truy cập nhanh
       </Typography>
       <List>
-        <ListItem button onClick={() => navigate('/videos')}>
-          <ListItemIcon>
-            <VideoLibraryIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Video" />
-        </ListItem>
         <ListItem button onClick={() => navigate('/friends')}>
           <ListItemIcon>
             <PeopleIcon sx={{ color: '#8b9dc3' }} />
@@ -40,12 +33,6 @@ const SidebarLeft = () => {
             <BookmarkIcon sx={{ color: '#d88d3c' }} />
           </ListItemIcon>
           <ListItemText primary="Đã Lưu" />
-        </ListItem>
-        <ListItem button onClick={() => navigate('/live')}>
-          <ListItemIcon>
-            <LiveTvIcon sx={{ color: '#c92a2a' }} />
-          </ListItemIcon>
-          <ListItemText primary="Phát trực tiếp" />
         </ListItem>
         <ListItem button onClick={() => navigate('/collections')}>
           <ListItemIcon>
