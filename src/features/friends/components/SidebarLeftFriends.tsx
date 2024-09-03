@@ -13,7 +13,7 @@ const SidebarLeftFriends = () => {
         Truy cập nhanh
       </Typography>
       <List>
-        <ListItem button onClick={() => navigate('/friends/')}>
+        <ListItem button onClick={() => navigate('/friends')}>
           <ListItemIcon>
             <Diversity3Icon color="primary" />
           </ListItemIcon>

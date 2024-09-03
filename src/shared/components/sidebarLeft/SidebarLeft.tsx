@@ -12,7 +12,7 @@ const SidebarLeft = () => {
   return (
     <div style={{ padding: '16px', borderRight: '1px solid #e0e0e0', height: '85vh' }}>
       <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-        Truy cập nhanh
+          Truy cập nhanh
       </Typography>
       <List>
         <ListItem button onClick={() => navigate('/friends')}>

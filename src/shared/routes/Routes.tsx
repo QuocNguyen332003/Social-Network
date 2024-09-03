@@ -73,11 +73,11 @@ const Routes = () => {
       ],
     },
     {
-      path: '/friends/',
+      path: '/friends',
       children: [
         {
           path: '',
-          element: <AllFriends />,
+          element: <AllFriends/>,
         },
         {
           path: 'friends-request',

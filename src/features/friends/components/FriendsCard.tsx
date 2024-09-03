@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Typography } from "@mui/material";
 
 type FriendsCardProps = {
@@ -25,15 +26,11 @@ function FriendsCard({avt, name, message, BoxButton}: FriendsCardProps) {
         display: 'flex', justifyContent: 'center', alignItems: 'center'
       }}
       >
-        <Box sx={{
-        width: '150px', height: '150px',
-        backgroundColor: '#ccc'
-      }}/>
-        {/* <img
-            src= {"src/assets/images/avt.png"}
+         <img
+            src= {avt}
             alt="Ảnh đại diện"
-            style={{width: '30px', height: '30px', borderRadius: 50 }}
-          /> */}
+            style={{width: '130px', height: '130px', borderRadius: 50, marginLeft: '20px' }}
+          /> 
       </Box>
       <Box
       sx={{
