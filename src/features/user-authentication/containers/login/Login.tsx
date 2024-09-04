@@ -24,7 +24,7 @@ const Login: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ height: '100vh', overflow: 'hidden' }}>
+      <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
 
         {/* Phần bên trái (2/3 màn hình) */}
@@ -52,17 +52,28 @@ const Login: React.FC = () => {
           display="flex"
           alignItems="center"
           justifyContent="center"
-          sx={{ p: 4, boxShadow: 2, borderRadius: 2, height: '100%', overflowY: 'auto' }}
+          sx={{ 
+            p: 4, 
+            boxShadow: 2, 
+            borderRadius: 2, 
+            minHeight: '100vh', // Giữ phần bên phải luôn cao 100% màn hình
+            overflowY: 'auto' 
+          }}
         >
-          <Container component="main" maxWidth="xs">
+          <Container component="main" maxWidth="xs" sx={{ width: '100%', p: 0 }}>
             <Box
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                width: '100%',
               }}
             >
-              <img src="./src/assets/images/logoSocialNetwork.png" alt="Logo" style={{ marginBottom: 16 }} /> {/* Thêm logo */}
+              <img 
+                src="./src/assets/images/logoSocialNetwork.png" 
+                alt="Logo" 
+                style={{ marginBottom: 16, maxWidth: '100%' }} 
+              /> {/* Đảm bảo logo có thể thu nhỏ */}
               <Typography
                 component="h1"
                 variant="h5"
@@ -70,7 +81,7 @@ const Login: React.FC = () => {
               >
                 Đăng nhập
               </Typography>
-              <Box component="form" noValidate sx={{ mt: 1 }}>
+              <Box component="form" noValidate sx={{ mt: 1, width: '100%' }}>
                 <TextField
                   margin="normal"
                   required
@@ -128,26 +139,33 @@ const Login: React.FC = () => {
                 </Box>
 
                 {/* Các nút đăng nhập mạng xã hội */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                    flexWrap: 'wrap', // Cho phép các nút xuống dòng khi không đủ chỗ
+                  }}
+                >
                   <Button
                     variant="outlined"
-                    sx={{ mx: 1 }}
+                    startIcon={<GoogleIcon />}
+                    sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }} // Đảm bảo mỗi button có tối thiểu 100px, và có khoảng cách dưới khi xuống dòng
                   >
-                    <GoogleIcon sx={{ mr: 1 }} />
                     Google
                   </Button>
                   <Button
                     variant="outlined"
-                    sx={{ mx: 1 }}
+                    startIcon={<AppleIcon />}
+                    sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }}
                   >
-                    <AppleIcon sx={{ mr: 1 }} />
                     Apple
                   </Button>
                   <Button
                     variant="outlined"
-                    sx={{ mx: 1 }}
+                    startIcon={<FacebookIcon />}
+                    sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }}
                   >
-                    <FacebookIcon sx={{ mr: 1 }} />
                     Facebook
                   </Button>
                 </Box>

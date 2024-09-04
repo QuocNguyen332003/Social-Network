@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Avatar, Paper, Button, IconButton, Collapse, TextField } from '@mui/material';
+import { Box, Typography, Avatar, Paper, Button, IconButton, Collapse, TextField, Menu, MenuItem } from '@mui/material';
 import { MoreHoriz, Favorite, Comment, Share, CardGiftcard, ThumbUpAlt, Reply } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -37,6 +37,10 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   const [replyInputs, setReplyInputs] = useState<{ [key: string]: boolean }>({});
   const [replyTexts, setReplyTexts] = useState<{ [key: string]: string }>({});
   const [newComment, setNewComment] = useState('');
+  
+  // State quản lý Menu của nút ba chấm
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
   const handleToggleComments = () => {
     setShowComments(!showComments);
@@ -105,64 +109,101 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
     }
   };
 
+  // Xử lý Menu của nút ba chấm
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSavePost = () => {
+    // Xử lý logic lưu bài viết ở đây
+    console.log('Post saved');
+    handleMenuClose();
+  };
+
   return (
-    <Paper sx={{ padding: 2, marginBottom: 2 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+    <Paper sx={{ padding: 3, marginBottom: 3, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
         <Box display="flex" alignItems="center">
-          <Avatar alt={post.idAuthor} src="/static/images/avatar/1.jpg" />
+          <Avatar alt={post.idAuthor} src="/static/images/avatar/1.jpg" sx={{ width: 48, height: 48 }} />
           <Box sx={{ marginLeft: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold">
+            <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#333' }}>
               {post.idAuthor}
             </Typography>
             <Typography variant="caption" color="textSecondary">
-              {post.startDate.toDateString()} - {post.scope}
+              {formatDistanceToNow(new Date(post.startDate))} - {post.scope}
             </Typography>
           </Box>
         </Box>
-        <IconButton>
-          <MoreHoriz />
+        <IconButton onClick={handleMenuOpen}>
+          <MoreHoriz sx={{ color: '#757575' }} />
         </IconButton>
+
+        {/* Menu của nút ba chấm */}
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        >
+          <MenuItem onClick={handleSavePost}>Lưu bài viết</MenuItem>
+        </Menu>
       </Box>
-      <Typography variant="body1" sx={{ marginTop: 2 }}>
+      
+      <Typography variant="body1" sx={{ color: '#424242', marginBottom: 2 }}>
         {post.content}
       </Typography>
+
       {post.img && (
-        <Box sx={{ marginTop: 2, display: 'flex', flexWrap: 'wrap' }}>
+        <Box sx={{ marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
           {post.img.map((url, index) => (
             <img
               key={index}
               src={url}
               alt={`post-image-${index}`}
-              style={{ maxWidth: '100px', maxHeight: '100px', marginRight: '10px', borderRadius: '8px' }}
+              style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '8px', objectFit: 'cover' }}
             />
           ))}
         </Box>
       )}
+
       <Box display="flex" alignItems="center" sx={{ marginTop: 2 }}>
         <ThumbUpAlt fontSize="small" sx={{ color: '#2e7d32', marginRight: 1 }} />
         <Favorite fontSize="small" sx={{ color: '#d32f2f', marginRight: 1 }} />
-        <Typography variant="body2" sx={{ marginLeft: 1 }}>
-          {post.emoticons?.length || 0} likes - {post.comments?.length || 0} Comments
+        <Typography variant="body2" sx={{ color: '#757575', marginLeft: 1 }}>
+          {post.emoticons?.length || 0} likes - {post.comments?.length || 0} bình luận
         </Typography>
       </Box>
+
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginTop: 2 }}>
         <Box>
-          <Button startIcon={<Favorite />} size="small" sx={{ color: '#424242', marginRight: 2 }}>
+          <Button startIcon={<Favorite />} size="small" sx={{ color: '#424242', marginRight: 2, '&:hover': { backgroundColor: '#f5f5f5' } }}>
             Yêu thích
           </Button>
-          <Button startIcon={<Comment />} size="small" sx={{ color: '#424242', marginRight: 2 }} onClick={handleToggleComments}>
+          <Button startIcon={<Comment />} size="small" sx={{ color: '#424242', marginRight: 2, '&:hover': { backgroundColor: '#f5f5f5' } }} onClick={handleToggleComments}>
             Bình luận
           </Button>
-          <Button startIcon={<Share />} size="small" sx={{ color: '#424242', marginRight: 2 }}>
+          <Button startIcon={<Share />} size="small" sx={{ color: '#424242', marginRight: 2, '&:hover': { backgroundColor: '#f5f5f5' } }}>
             Chia sẻ
           </Button>
-          <Button startIcon={<CardGiftcard />} size="small" sx={{ color: '#424242' }}>
+          <Button startIcon={<CardGiftcard />} size="small" sx={{ color: '#424242', '&:hover': { backgroundColor: '#f5f5f5' } }}>
             Quà tặng
           </Button>
         </Box>
       </Box>
+
       <Collapse in={showComments} timeout="auto" unmountOnExit>
-        <Box sx={{ marginTop: 2, backgroundColor: '#f5f5f5', padding: 2, borderRadius: 1 }}>
+        <Box sx={{ marginTop: 2, backgroundColor: '#f5f5f5', padding: 2, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
           <Box sx={{ marginBottom: 2 }}>
             <TextField
               fullWidth
@@ -171,60 +212,48 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
               placeholder="Viết bình luận..."
               value={newComment}
               onChange={handleNewCommentChange}
-              sx={{ marginBottom: 1 }}
+              sx={{ marginBottom: 1, borderRadius: '8px', backgroundColor: '#fff' }}
             />
-            <Button variant="contained" size="small" onClick={handleSubmitNewComment}>
+            <Button variant="contained" size="small" onClick={handleSubmitNewComment} sx={{ marginTop: 1 }}>
               Gửi
             </Button>
           </Box>
+
           {post.comments && post.comments.length > 0 ? (
             <Box>
-              <Typography variant="subtitle2" fontWeight="bold" sx={{ marginBottom: 2 }}>
-                Bình luận:
-              </Typography>
               {post.comments.map((comment, index) => (
-                <Box key={index} sx={{ marginBottom: 2, paddingLeft: 2, borderLeft: '3px solid #e0e0e0' }}>
+                <Box key={index} sx={{ marginBottom: 2, padding: 2, borderRadius: 2, backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                   <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
                     {comment._iduser}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#616161' }}>
+                  <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
                     {comment.content}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: '#757575', marginLeft: 1 }}>
+                  <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
                     {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
                   </Typography>
-                  {comment.img && (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', marginTop: 1 }}>
-                      {comment.img.map((url, imgIndex) => (
-                        <img
-                          key={imgIndex}
-                          src={url}
-                          alt={`comment-image-${imgIndex}`}
-                          style={{ maxWidth: '50px', maxHeight: '50px', marginRight: '5px', borderRadius: '4px' }}
-                        />
-                      ))}
-                    </Box>
-                  )}
+
                   <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
                     <Button
                       size="small"
-                      color="primary"
                       startIcon={<ThumbUpAlt />}
+                      sx={{ color: likedComments.includes(comment._iduser) ? '#2e7d32' : '#757575', textTransform: 'none' }}
                       onClick={() => handleLikeComment(comment._iduser)}
                     >
                       {likedComments.includes(comment._iduser) ? 'Bỏ thích' : 'Thích'}
                     </Button>
                     <Button
                       size="small"
-                      color="primary"
                       startIcon={<Reply />}
+                      sx={{ color: '#757575', textTransform: 'none' }}
                       onClick={() => handleReplyToComment(comment._iduser)}
                     >
                       Trả lời
                     </Button>
                   </Box>
+
                   {replyInputs[comment._iduser] && (
-                    <Box sx={{ marginTop: 1, paddingLeft: 2 }}>
+                    <Box sx={{ marginTop: 1 }}>
                       <TextField
                         fullWidth
                         variant="outlined"
@@ -232,7 +261,7 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
                         placeholder="Nhập trả lời của bạn..."
                         value={replyTexts[comment._iduser] || ''}
                         onChange={(e) => handleReplyChange(comment._iduser, e.target.value)}
-                        sx={{ marginBottom: 1 }}
+                        sx={{ marginBottom: 1, borderRadius: '8px', backgroundColor: '#fff' }}
                       />
                       <Button
                         variant="contained"
@@ -243,49 +272,42 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
                       </Button>
                     </Box>
                   )}
+
                   {comment.replyComment && comment.replyComment.map((reply, replyIndex) => (
-                    <Box key={replyIndex} sx={{ marginTop: 1, paddingLeft: 2, borderLeft: '2px solid #bdbdbd' }}>
+                    <Box key={replyIndex} sx={{ marginTop: 2, paddingLeft: 2, borderLeft: '2px solid #bdbdbd' }}>
                       <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
                         {reply._iduser}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#757575' }}>
+                      <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
                         {reply.content}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#757575', marginLeft: 1 }}>
+                      <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
                         {formatDistanceToNow(new Date(reply.timestamp), { addSuffix: true })}
                       </Typography>
-                      {reply.img && (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', marginTop: 1 }}>
-                          {reply.img.map((url, replyImgIndex) => (
-                            <img
-                              key={replyImgIndex}
-                              src={url}
-                              alt={`reply-image-${replyImgIndex}`}
-                              style={{ maxWidth: '50px', maxHeight: '50px', marginRight: '5px', borderRadius: '4px' }}
-                            />
-                          ))}
-                        </Box>
-                      )}
+
+                      {/* Nút Thích và Trả lời cho bình luận nhỏ */}
                       <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
                         <Button
                           size="small"
-                          color="primary"
                           startIcon={<ThumbUpAlt />}
+                          sx={{ color: likedComments.includes(`${comment._iduser}-${replyIndex}`) ? '#2e7d32' : '#757575', textTransform: 'none' }}
                           onClick={() => handleLikeComment(`${comment._iduser}-${replyIndex}`)}
                         >
                           {likedComments.includes(`${comment._iduser}-${replyIndex}`) ? 'Bỏ thích' : 'Thích'}
                         </Button>
                         <Button
                           size="small"
-                          color="primary"
                           startIcon={<Reply />}
+                          sx={{ color: '#757575', textTransform: 'none' }}
                           onClick={() => handleReplyToComment(`${comment._iduser}-${replyIndex}`)}
                         >
                           Trả lời
                         </Button>
                       </Box>
+
+                      {/* Khung nhập trả lời cho bình luận nhỏ */}
                       {replyInputs[`${comment._iduser}-${replyIndex}`] && (
-                        <Box sx={{ marginTop: 1, paddingLeft: 2 }}>
+                        <Box sx={{ marginTop: 1 }}>
                           <TextField
                             fullWidth
                             variant="outlined"
@@ -293,7 +315,7 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
                             placeholder="Nhập trả lời của bạn..."
                             value={replyTexts[`${comment._iduser}-${replyIndex}`] || ''}
                             onChange={(e) => handleReplyChange(`${comment._iduser}-${replyIndex}`, e.target.value)}
-                            sx={{ marginBottom: 1 }}
+                            sx={{ marginBottom: 1, borderRadius: '8px', backgroundColor: '#fff' }}
                           />
                           <Button
                             variant="contained"
