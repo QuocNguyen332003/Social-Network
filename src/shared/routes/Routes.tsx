@@ -19,6 +19,7 @@ import ProfileImage from '../../features/profile/containers/personal-image/Profi
 import ProfileVideo from '../../features/profile/containers/personal-video/ProfileVideo';
 import Profile from '../../features/profile/containers/Profile';
 import ProfileEdit from '../../features/profile/containers/edit-profile/ProfileEdit';
+import SavedItems from '../../features/saved/containers/saved/SavedItems';
 
 const Routes = () => {
   const router = createBrowserRouter([
@@ -45,6 +46,10 @@ const Routes = () => {
     {
       path: '/groups',
       element: <Group />,
+    },
+    {
+      path: '/saved',
+      element: <SavedItems />,
     },
     {
       path: '/messages', 
