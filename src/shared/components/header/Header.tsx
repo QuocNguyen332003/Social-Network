@@ -6,6 +6,8 @@ import HomeIcon from '@mui/icons-material/Home';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../../assets/images/logoSocialNetwork.png';  // Adjust the path
 
+const userID = "Phan Minh Quan"
+
 const Header = () => {
   const navigate = useNavigate();
   const [searchMode, setSearchMode] = useState(false); // Trạng thái để quản lý chế độ tìm kiếm
@@ -152,16 +154,17 @@ const Header = () => {
           >
             <Notifications />
           </IconButton>
-          <Avatar
-            alt="User Avatar"
-            src="/static/images/avatar/1.jpg"
-            sx={{
-              width: 40,
-              height: 40,
-              marginLeft: '16px',
-              border: '2px solid #e0e0e0',
-            }}
-          />
+          <IconButton aria-label="delete" onClick={() => navigate(`/profile/${userID}`)}>
+            <Avatar
+              alt="User Avatar"
+              src="/static/images/avatar/1.jpg"
+              sx={{
+                width: 40,
+                height: 40,
+                border: '2px solid #e0e0e0',
+              }}
+            />
+          </IconButton>
         </Box>
       </Toolbar>
     </AppBar>

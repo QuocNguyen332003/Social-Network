@@ -14,6 +14,11 @@ import Messages from '../../features/conversations/containers/Messages'
 import AllFriends from '../../features/friends/containers/friends/AllFriends';
 import FriendsRequest from '../../features/friends/containers/friends-request/FriendsRequest';
 import FriendsSuggest from '../../features/friends/containers/friends-suggest/FriendsSuggest';
+import ProfilePost from '../../features/profile/containers/personal-page/ProfilePost';
+import ProfileImage from '../../features/profile/containers/personal-image/ProfileImage';
+import ProfileVideo from '../../features/profile/containers/personal-video/ProfileVideo';
+import Profile from '../../features/profile/containers/Profile';
+import ProfileEdit from '../../features/profile/containers/edit-profile/ProfileEdit';
 
 const Routes = () => {
   const router = createBrowserRouter([
@@ -89,6 +94,29 @@ const Routes = () => {
         },
       ],
     },
+    {
+      path: '/profile/:userID',
+      element: <Profile />,
+      children: [
+        {
+          path: '',
+          element: <ProfilePost />,
+        },
+        {
+          path: 'image',
+          element: <ProfileImage />, 
+        },
+        {
+          path: 'video',
+          element: <ProfileVideo />,
+        },
+    
+      ],
+    },
+    {
+      path: '/edit-profile/:userID',
+      element: <ProfileEdit/>
+    }
   ]);
 
   return <RouterProvider router={router} />;
