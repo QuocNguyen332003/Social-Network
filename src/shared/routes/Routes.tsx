@@ -14,6 +14,7 @@ import Messages from '../../features/conversations/containers/Messages'
 import AllFriends from '../../features/friends/containers/friends/AllFriends';
 import FriendsRequest from '../../features/friends/containers/friends-request/FriendsRequest';
 import FriendsSuggest from '../../features/friends/containers/friends-suggest/FriendsSuggest';
+import SavedItems from '../../features/saved/containers/saved/SavedItems';
 
 const Routes = () => {
   const router = createBrowserRouter([
@@ -40,6 +41,10 @@ const Routes = () => {
     {
       path: '/groups',
       element: <Group />,
+    },
+    {
+      path: '/saved',
+      element: <SavedItems />,
     },
     {
       path: '/messages', 
