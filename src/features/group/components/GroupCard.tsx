@@ -11,7 +11,7 @@ interface GroupCardProps {
 
 const GroupCard: React.FC<GroupCardProps> = ({ groupName, groupDescription, groupImage, isJoined, onClick }) => {
   return (
-    <Card onClick={onClick} sx={{ display: 'flex', marginBottom: 2, cursor: 'pointer' }}>
+    <Card onClick={onClick} sx={{ display: 'flex', marginBottom: 2, cursor: 'pointer', borderRadius: '8px', }}>
       <CardMedia
         component="img"
         sx={{ width: 151 }}

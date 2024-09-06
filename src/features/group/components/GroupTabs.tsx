@@ -28,7 +28,7 @@ const GroupTabs: React.FC<GroupTabsProps> = ({ groupName }) => {
   };
 
   return (
-    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+    <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: 'white' }}>
       <Tabs value={currentTab} onChange={handleTabChange} aria-label="group tabs">
         <Tab label="Trang chủ" />
         <Tab label="Thành viên" />

@@ -100,7 +100,12 @@ const DetailContent = () => {
   };
 
   return (
-    <Box sx={{ padding: 2, height: '85vh', overflowY: 'scroll' }}>
+    <Box sx={{ padding: 2, backgroundColor: '#e9e9e9', height: '60vh',
+      overflowY: 'auto', 
+      scrollbarWidth: 'none',
+      '&::-webkit-scrollbar': {
+        display: 'none',
+      } }}>
       <PostForm onSubmit={handlePostSubmit} />
       {posts.map((post, index) => (
         <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} />

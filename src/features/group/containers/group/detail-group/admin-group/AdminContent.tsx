@@ -3,11 +3,22 @@ import { Box, Typography, Avatar, Button, List, ListItem, ListItemAvatar, ListIt
 const admins = [
   { name: 'Jada Jackson', username: '@Jadajackson', role: 'You', joined: '335 days ago', avatar: '/static/images/avatar/1.jpg' },
   { name: 'Craig Saris', username: '@Jadajackson', role: '', joined: '335 days ago', avatar: '/static/images/avatar/2.jpg' },
+  { name: 'Jada Jackson', username: '@Jadajackson', role: 'You', joined: '335 days ago', avatar: '/static/images/avatar/1.jpg' },
+  { name: 'Craig Saris', username: '@Jadajackson', role: '', joined: '335 days ago', avatar: '/static/images/avatar/2.jpg' },
+  { name: 'Jada Jackson', username: '@Jadajackson', role: 'You', joined: '335 days ago', avatar: '/static/images/avatar/1.jpg' },
+  { name: 'Craig Saris', username: '@Jadajackson', role: '', joined: '335 days ago', avatar: '/static/images/avatar/2.jpg' },
+  { name: 'Jada Jackson', username: '@Jadajackson', role: 'You', joined: '335 days ago', avatar: '/static/images/avatar/1.jpg' },
+  { name: 'Craig Saris', username: '@Jadajackson', role: '', joined: '335 days ago', avatar: '/static/images/avatar/2.jpg' },
 ];
 
 const AdminContent = () => {
   return (
-    <Box sx={{ padding: 3 }}>
+    <Box sx={{ padding: 2, backgroundColor: '#e9e9e9', height: '60vh',
+      overflowY: 'auto', 
+      scrollbarWidth: 'none',
+      '&::-webkit-scrollbar': {
+        display: 'none',
+      } }}>
       {/* Admin List Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
         <Typography variant="h5" fontWeight="bold">Quản trị viên</Typography>

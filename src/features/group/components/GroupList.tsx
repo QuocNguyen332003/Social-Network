@@ -36,8 +36,7 @@ const GroupList = () => {
     <Box 
       sx={{ 
         padding: '16px', 
-        height: '85vh', 
-        overflowY: 'scroll' 
+        height: '85vh'
       }}
     >
       {/* Nút Tạo nhóm */}

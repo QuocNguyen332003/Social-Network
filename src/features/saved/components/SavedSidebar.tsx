@@ -12,13 +12,10 @@ const SavedSidebar = () => {
   return (
     <Box
       sx={{
-        padding: 2,
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start', // Đảm bảo các phần tử xếp từ trên xuống dưới
-        backgroundColor: '#f9f9f9',
-        borderRight: '1px solid #e0e0e0',
       }}
     >
       {/* Header */}

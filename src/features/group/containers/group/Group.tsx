@@ -12,7 +12,9 @@ const Group = () => {
         <Grid item xs={2}>
           <SidebarLeft />
         </Grid>
-        <Grid item xs={7}>
+        <Grid item xs={7} sx={{
+            backgroundColor: '#e9e9e9',
+          }}>
           <MainContent />
         </Grid>
         <Grid item xs={3}>

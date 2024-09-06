@@ -24,11 +24,25 @@ const items = [
     media: '/static/git-post-thumbnail.jpg',
     savedBy: 'Cuộc Đời Anh IT',
   },
+  {
+    type: 'Link',
+    content: 'Saritasa',
+    collection: 'SG',
+    media: '/static/link-thumbnail.jpg',
+    savedBy: 'Khoa Công nghệ Thông tin - Trường ĐH SPKT Tp.HCM',
+  },
+  {
+    type: 'Post',
+    content: 'MỘT SỐ LỆNH GIT CƠ BẢN',
+    collection: 'SG',
+    media: '/static/git-post-thumbnail.jpg',
+    savedBy: 'Cuộc Đời Anh IT',
+  },
 ];
 
 const MainContent = () => {
   return (
-    <Box sx={{ padding: 2, color: 'black', height: '100vh', overflowY: 'auto' }}>
+    <Box sx={{ padding: 2, color: 'black', height: '100vh' }}>
       <Typography variant="h6" gutterBottom>
         Tất cả
       </Typography>

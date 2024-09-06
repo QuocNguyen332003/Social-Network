@@ -11,7 +11,6 @@ const GroupHeader = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        borderRadius: '8px',
         overflow: 'hidden',
       }}
     >

@@ -7,7 +7,7 @@ import Group from '../../features/group/containers/group/Group';
 import MemberContent from '../../features/group/containers/group/detail-group/member-group/MemberContent';
 import HomeContent from '../../features/group/containers/group/detail-group/home-group/HomeContent';
 import RulesContent from '../../features/group/containers/group/detail-group/rules-group/RulesContent';
-import ApprovalContent from '../../features/group/containers/approval-group/ApprovalContent';
+import ApprovalContent from '../../features/group/containers/group/detail-group/approval-group/ApprovalContent';
 import AdminContent from '../../features/group/containers/group/detail-group/admin-group/AdminContent';
 import MainContent from '../../features/group/containers/group/detail-group/MainContent';
 import Messages from '../../features/conversations/containers/Messages'

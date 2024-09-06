@@ -14,12 +14,29 @@ const rules = [
     title: "Rule No 3",
     description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
   },
+  {
+    title: "Rule No 4",
+    description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+  },
+  {
+    title: "Rule No 5",
+    description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+  },
+  {
+    title: "Rule No 6",
+    description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+  },
 ];
 
 const RulesContent: React.FC = () => {
   return (
-    <Box sx={{ padding: 2 }}>      
-      <Paper sx={{ padding: 2, marginTop: 2 }}>
+    <Box sx={{ padding: 2, backgroundColor: '#e9e9e9', height: '60vh',
+      overflowY: 'auto', 
+      scrollbarWidth: 'none',
+      '&::-webkit-scrollbar': {
+        display: 'none',
+      } }}>
+      <Paper sx={{ padding: 2 }}>
         {rules.map((rule, index) => (
           <Box key={index} sx={{ marginBottom: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{rule.title}</Typography>
@@ -36,3 +53,4 @@ const RulesContent: React.FC = () => {
 };
 
 export default RulesContent;
+

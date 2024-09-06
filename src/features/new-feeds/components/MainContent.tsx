@@ -100,7 +100,7 @@ const MainContent = () => {
   };
 
   return (
-    <Box sx={{ padding: 2, height: '85vh', overflowY: 'scroll' }}>
+    <Box sx={{ padding: 2, height: '85vh' }}>
       <PostForm onSubmit={handlePostSubmit} />
       {posts.map((post, index) => (
         <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} />

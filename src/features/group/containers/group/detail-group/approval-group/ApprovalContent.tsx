@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, Paper, Divider, IconButton, Grid } from '@mui/material';
+import { Box, Button, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, Divider, IconButton, Grid } from '@mui/material';
 import { MoreHoriz } from '@mui/icons-material';
 
 const pendingPosts = [
@@ -49,19 +49,22 @@ const ApprovalContent: React.FC = () => {
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Paper sx={{ padding: 3, borderRadius: 3, boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+    <Box sx={{ padding: 2, backgroundColor: '#e9e9e9', height: '60vh',
+      overflowY: 'auto', 
+      scrollbarWidth: 'none',
+      '&::-webkit-scrollbar': {
+        display: 'none',
+      } }}>
         <Typography variant="h6" sx={{ marginBottom: 3 }}>
           Chờ phê duyệt
         </Typography>
-        <Box sx={{ height: '60vh', overflowY: 'auto', paddingRight: 1 }}>
           <List>
             {pendingPosts.map((post, index) => (
               <Box
                 key={index}
                 sx={{
                   padding: 3,
-                  marginBottom: 4,
+      
                   borderRadius: 2,
                   border: '1px solid #e0e0e0',
                   boxShadow: '0 3px 6px rgba(0,0,0,0.1)',
@@ -153,9 +156,7 @@ const ApprovalContent: React.FC = () => {
                 </Box>
               </Box>
             ))}
-          </List>
-        </Box>
-      </Paper>
+        </List>
     </Box>
   );
 };

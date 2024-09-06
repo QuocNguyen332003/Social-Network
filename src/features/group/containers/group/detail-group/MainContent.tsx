@@ -14,7 +14,7 @@ const MainContent = () => {
         <Grid item xs={2}>
           <SidebarLeft />
         </Grid>
-        <Grid item xs={7}>
+        <Grid item xs={7} >
           <GroupHeader />
           <GroupTabs groupName="Cat Lover Universe" />
           <Outlet/>  

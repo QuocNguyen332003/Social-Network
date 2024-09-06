@@ -23,7 +23,6 @@ const SavedItems = () => {
               sx={{
                 height: { xs: 'auto', sm: '100%' }, // Chiều cao tự động khi màn hình nhỏ hơn sm
                 marginRight: { xs: 0, sm: 2 }, // Thêm khoảng cách cho sidebar khi ở màn hình lớn
-                borderRight: '1px solid #e0e0e0', // Đường viền bên phải của Sidebar
               }}
             >
               <SavedSidebar />
@@ -31,7 +30,14 @@ const SavedItems = () => {
           </Grid>
 
           {/* Main content */}
-          <Grid item xs={12} sm={9}>
+          <Grid item xs={12} sm={9} sx={{
+            overflowY: 'auto', 
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': {
+              display: 'none',
+            },
+            backgroundColor: '#e9e9e9',
+          }}>
             <MainContent />
           </Grid>
         </Grid>
