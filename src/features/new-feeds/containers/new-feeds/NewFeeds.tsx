@@ -10,7 +10,7 @@ const NewFeeds = () => {
     <>
       <Header />
       <Grid container >
-        <Grid item xs={2}>
+        <Grid item xs={2.5}>
           <SidebarLeft />
         </Grid>
         <Grid item xs={7} sx={{
@@ -23,7 +23,7 @@ const NewFeeds = () => {
           }}>
           <MainContent />
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={2.5}>
           <SidebarRight />
         </Grid>
       </Grid>

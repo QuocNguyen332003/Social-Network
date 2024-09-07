@@ -10,6 +10,7 @@ function ListMesssages() {
         height: '79vh',
         border: '1px solid #e0e0e0',
         padding: '20px',
+        backgroundColor: 'white',
       }}
     >
         <Box 

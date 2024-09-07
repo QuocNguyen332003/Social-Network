@@ -12,7 +12,7 @@ const Profile = () => {
     <>
       <Header />
       <Grid container >
-        <Grid item xs={2}>
+        <Grid item xs={2.5}>
           <SidebarLeft />
         </Grid>
         <Grid item xs={7}
@@ -31,7 +31,7 @@ const Profile = () => {
           <ProfileTabs userID={'Phan Minh Quan'}/>
           <Outlet/>  
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={2.5}>
           <SidebarRight />
         </Grid>
       </Grid>

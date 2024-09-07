@@ -23,6 +23,7 @@ function App() {
         '&::-webkit-scrollbar': {
           display: 'none', /* Chrome, Safari, Opera */
         },
+        backgroundColor: '#e9e9e9',
       }}
     >
       <Typography variant="h5" component="h2"

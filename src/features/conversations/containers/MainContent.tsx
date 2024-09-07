@@ -10,13 +10,15 @@ function App() {
         padding: '16px', 
         height: '85vh', 
         overflowY: 'scroll', 
+        backgroundColor: '#e9e9e9',
       }}
+      
     >
       <Grid container >
-        <Grid item xs={3}>
+        <Grid item xs={4}>
           <ListMesssages/>
         </Grid>
-        <Grid item xs={9}>
+        <Grid item xs={8}>
           <MessageBox />
         </Grid>
       </Grid>

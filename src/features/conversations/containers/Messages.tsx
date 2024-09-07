@@ -8,10 +8,10 @@ const Messages = () => {
     <>
       <Header />
       <Grid container >
-        <Grid item xs={2}>
+        <Grid item xs={2.5}>
           <SidebarLeft />
         </Grid>
-        <Grid item xs={10}>
+        <Grid item xs={9.5} >
           <MainContent />
         </Grid>
       </Grid>

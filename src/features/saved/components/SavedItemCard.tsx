@@ -36,7 +36,6 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ item, collections }) => {
       <Paper
         sx={{
           padding: 2,
-          borderRadius: 2,
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' }, // Responsive layout
           alignItems: 'center',
@@ -48,7 +47,7 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ item, collections }) => {
           <img
             src={item.media}
             alt={item.content}
-            style={{ width: '100%', borderRadius: 8, filter: 'grayscale(100%)', display: 'block' }}
+            style={{ width: '100%', filter: 'grayscale(100%)', display: 'block' }}
           />
         </Box>
         <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
