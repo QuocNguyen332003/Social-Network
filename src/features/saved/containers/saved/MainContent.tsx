@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Grid } from '@mui/material';
-import SavedItemCard from '../../components/SavedItemCard'; // Adjust the path based on your folder structure
+import SavedItemCard from '../../components/SavedItemCard';
 
 const items = [
   {
@@ -40,6 +40,8 @@ const items = [
   },
 ];
 
+const collections = ['SG', 'TV & Phim ảnh', 'Công việc']; // Các bộ sưu tập có sẵn
+
 const MainContent = () => {
   return (
     <Box sx={{ padding: 2, color: 'black', height: '100vh' }}>
@@ -50,7 +52,7 @@ const MainContent = () => {
       <Grid container spacing={2}>
         {items.map((item, index) => (
           <Grid item xs={12} key={index}>
-            <SavedItemCard item={item} />
+            <SavedItemCard item={item} collections={collections} />
           </Grid>
         ))}
       </Grid>
@@ -59,3 +61,4 @@ const MainContent = () => {
 };
 
 export default MainContent;
+  
