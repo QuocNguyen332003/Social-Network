@@ -20,6 +20,7 @@ import ProfileVideo from '../../features/profile/containers/personal-video/Profi
 import Profile from '../../features/profile/containers/Profile';
 import ProfileEdit from '../../features/profile/containers/edit-profile/ProfileEdit';
 import SavedItems from '../../features/saved/containers/saved/SavedItems';
+import NotificationPage from '../../features/notifications/containers/notifications/NotificationPage';
 
 const Routes = () => {
   const router = createBrowserRouter([
@@ -54,6 +55,10 @@ const Routes = () => {
     {
       path: '/messages', 
       element: <Messages/> // Protect this route
+    },
+    {
+      path: '/notifications', 
+      element: <NotificationPage/> // Protect this route
     },
     {
       path: '/groups/:groupName',
