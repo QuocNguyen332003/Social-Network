@@ -3,26 +3,37 @@ import { Box } from '@mui/material';
 import PostForm from '../../../../../../shared/components/postForm/PostForm';
 import Post from '../../../../../../shared/components/post/Post';
 
+interface EmoticonProps {
+  typeEmoticons: string;
+  _iduser: string;
+}
+
 interface CommentProps {
+  _id: string;
   _iduser: string;
   content: string;
   img?: string[];
   replyComment?: CommentProps[];
-  emoticons?: { typeEmoticons: string, _iduser: string }[];
-  timestamp: Date;
+  emoticons?: EmoticonProps[];
+  createdAt: Date;
+  updatedAt: Date;
+  _destroy?: Date;
 }
 
 interface PostData {
   _id: string;
   idAuthor: string;
   startDate: Date;
-  groupID?: string;
+  groupID?: string | null;
   changeDate?: Date;
   content: string;
   img?: string[];
   scope: string;
-  emoticons?: { typeEmoticons: string, _iduser: string }[];
+  emoticons?: EmoticonProps[];
   comments?: CommentProps[];
+  createdAt: Date;
+  updatedAt: Date;
+  _destroy?: Date;
 }
 
 const DetailContent = () => {
@@ -36,25 +47,37 @@ const DetailContent = () => {
       scope: 'Public',
       comments: [
         {
+          _id: 'comment-1',
           _iduser: 'JohnDoe',
           content: 'Wow, that’s interesting!',
-          timestamp: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
           replyComment: [],
+          emoticons: [],
         },
         {
+          _id: 'comment-2',
           _iduser: 'JaneDoe',
           content: 'I never knew that!',
-          timestamp: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
           replyComment: [
             {
+              _id: 'comment-3',
               _iduser: 'PandaLover',
               content: 'Yes, it’s a fascinating history!',
-              timestamp: new Date(),
+              createdAt: new Date(),
+              updatedAt: new Date(),
               replyComment: [],
+              emoticons: [],
             },
           ],
+          emoticons: [],
         },
       ],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      emoticons: [],
     },
   ]);
 
@@ -68,6 +91,8 @@ const DetailContent = () => {
       scope: 'Public',
       emoticons: [],
       comments: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     setPosts([newPostEntry, ...posts]); // Thêm bài đăng mới vào danh sách
   };
@@ -87,7 +112,7 @@ const DetailContent = () => {
       prevPosts.map((post) => {
         if (post._id === postId) {
           const updatedComments = post.comments!.map((comment) => {
-            if (comment._iduser === commentId) {
+            if (comment._id === commentId) {
               return { ...comment, replyComment: [...comment.replyComment!, newReply] };
             }
             return comment;

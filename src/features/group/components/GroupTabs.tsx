@@ -3,14 +3,13 @@ import { Tabs, Tab, Box } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface GroupTabsProps {
-  groupName: string;
+  groupId: string;
 }
 
-const GroupTabs: React.FC<GroupTabsProps> = ({ groupName }) => {
+const GroupTabs: React.FC<GroupTabsProps> = ({ groupId }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Map the current path to a tab index
   const tabMap: { [key: string]: number } = {
     '': 0,
     'members': 1,
@@ -21,10 +20,9 @@ const GroupTabs: React.FC<GroupTabsProps> = ({ groupName }) => {
 
   const currentTab = tabMap[location.pathname.split('/').pop() || ''] || 0;
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    // Map the tab index to the corresponding path
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     const pathMap = ['', 'members', 'rules', 'admins', 'pending'];
-    navigate(`/groups/${groupName}/${pathMap[newValue]}`);
+    navigate(`/groups/${groupId}/${pathMap[newValue]}`);
   };
 
   return (

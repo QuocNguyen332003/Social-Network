@@ -61,7 +61,7 @@ const Routes = () => {
       element: <NotificationPage/> // Protect this route
     },
     {
-      path: '/groups/:groupName',
+      path: '/groups/:groupId',
       element: <MainContent />,
       children: [
         {

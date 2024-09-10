@@ -1,55 +1,72 @@
 import React from 'react';
-import { Box, Typography, Button, Avatar, List, ListItem, ListItemAvatar, ListItemText, Divider } from '@mui/material';
+import { Box, Avatar, Button, List, ListItem, ListItemAvatar, ListItemText, Typography, Divider } from '@mui/material';
+import { useOutletContext } from 'react-router-dom';
 
-const members = [
-  { name: 'Jada Jackson', username: '@Jadajackson', joined: '335 days ago', avatar: '/static/images/avatar/1.jpg' },
-  { name: 'Craig Saris', username: '@CraigSaris', joined: '335 days ago', avatar: '/static/images/avatar/2.jpg' },
-  { name: 'Jaxson Lipshutz', username: '@JaxsonLipshutz', joined: '335 days ago', avatar: '/static/images/avatar/3.jpg' },
-  { name: 'Abram Donin', username: '@AbramDonin', joined: '335 days ago', avatar: '/static/images/avatar/4.jpg' },
-  { name: 'Cheyenne Botosh', username: '@CheyenneBotosh', joined: '335 days ago', avatar: '/static/images/avatar/5.jpg' },
-  { name: 'Jada Jackson', username: '@Jadajackson', joined: '335 days ago', avatar: '/static/images/avatar/1.jpg' },
-  { name: 'Craig Saris', username: '@CraigSaris', joined: '335 days ago', avatar: '/static/images/avatar/2.jpg' },
-  { name: 'Jaxson Lipshutz', username: '@JaxsonLipshutz', joined: '335 days ago', avatar: '/static/images/avatar/3.jpg' },
-  { name: 'Abram Donin', username: '@AbramDonin', joined: '335 days ago', avatar: '/static/images/avatar/4.jpg' },
-  { name: 'Cheyenne Botosh', username: '@CheyenneBotosh', joined: '335 days ago', avatar: '/static/images/avatar/5.jpg' },  
-];
+interface GroupProps {
+  _id: string;
+  groupName: string;
+  type: 'public' | 'private';
+  idAdmin: string;
+  introduction: string;
+  avt: string;
+  backGround: string;
+  members: {
+    count: number;
+    listUsers: { idUser: string; joinDate: Date }[];
+  };
+  articles: {
+    count: number;
+    listArticle: { idArticle: string; state: string }[];
+  };
+  rule: string[];
+  Administrators: { idUser: string; joinDate: Date }[];
+  createdAt: Date;
+  updatedAt: Date;
+  _destroy?: Date;
+}
 
 const MemberContent: React.FC = () => {
+  const { group } = useOutletContext<{ group: GroupProps }>();
+
+  console.log('Group data in MemberContent: ', group); // Debug
+  
   return (
-    <Box sx={{ padding: 2, backgroundColor: 'white', height: '60vh',
-      overflowY: 'auto', 
+    <Box sx={{
+      padding: 2,
+      backgroundColor: 'white',
+      height: '60vh',
+      overflowY: 'auto',
       scrollbarWidth: 'none',
       '&::-webkit-scrollbar': {
         display: 'none',
-      } }}>
+      }
+    }}>
       <List>
-        {members.map((member, index) => (
+        {group.members.listUsers.map((member, index) => (
           <React.Fragment key={index}>
             <ListItem sx={{ paddingLeft: 0 }}>
               <ListItemAvatar>
-                <Avatar src={member.avatar} />
+                <Avatar src={`/static/images/avatar/${index + 1}.jpg`} />
               </ListItemAvatar>
               <ListItemText
-                primary={member.name}
+                primary={member.idUser}
                 secondary={
-                  <>
-                    <Typography component="span" variant="body2" color="textPrimary">
-                      {member.username}
-                    </Typography>
-                    {' — Joined ' + member.joined}
-                  </>
+                  <Typography component="span" variant="body2" color="textPrimary">
+                    Joined {new Date(member.joinDate).toDateString()}
+                  </Typography>
                 }
               />
               <Button variant="outlined" color="error">
                 Remove
               </Button>
             </ListItem>
-            {index < members.length - 1 && <Divider />} {/* Đường gạch dưới phân biệt */}
+            {index < group.members.listUsers.length - 1 && <Divider />}
           </React.Fragment>
         ))}
       </List>
     </Box>
   );
 };
+
 
 export default MemberContent;

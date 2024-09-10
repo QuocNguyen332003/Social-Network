@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { Box, Paper, IconButton, Button, InputBase, Input } from '@mui/material';
-import { InsertPhoto, Mic, LocalOffer, Poll, Timer, AttachMoney } from '@mui/icons-material';
+import { Box, Paper, IconButton, Button, InputBase, Avatar, MenuItem, Select, FormControl, Typography, Input } from '@mui/material';
+import { InsertPhoto, Mic, LocalOffer, Poll, Timer, AttachMoney, EmojiEmotions } from '@mui/icons-material';
 
-const PostForm = ({ onSubmit }: { onSubmit: (newPost: string, images: File[]) => void }) => {
+const PostForm = ({ onSubmit }: { onSubmit: (newPost: string, images: File[], visibility: string) => void }) => {
   const [newPost, setNewPost] = useState('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [visibility, setVisibility] = useState('public'); // Phạm vi bài viết, mặc định là 'public'
 
   const handlePostSubmit = () => {
     if (newPost.trim() || selectedImages.length > 0) {
-      onSubmit(newPost, selectedImages);
-      setNewPost('');  // Clear input
+      onSubmit(newPost, selectedImages, visibility);
+      setNewPost(''); // Clear input
       setSelectedImages([]); // Clear selected images
     }
   };
@@ -21,12 +22,35 @@ const PostForm = ({ onSubmit }: { onSubmit: (newPost: string, images: File[]) =>
   };
 
   return (
-    <Paper sx={{ padding: 2, marginBottom: 2, borderRadius: '8px' }}>
+    <Paper sx={{ padding: 2, marginBottom: 2, borderRadius: '8px', width: '96%' }}>
+      {/* Header với Avatar và tên người dùng */}
+      <Box display="flex" alignItems="center" mb={2}>
+        <Avatar alt="User Avatar" src="https://via.placeholder.com/150" sx={{ width: 48, height: 48, marginRight: 2 }} />
+        <Box>
+          <Typography variant="subtitle1" fontWeight="bold">Bảo Quốc</Typography>
+          {/* Phạm vi bài viết */}
+          <FormControl sx={{ minWidth: 120 }}>
+            <Select
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value as string)}
+              displayEmpty
+              inputProps={{ 'aria-label': 'Phạm vi bài viết' }}
+              sx={{ fontSize: '14px' }}
+            >
+              <MenuItem value="public">Công khai</MenuItem>
+              <MenuItem value="friends">Bạn bè</MenuItem>
+              <MenuItem value="private">Riêng tư</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Box>
+
+      {/* Input để viết bài */}
       <InputBase
-        placeholder="Hãy chia sẻ suy nghĩ của bạn lúc này"
+        placeholder="Quốc ơi, bạn đang nghĩ gì thế?"
         fullWidth
         multiline
-        rows={1}
+        rows={2}
         value={newPost}
         onChange={(e) => setNewPost(e.target.value)}
         sx={{
@@ -49,6 +73,7 @@ const PostForm = ({ onSubmit }: { onSubmit: (newPost: string, images: File[]) =>
           ))}
         </Box>
       )}
+      {/* Thanh chức năng với các nút tương tự */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
           <label htmlFor="upload-photo">
@@ -68,9 +93,11 @@ const PostForm = ({ onSubmit }: { onSubmit: (newPost: string, images: File[]) =>
           <IconButton><Poll sx={{ color: 'gray' }} /></IconButton>
           <IconButton><Timer sx={{ color: 'gray' }} /></IconButton>
           <IconButton><AttachMoney sx={{ color: 'gray' }} /></IconButton>
+          <IconButton><EmojiEmotions sx={{ color: 'gray' }} /></IconButton>
         </Box>
-        <Button 
-          variant="contained" 
+
+        <Button
+          variant="contained"
           sx={{ bgcolor: '#0D47A1', borderRadius: '16px', padding: '6px 24px' }}
           onClick={handlePostSubmit}
         >

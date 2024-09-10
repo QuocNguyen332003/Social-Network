@@ -1,11 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IconButton, Menu, Badge, List, ListItem, ListItemAvatar, ListItemText, Avatar, Divider, MenuItem, Typography } from '@mui/material';
 import { Notifications } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
+// Khai báo interface cho notification
+interface Notification {
+  _id: string;
+  senderId: string;
+  receiverId: string;
+  message: string;
+  status: string;
+  readAt: string | null;
+  createdAt: string;
+  _destroy: string | null;
+}
+
 const NotificationMenu = () => {
   const [anchorNotification, setAnchorNotification] = useState<null | HTMLElement>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]); // Khai báo kiểu Notification[]
+  const [unreadCount, setUnreadCount] = useState(0); // Số thông báo chưa đọc
   const navigate = useNavigate();
+
+  // Sử dụng useEffect để giả lập việc gọi API và lấy dữ liệu thông báo
+  useEffect(() => {
+    // Dữ liệu giả định (mock data) cho thông báo
+    const mockNotifications: Notification[] = [
+      {
+        _id: "1",
+        senderId: "123",
+        receiverId: "456",
+        message: "Order Giày, Quần Áo Puma Chính Hãng đã nhắc đến bạn",
+        status: "Chưa đọc",
+        readAt: null,
+        createdAt: new Date().toISOString(),
+        _destroy: null,
+      },
+      {
+        _id: "2",
+        senderId: "789",
+        receiverId: "456",
+        message: "Running Man Vietnam đã đăng video mới",
+        status: "Đã đọc",
+        readAt: new Date().toISOString(),
+        createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 ngày trước
+        _destroy: null,
+      },
+      {
+        _id: "3",
+        senderId: "321",
+        receiverId: "456",
+        message: "Cổng Thông tin Đồng Tháp đã phát trực tiếp",
+        status: "Đã đọc",
+        readAt: new Date().toISOString(),
+        createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 ngày trước
+        _destroy: null,
+      },
+    ];
+
+    // Cập nhật state với mock data
+    setNotifications(mockNotifications);
+
+    // Đếm số thông báo chưa đọc
+    const unread = mockNotifications.filter(notification => notification.status === "Chưa đọc").length;
+    setUnreadCount(unread);
+  }, []);
 
   const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorNotification(event.currentTarget);
@@ -32,7 +90,7 @@ const NotificationMenu = () => {
         }}
         onClick={handleNotificationClick}
       >
-        <Badge badgeContent={4} color="error">
+        <Badge badgeContent={unreadCount} color="error">
           <Notifications />
         </Badge>
       </IconButton>
@@ -65,36 +123,20 @@ const NotificationMenu = () => {
         }}
       >
         <List>
-          <ListItem button>
-            <ListItemAvatar>
-              <Avatar alt="Order Giày" src="path_to_icon.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primary="Order Giày, Quần Áo Puma Chính Hãng đã nhắc đến bạn"
-              secondary="20 giờ trước"
-            />
-          </ListItem>
-          <Divider variant="inset" />
-          <ListItem button>
-            <ListItemAvatar>
-              <Avatar alt="Running Man Vietnam" src="path_to_icon.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primary="Running Man Vietnam đã đăng video mới"
-              secondary="1 ngày trước"
-            />
-          </ListItem>
-          <Divider variant="inset" />
-          <ListItem button>
-            <ListItemAvatar>
-              <Avatar alt="Cổng Thông tin Đồng Tháp" src="path_to_icon.jpg" />
-            </ListItemAvatar>
-            <ListItemText
-              primary="Cổng Thông tin Đồng Tháp đã phát trực tiếp"
-              secondary="2 ngày trước"
-            />
-          </ListItem>
-          <Divider variant="inset" />
+          {notifications.map((notification, index) => (
+            <div key={index}>
+              <ListItem button>
+                <ListItemAvatar>
+                  <Avatar alt="Sender" src="path_to_sender_avatar.jpg" /> {/* Có thể thay đổi để lấy avatar người gửi */}
+                </ListItemAvatar>
+                <ListItemText
+                  primary={notification.message}
+                  secondary={new Date(notification.createdAt).toLocaleString()}
+                />
+              </ListItem>
+              {index < notifications.length - 1 && <Divider variant="inset" />}
+            </div>
+          ))}
         </List>
 
         <MenuItem onClick={handleViewAllNotifications} sx={{ justifyContent: 'center', paddingTop: '10px', paddingBottom: '10px' }}>

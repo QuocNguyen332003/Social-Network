@@ -3,30 +3,41 @@ import { Box, Typography, Avatar, Paper, Button, IconButton, Collapse, TextField
 import { MoreHoriz, Favorite, Comment, Share, CardGiftcard, ThumbUpAlt, Reply } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
 
+interface EmoticonProps {
+  typeEmoticons: string;
+  _iduser: string;
+}
+
 interface CommentProps {
+  _id: string;
   _iduser: string;
   content: string;
   img?: string[];
   replyComment?: CommentProps[];
-  emoticons?: { typeEmoticons: string, _iduser: string }[];
-  timestamp: Date;
+  emoticons?: EmoticonProps[];
+  createdAt: Date;
+  updatedAt: Date;
+  _destroy?: Date;
 }
 
-interface PostProps {
+interface PostData {
   _id: string;
   idAuthor: string;
   startDate: Date;
-  groupID?: string;
+  groupID?: string | null;
   changeDate?: Date;
   content: string;
   img?: string[];
   scope: string;
-  emoticons?: { typeEmoticons: string, _iduser: string }[];
+  emoticons?: EmoticonProps[];
   comments?: CommentProps[];
+  createdAt: Date;
+  updatedAt: Date;
+  _destroy?: Date;
 }
 
 interface PostComponentProps {
-  post: PostProps;
+  post: PostData;
   onAddComment: (postId: string, newComment: CommentProps) => void;
   onAddReply: (postId: string, commentId: string, newReply: CommentProps) => void;
 }
@@ -37,8 +48,7 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   const [replyInputs, setReplyInputs] = useState<{ [key: string]: boolean }>({});
   const [replyTexts, setReplyTexts] = useState<{ [key: string]: string }>({});
   const [newComment, setNewComment] = useState('');
-  
-  // State quản lý Menu của nút ba chấm
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -72,12 +82,14 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
     const replyText = replyTexts[commentId];
     if (replyText.trim()) {
       const reply: CommentProps = {
+        _id: `reply-${Date.now()}`, // Tạo ID cho comment reply
         _iduser: 'CurrentUser', // Thay bằng ID người dùng hiện tại
         content: replyText,
         img: [],
         replyComment: [],
         emoticons: [],
-        timestamp: new Date(), // Lưu thời gian hiện tại khi trả lời bình luận
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       onAddReply(post._id, commentId, reply);
       setReplyInputs((prevReplyInputs) => ({
@@ -97,19 +109,20 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   const handleSubmitNewComment = () => {
     if (newComment.trim()) {
       const comment: CommentProps = {
+        _id: `comment-${Date.now()}`, // Tạo ID cho comment
         _iduser: 'CurrentUser', // Thay bằng ID người dùng hiện tại
         content: newComment,
         img: [],
         replyComment: [],
         emoticons: [],
-        timestamp: new Date(), // Lưu thời gian hiện tại khi tạo bình luận
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       onAddComment(post._id, comment);
       setNewComment(''); // Reset input sau khi gửi bình luận
     }
   };
 
-  // Xử lý Menu của nút ba chấm
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -119,7 +132,6 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   };
 
   const handleSavePost = () => {
-    // Xử lý logic lưu bài viết ở đây
     console.log('Post saved');
     handleMenuClose();
   };
@@ -142,7 +154,6 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
           <MoreHoriz sx={{ color: '#757575' }} />
         </IconButton>
 
-        {/* Menu của nút ba chấm */}
         <Menu
           anchorEl={anchorEl}
           open={open}
@@ -230,43 +241,43 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
                     {comment.content}
                   </Typography>
                   <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
-                    {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                   </Typography>
 
                   <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
                     <Button
                       size="small"
                       startIcon={<ThumbUpAlt />}
-                      sx={{ color: likedComments.includes(comment._iduser) ? '#2e7d32' : '#757575', textTransform: 'none' }}
-                      onClick={() => handleLikeComment(comment._iduser)}
+                      sx={{ color: likedComments.includes(comment._id) ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                      onClick={() => handleLikeComment(comment._id)}
                     >
-                      {likedComments.includes(comment._iduser) ? 'Bỏ thích' : 'Thích'}
+                      {likedComments.includes(comment._id) ? 'Bỏ thích' : 'Thích'}
                     </Button>
                     <Button
                       size="small"
                       startIcon={<Reply />}
                       sx={{ color: '#757575', textTransform: 'none' }}
-                      onClick={() => handleReplyToComment(comment._iduser)}
+                      onClick={() => handleReplyToComment(comment._id)}
                     >
                       Trả lời
                     </Button>
                   </Box>
 
-                  {replyInputs[comment._iduser] && (
+                  {replyInputs[comment._id] && (
                     <Box sx={{ marginTop: 1 }}>
                       <TextField
                         fullWidth
                         variant="outlined"
                         size="small"
                         placeholder="Nhập trả lời của bạn..."
-                        value={replyTexts[comment._iduser] || ''}
-                        onChange={(e) => handleReplyChange(comment._iduser, e.target.value)}
+                        value={replyTexts[comment._id] || ''}
+                        onChange={(e) => handleReplyChange(comment._id, e.target.value)}
                         sx={{ marginBottom: 1, borderRadius: '8px', backgroundColor: '#fff' }}
                       />
                       <Button
                         variant="contained"
                         size="small"
-                        onClick={() => handleSubmitReply(comment._iduser)}
+                        onClick={() => handleSubmitReply(comment._id)}
                       >
                         Gửi
                       </Button>
@@ -282,50 +293,27 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
                         {reply.content}
                       </Typography>
                       <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
-                        {formatDistanceToNow(new Date(reply.timestamp), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
                       </Typography>
 
-                      {/* Nút Thích và Trả lời cho bình luận nhỏ */}
                       <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
                         <Button
                           size="small"
                           startIcon={<ThumbUpAlt />}
-                          sx={{ color: likedComments.includes(`${comment._iduser}-${replyIndex}`) ? '#2e7d32' : '#757575', textTransform: 'none' }}
-                          onClick={() => handleLikeComment(`${comment._iduser}-${replyIndex}`)}
+                          sx={{ color: likedComments.includes(reply._id) ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                          onClick={() => handleLikeComment(reply._id)}
                         >
-                          {likedComments.includes(`${comment._iduser}-${replyIndex}`) ? 'Bỏ thích' : 'Thích'}
+                          {likedComments.includes(reply._id) ? 'Bỏ thích' : 'Thích'}
                         </Button>
                         <Button
                           size="small"
                           startIcon={<Reply />}
                           sx={{ color: '#757575', textTransform: 'none' }}
-                          onClick={() => handleReplyToComment(`${comment._iduser}-${replyIndex}`)}
+                          onClick={() => handleReplyToComment(reply._id)}
                         >
                           Trả lời
                         </Button>
                       </Box>
-
-                      {/* Khung nhập trả lời cho bình luận nhỏ */}
-                      {replyInputs[`${comment._iduser}-${replyIndex}`] && (
-                        <Box sx={{ marginTop: 1 }}>
-                          <TextField
-                            fullWidth
-                            variant="outlined"
-                            size="small"
-                            placeholder="Nhập trả lời của bạn..."
-                            value={replyTexts[`${comment._iduser}-${replyIndex}`] || ''}
-                            onChange={(e) => handleReplyChange(`${comment._iduser}-${replyIndex}`, e.target.value)}
-                            sx={{ marginBottom: 1, borderRadius: '8px', backgroundColor: '#fff' }}
-                          />
-                          <Button
-                            variant="contained"
-                            size="small"
-                            onClick={() => handleSubmitReply(`${comment._iduser}-${replyIndex}`)}
-                          >
-                            Gửi
-                          </Button>
-                        </Box>
-                      )}
                     </Box>
                   ))}
                 </Box>
