@@ -40,7 +40,7 @@ const items = [
   },
 ];
 
-const collections = ['SG', 'TV & Phim ảnh', 'Công việc']; // Các bộ sưu tập có sẵn
+const collections = ['SG', 'TV & Phim ảnh']; // Các bộ sưu tập có sẵn
 
 const MainContent = () => {
   return (

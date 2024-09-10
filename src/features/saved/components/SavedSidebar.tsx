@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button, List, ListItem, ListItemText, Avatar } from '@mui/material';
+import { Box, Typography, Button, List, ListItem, ListItemText, Avatar, Divider } from '@mui/material';
 import { Add } from '@mui/icons-material';
 
 const collections = ['SG', 'TV & Phim ảnh'];
@@ -15,11 +15,14 @@ const SavedSidebar = () => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-start', // Đảm bảo các phần tử xếp từ trên xuống dưới
+        justifyContent: 'flex-start',
+        padding: { xs: 2, sm: 3 },
+        gap: 2, // Điều chỉnh khoảng cách giữa các thành phần chính
+        backgroundColor: '#fafafa',
       }}
     >
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Typography
           variant="h6"
           sx={{
@@ -34,13 +37,23 @@ const SavedSidebar = () => {
       </Box>
 
       {/* "Mục đã lưu" */}
-      <List sx={{ mb: 0 }}> {/* Đảm bảo không có khoảng cách giữa danh sách và phần dưới */}
-        <ListItem button sx={{ borderRadius: 2, mb: 1, backgroundColor: '#e3f2fd' }} onClick={handleSavedClick}>
+      <List>
+        <ListItem
+          button
+          sx={{
+            borderRadius: 2,
+            backgroundColor: '#e3f2fd',
+            padding: { xs: 1, sm: 1.5 },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2, // Giảm khoảng cách giữa Avatar và Text
+          }}
+          onClick={handleSavedClick}
+        >
           <Avatar
             sx={{
               backgroundColor: '#1e88e5',
-              marginRight: 2,
-              width: { xs: 24, sm: 32 }, // Responsive avatar size
+              width: { xs: 24, sm: 32 },
               height: { xs: 24, sm: 32 },
             }}
           />
@@ -55,31 +68,46 @@ const SavedSidebar = () => {
         </ListItem>
       </List>
 
+      <Divider sx={{ my: 2 }} /> {/* Divider để phân cách các phần */}
+
       {/* Collection list */}
       <Typography
         variant="subtitle1"
         color="gray"
-        sx={{ mb: 1, fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1rem' }, mt: 2 }} // Điều chỉnh margin-top cho tiêu đề
+        sx={{
+          fontWeight: 'bold',
+          fontSize: { xs: '0.9rem', sm: '1rem' },
+        }}
       >
         Bộ sưu tập của tôi
       </Typography>
-      <List sx={{ mb: 0 }}> {/* Giảm khoảng cách bên dưới */}
+      <List sx={{ gap: 1, display: 'flex', flexDirection: 'column' }}> {/* Flex direction để xếp các item dọc */}
         {collections.map((collection, index) => (
-          <ListItem button key={index} sx={{ borderRadius: 2, mb: 1, backgroundColor: '#f5f5f5' }}>
+          <ListItem
+            button
+            key={index}
+            sx={{
+              borderRadius: 2,
+              backgroundColor: '#f5f5f5',
+              padding: { xs: 1, sm: 1.5 },
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2, // Giảm khoảng cách giữa Avatar và Text
+            }}
+          >
             <Avatar
               alt={collection}
               src={`/static/images/${collection.toLowerCase()}.jpg`}
               sx={{
-                width: { xs: 24, sm: 32 }, // Responsive avatar size
+                width: { xs: 24, sm: 32 },
                 height: { xs: 24, sm: 32 },
               }}
             />
             <ListItemText
               primary={collection}
               sx={{
-                ml: 2,
                 color: '#424242',
-                fontSize: { xs: '0.9rem', sm: '1rem' }, // Responsive text size
+                fontSize: { xs: '0.9rem', sm: '1rem' },
               }}
             />
           </ListItem>
@@ -94,9 +122,9 @@ const SavedSidebar = () => {
           padding: { xs: 1, sm: 1.5 },
           borderRadius: 3,
           backgroundColor: '#1e88e5',
-          fontSize: { xs: '0.9rem', sm: '1rem' }, // Responsive font size
+          fontSize: { xs: '0.9rem', sm: '1rem' },
           ':hover': { backgroundColor: '#1565c0' },
-          mt: 1, // Giảm khoảng cách giữa danh sách và nút
+          marginTop: 'auto', // Đẩy nút xuống dưới cùng
         }}
         startIcon={<Add />}
       >
