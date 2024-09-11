@@ -21,7 +21,9 @@ import Profile from '../../features/profile/containers/Profile';
 import ProfileEdit from '../../features/profile/containers/edit-profile/ProfileEdit';
 import SavedItems from '../../features/saved/containers/saved/SavedItems';
 import NotificationPage from '../../features/notifications/containers/notifications/NotificationPage';
-
+import CollectionsMain from '../../features/collections/containers/CollectionsMain';
+import Collections from '../../features/collections/containers/collection/Collection';
+import DetailArticle from '../../features/collections/containers/article-collection/DetailArticle';
 const Routes = () => {
   const router = createBrowserRouter([
     {
@@ -126,7 +128,21 @@ const Routes = () => {
     {
       path: '/edit-profile/:userID',
       element: <ProfileEdit/>
-    }
+    },
+    {
+      path: '/collections',
+      element: <CollectionsMain/>,
+      children: [
+        {
+          path: '',
+          element: <Collections />,
+        },
+        {
+          path: 'article',
+          element: <DetailArticle />, 
+        },
+      ],
+    },
   ]);
 
   return <RouterProvider router={router} />;
