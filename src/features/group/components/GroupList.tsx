@@ -1,182 +1,149 @@
 import React from 'react';
 import { Box, Typography, Divider } from '@mui/material';
 import GroupCard from './GroupCard'; 
+import {Group, User} from '../../../interface/interface'
 
-interface UserProps {
-  _id: string;
-  account: {
-    email: string;
-    password: string;
-  };
-  firstName: string;
-  lastName: string;
-  displayName: string;
-  username: string;
-  friends: { userID: string; addDate: Date }[];
-  status: 'online' | 'offline';
-  avt: string[]; // Avatar images
-  collections: {
-    _id: string;
-    name: string;
-    items: string[]; // Array of ObjectId references to posts
-    createdAt: Date;
-    updatedAt: Date;
-    _destroy?: Date;
-  }[];
-  groups: string[]; // List of group IDs that the user has joined
-  backGround: string[]; // Background images
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
 
-interface GroupProps {
-  _id: string;
-  groupName: string;
-  type: 'public' | 'private';
-  idAdmin: string;
-  introduction: string;
-  avt: string; // Avatar image of the group
-  backGround: string; // Background image of the group
-  members: {
-    count: number;
-    listUsers: { idUser: string; joinDate: Date }[];
-  };
-  articles: {
-    count: number;
-    listArticle: { idArticle: string; state: string }[];
-  };
-  rule: string[];
-  Administrators: { idUser: string; joinDate: Date }[];
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
-
-// Dữ liệu người dùng
-const user: UserProps = {
-  _id: 'userId1',
+export const user: User = {
+  _id: 'user123',
   account: {
     email: 'user@example.com',
-    password: 'password',
+    password: 'password123',
   },
   firstName: 'John',
   lastName: 'Doe',
   displayName: 'JohnD',
-  username: 'johndoe',
-  friends: [],
-  status: 'online',
-  avt: ['avatar1.jpg'],
-  collections: [],
-  groups: ['groupId1', 'groupId2'], // Các group ID mà người dùng đã tham gia
-  backGround: ['background1.jpg'],
+  userName: 'john.doe',
+  friends: [
+    { userId: 'friend1', addDate: '2023-05-01' },
+    { userId: 'friend2', addDate: '2023-06-15' },
+  ],
+  avt: ['/src/assets/images/avt.png'],
+  backGround: ['/src/assets/images/avt.png'],
+  status: 'active',
+  createDate: '2022-01-01',
+  details: {
+    phoneNumber: '123-456-7890',
+    address: '123 Main St, City, Country',
+    gender: true,
+    birthDate: new Date('1990-01-01'),
+  },
+  collections: [
+    {
+      _id: 'collection1',
+      name: 'Favorite Articles',
+      items: ['article1', 'article2'],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      _destroy:  new Date(),
+    },
+  ],
+  groups: ['group123', 'group456'],
+  hobbies: ['Reading', 'Gaming'],
+  listArticle: ['article1', 'article2'],
+  listArticleShare: [
+    { id_article: 'article1', id_tuongtac: 'interaction1' },
+  ],
   createdAt: new Date(),
   updatedAt: new Date(),
+  _destroy: new Date(),
 };
 
+
 // Dữ liệu nhóm
-const groups: GroupProps[] = [
+export const groups: Group[] = [
   {
-    _id: 'groupId1',
-    groupName: 'Cat Lovers',
-    type: 'public',
-    idAdmin: 'adminId1',
-    introduction: 'A group for cat lovers',
-    avt: 'path_to_avatar.jpg',
-    backGround: 'path_to_background.jpg',
-    members: { 
-      count: 100, 
-      listUsers: [
-        { idUser: 'userId1', joinDate: new Date('2023-01-01') },
-        { idUser: 'userId2', joinDate: new Date('2023-02-15') },
-        { idUser: 'userId3', joinDate: new Date('2023-03-10') },
-      ] 
-    },
-    articles: { count: 10, listArticle: [] },
-    rule: ['No spam', 'Be kind'],
-    Administrators: [
-      { idUser: 'adminId1', joinDate: new Date('2023-01-15') },
-      { idUser: 'adminId2', joinDate: new Date('2023-02-10') }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: 'groupId3',
+    _id: 'group123',
     groupName: 'Tech Enthusiasts',
     type: 'public',
-    idAdmin: 'adminId2',
-    introduction: 'Technology and Gadgets',
-    avt: 'path_to_avatar.jpg',
-    backGround: 'path_to_background.jpg',
-    members: { 
-      count: 150, 
+    idAdmin: 'admin123',
+    introduction: 'A group for technology lovers.',
+    avt: '/src/assets/images/avt.png',
+    backGround: '/src/assets/images/avt.png',
+    members: {
+      count: 10,
       listUsers: [
-        { idUser: 'userId4', joinDate: new Date('2023-03-05') },
-        { idUser: 'userId5', joinDate: new Date('2023-03-20') },
-        { idUser: 'userId6', joinDate: new Date('2023-04-01') },
-      ] 
+        { idUser: 'user123', joinDate: '2023-01-01' },
+        { idUser: 'user456', joinDate: '2023-02-15' },
+      ],
     },
-    articles: { count: 20, listArticle: [] },
-    rule: ['No spam', 'Respect others'],
+    article: {
+      count: 5,
+      listArticle: [
+        { idArticle: '1', state: 'pending' }, // Chờ duyệt
+        { idArticle: '2', state: 'approved' }, // Đã duyệt
+        { idArticle: '3', state: 'pending' }, // Chờ duyệt
+      ],
+    },
+    rule: ['Be respectful', 'No spam'],
     Administrators: [
-      { idUser: 'adminId2', joinDate: new Date('2023-03-05') },
-      { idUser: 'adminId3', joinDate: new Date('2023-04-12') }
+      { idUser: 'admin123', joinDate: '2023-01-01' },
     ],
+    hobbies: ['Technology', 'Innovation'],
     createdAt: new Date(),
     updatedAt: new Date(),
+    _destroy: new Date(),
   },
   {
-    _id: 'groupId2',
-    groupName: 'Cat Lovers-1',
-    type: 'public',
-    idAdmin: 'adminId1',
-    introduction: 'A group for cat lovers',
-    avt: 'path_to_avatar.jpg',
-    backGround: 'path_to_background.jpg',
-    members: { 
-      count: 105, 
+    _id: 'group456',
+    groupName: 'Book Lovers',
+    type: 'private',
+    idAdmin: 'admin456',
+    introduction: 'A group for people who love reading.',
+    avt: '/src/assets/images/avt.png',
+    backGround: '/src/assets/images/avt.png',
+    members: {
+      count: 15,
       listUsers: [
-        { idUser: 'userId7', joinDate: new Date('2023-05-01') },
-        { idUser: 'userId8', joinDate: new Date('2023-06-10') },
-        { idUser: 'userId9', joinDate: new Date('2023-07-22') },
-      ] 
+        { idUser: 'user789', joinDate: '2023-03-01' },
+      ],
     },
-    articles: { count: 15, listArticle: [] },
-    rule: ['No spam', 'Be kind'],
+    article: {
+      count: 1,
+      listArticle: [
+        { idArticle: '3', state: 'pending' },
+      ],
+    },
+    rule: ['No spoilers', 'Be kind'],
     Administrators: [
-      { idUser: 'adminId1', joinDate: new Date('2023-05-18') },
-      { idUser: 'adminId4', joinDate: new Date('2023-06-20') }
+      { idUser: 'admin456', joinDate: '2023-03-01' },
     ],
+    hobbies: ['Reading', 'Writing'],
     createdAt: new Date(),
     updatedAt: new Date(),
+    _destroy: new Date(),
   },
   {
-    _id: 'groupId4',
-    groupName: 'Tech Enthusiasts',
+    _id: 'group789',
+    groupName: 'Fitness Fanatics',
     type: 'public',
-    idAdmin: 'adminId2',
-    introduction: 'Technology and Gadgets',
-    avt: 'path_to_avatar.jpg',
-    backGround: 'path_to_background.jpg',
-    members: { 
-      count: 150, 
-      listUsers: [
-        { idUser: 'userId10', joinDate: new Date('2023-08-01') },
-        { idUser: 'userId11', joinDate: new Date('2023-09-15') },
-        { idUser: 'userId12', joinDate: new Date('2023-10-05') },
-      ] 
+    idAdmin: 'admin789',
+    introduction: 'For people who love fitness and staying healthy.',
+    avt: '/src/assets/images/avt.png',
+    backGround: '/src/assets/images/avt.png',
+    members: {
+      count: 20,
+      listUsers: [],
     },
-    articles: { count: 20, listArticle: [] },
-    rule: ['No spam', 'Respect others'],
+    article: {
+      count: 8,
+      listArticle: [
+        { idArticle: '1', state: 'published' },
+      ],
+    },
+    rule: ['Respect others', 'No self-promotion'],
     Administrators: [
-      { idUser: 'adminId2', joinDate: new Date('2023-07-10') },
-      { idUser: 'adminId5', joinDate: new Date('2023-08-22') }
+      { idUser: 'admin789', joinDate: '2023-05-01' },
     ],
+    hobbies: ['Fitness', 'Nutrition'],
     createdAt: new Date(),
     updatedAt: new Date(),
-  }
+    _destroy: new Date(),
+  },
 ];
+// Mock dữ liệu bài viết
+
+
 
 
 

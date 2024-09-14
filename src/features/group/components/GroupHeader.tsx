@@ -1,31 +1,9 @@
 import React from 'react';
 import { Box, Typography, Button, Avatar } from '@mui/material';
+import {Group} from '../../../interface/interface'
 
-
-interface GroupProps {
-  _id: string;
-  groupName: string;
-  type: 'public' | 'private';
-  idAdmin: string;
-  introduction: string;
-  avt: string; // Avatar image of the group
-  backGround: string; // Background image of the group
-  members: {
-    count: number;
-    listUsers: { idUser: string; joinDate: Date }[];
-  };
-  articles: {
-    count: number;
-    listArticle: { idArticle: string; state: string }[];
-  };
-  rule: string[];
-  Administrators: { idUser: string; joinDate: Date }[];
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
 interface GroupHeaderProps {
-  group: GroupProps;
+  group: Group;
 }
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({group}) => {
@@ -49,7 +27,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({group}) => {
             {group.groupName}
           </Typography>
           <Typography variant="body1" color="black">
-            {group.articles.count} Bài đăng · {group.members.count} Thành viên
+            {group.article.count} Bài đăng · {group.members.count} Thành viên
           </Typography>
           <Typography variant="body1" color="black">
             {group.introduction}
