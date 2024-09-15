@@ -24,6 +24,7 @@ import NotificationPage from '../../features/notifications/containers/notificati
 import CollectionsMain from '../../features/collections/containers/CollectionsMain';
 import Collections from '../../features/collections/containers/collection/Collection';
 import DetailArticle from '../../features/collections/containers/article-collection/DetailArticle';
+import MyFriendsRequest from '../../features/friends/containers/my-friend-request/MyFriendsRequest';
 const Routes = () => {
   const router = createBrowserRouter([
     {
@@ -103,6 +104,10 @@ const Routes = () => {
         {
           path: 'friends-suggest',
           element: <FriendsSuggest />,
+        },
+        {
+          path: 'my-friends-request',
+          element: <MyFriendsRequest />,
         },
       ],
     },

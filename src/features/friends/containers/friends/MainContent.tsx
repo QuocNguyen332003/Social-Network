@@ -1,18 +1,13 @@
 import { Box, Typography } from "@mui/material";
 import FriendsCard from "../../components/FriendsCard";
 import { BoxButtonAllFriends } from "../../components/BoxButton";
-
-const dataTest = [
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."}
-]
+import { useAllFriend } from "./useAllFriend";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import { useDialogFriend } from "./useDialogFriend";
 
 function App() {  
+  const {data, deleteFriend, viewPersonalPage} = useAllFriend();
+  const {showDialog, setShowDialog, currUserID, currName, askDeleteFriend} = useDialogFriend();
   return (
     <Box 
       sx={{ 
@@ -30,7 +25,20 @@ function App() {
       sx={{fontWeight: 'bold'}}>
         Tất cả bạn bè
       </Typography>
-      {dataTest.map((item) => <FriendsCard avt={item.avt} name={item.name} message={item.message} BoxButton={BoxButtonAllFriends}/>)}
+      {data.map((item) => 
+      <FriendsCard avt={item.avt} 
+              name={item.name} 
+              message={item.aboutMe}
+              > <BoxButtonAllFriends FuncButton={[()=> {askDeleteFriend(item.userID, item.name)}, () => {viewPersonalPage(item.userID)}]}/>
+      </FriendsCard>
+      )}
+      <ConfirmDialog
+        title = {"Xác Nhận"}
+        open={showDialog}
+        onClose={() => { setShowDialog(false); } } textOnClose={"Hủy"}
+        message={`Bạn có chắc chắn xóa kết bạn với ${currName}`} 
+        actions={[{text: "Xác nhận", action: () => { deleteFriend(currUserID); setShowDialog(false); }}]}     
+        />
     </Box>
   );
 }

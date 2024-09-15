@@ -1,14 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Typography } from "@mui/material";
+import { ReactNode } from "react";
 
 type FriendsCardProps = {
-    avt: string,
-    name: string,
-    message: string,
-    BoxButton: React.ComponentType<any>,
-}
+  avt: string;
+  name: string;
+  message: string;
+  children?: ReactNode;
+};
 
-function FriendsCard({avt, name, message, BoxButton}: FriendsCardProps) {    
+function FriendsCard({ avt, name, message, children }: FriendsCardProps) {  
   return (
     <Box 
       sx={{ 
@@ -29,7 +29,7 @@ function FriendsCard({avt, name, message, BoxButton}: FriendsCardProps) {
          <img
             src= {avt}
             alt="Ảnh đại diện"
-            style={{width: '130px', height: '130px', borderRadius: 50, marginLeft: '20px' }}
+            style={{width: '130px', height: '130px', borderRadius: 50, marginLeft: '20px', objectFit: 'cover' }}
           /> 
       </Box>
       <Box
@@ -45,7 +45,7 @@ function FriendsCard({avt, name, message, BoxButton}: FriendsCardProps) {
             sx={{color: '#150aa1', fontWeight: 'bold'}}>
                 {name}
             </Typography>
-            <BoxButton/>
+            {children}
         </Box>
         <Typography variant="body1" component="h2"
             sx={{color: '#808080'}}
