@@ -1,12 +1,16 @@
 import React from 'react';
-import { Box, Typography, Button, List, ListItem, ListItemText, Avatar, Divider } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemText, Avatar, Divider, Button } from '@mui/material';
 import { Add } from '@mui/icons-material';
+import { User } from '../../../interface/interface'; 
 
-const collections = ['SG', 'TV & Phim ảnh'];
+interface SavedSidebarProps {
+  user: User;
+  onSelectCollection: (collectionId: string | null) => void; // Truyền callback khi chọn bộ sưu tập
+}
 
-const SavedSidebar = () => {
+const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection }) => {
   const handleSavedClick = () => {
-    console.log('Mục đã lưu clicked');
+    onSelectCollection(null); // Khi click vào "Mục đã lưu" thì đặt collectionId là null (hiển thị tất cả bài viết)
   };
 
   return (
@@ -17,7 +21,7 @@ const SavedSidebar = () => {
         flexDirection: 'column',
         justifyContent: 'flex-start',
         padding: { xs: 2, sm: 3 },
-        gap: 2, // Điều chỉnh khoảng cách giữa các thành phần chính
+        gap: 2,
         backgroundColor: '#fafafa',
       }}
     >
@@ -29,7 +33,7 @@ const SavedSidebar = () => {
             flexGrow: 1,
             fontWeight: 'bold',
             color: '#1e88e5',
-            fontSize: { xs: '1.2rem', sm: '1.5rem' }, // Responsive font size
+            fontSize: { xs: '1.2rem', sm: '1.5rem' },
           }}
         >
           Đã lưu
@@ -46,7 +50,7 @@ const SavedSidebar = () => {
             padding: { xs: 1, sm: 1.5 },
             display: 'flex',
             alignItems: 'center',
-            gap: 2, // Giảm khoảng cách giữa Avatar và Text
+            gap: 2,
           }}
           onClick={handleSavedClick}
         >
@@ -62,13 +66,13 @@ const SavedSidebar = () => {
             sx={{
               color: '#424242',
               fontWeight: 'bold',
-              fontSize: { xs: '0.9rem', sm: '1rem' }, // Responsive text size
+              fontSize: { xs: '0.9rem', sm: '1rem' },
             }}
           />
         </ListItem>
       </List>
 
-      <Divider sx={{ my: 2 }} /> {/* Divider để phân cách các phần */}
+      <Divider sx={{ my: 2 }} />
 
       {/* Collection list */}
       <Typography
@@ -81,8 +85,8 @@ const SavedSidebar = () => {
       >
         Bộ sưu tập của tôi
       </Typography>
-      <List sx={{ gap: 1, display: 'flex', flexDirection: 'column' }}> {/* Flex direction để xếp các item dọc */}
-        {collections.map((collection, index) => (
+      <List sx={{ gap: 1, display: 'flex', flexDirection: 'column' }}>
+        {user.collections.map((collection, index) => (
           <ListItem
             button
             key={index}
@@ -92,19 +96,20 @@ const SavedSidebar = () => {
               padding: { xs: 1, sm: 1.5 },
               display: 'flex',
               alignItems: 'center',
-              gap: 2, // Giảm khoảng cách giữa Avatar và Text
+              gap: 2,
             }}
+            onClick={() => onSelectCollection(collection._id)} // Chọn bộ sưu tập
           >
             <Avatar
-              alt={collection}
-              src={`/static/images/${collection.toLowerCase()}.jpg`}
+              alt={collection.name}
+              src={`/static/images/${collection.name.toLowerCase()}.jpg`}
               sx={{
                 width: { xs: 24, sm: 32 },
                 height: { xs: 24, sm: 32 },
               }}
             />
             <ListItemText
-              primary={collection}
+              primary={collection.name}
               sx={{
                 color: '#424242',
                 fontSize: { xs: '0.9rem', sm: '1rem' },
@@ -114,7 +119,6 @@ const SavedSidebar = () => {
         ))}
       </List>
 
-      {/* Create new collection button */}
       <Button
         variant="contained"
         sx={{
@@ -124,7 +128,7 @@ const SavedSidebar = () => {
           backgroundColor: '#1e88e5',
           fontSize: { xs: '0.9rem', sm: '1rem' },
           ':hover': { backgroundColor: '#1565c0' },
-          marginTop: 'auto', // Đẩy nút xuống dưới cùng
+          marginTop: 'auto',
         }}
         startIcon={<Add />}
       >

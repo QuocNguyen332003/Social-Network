@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 import { Box, Typography, Paper, Button, IconButton } from '@mui/material';
 import { MoreHoriz } from '@mui/icons-material';
-import CollectionDialog from './CollectionDialog'; // Import dialog vừa tạo
+import { useNavigate } from 'react-router-dom';
+import CollectionDialog from './CollectionDialog';
 
 interface SavedItem {
-  type: string;
+  _id: string;
   content: string;
   collection: string;
   media: string;
-  savedBy: string;
 }
 
 interface SavedItemCardProps {
   item: SavedItem;
-  collections: string[]; // Thêm prop collections
+  collections: string[];
 }
 
 const SavedItemCard: React.FC<SavedItemCardProps> = ({ item, collections }) => {
   const [openDialog, setOpenDialog] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddToCollection = () => {
     setOpenDialog(true);
@@ -28,7 +29,12 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ item, collections }) => {
   };
 
   const handleSelectCollection = (collection: string) => {
-    console.log(`Thêm vào bộ sưu tập: ${collection}`); // Xử lý thêm vào bộ sưu tập
+    console.log(`Thêm vào bộ sưu tập: ${collection}`);
+  };
+
+  const handleViewPost = () => {
+    // Điều hướng đến trang chi tiết bài viết, truyền dữ liệu bài viết qua state
+    navigate(`/new-feeds/${item._id}`, { state: { item } });
   };
 
   return (
@@ -37,17 +43,19 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ item, collections }) => {
         sx={{
           padding: 2,
           display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' }, // Responsive layout
+          flexDirection: { xs: 'column', sm: 'row' },
           alignItems: 'center',
           backgroundColor: '#f5f5f5',
           color: '#333',
+          cursor: 'pointer',
         }}
+        onClick={handleViewPost}
       >
         <Box sx={{ width: { xs: '100%', sm: '20%' }, mb: { xs: 2, sm: 0 }, mr: { sm: 2 } }}>
           <img
             src={item.media}
             alt={item.content}
-            style={{ width: '100%', filter: 'grayscale(100%)', display: 'block' }}
+            style={{ width: '100%', display: 'block' }}
           />
         </Box>
         <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
@@ -55,26 +63,28 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ item, collections }) => {
             {item.content}
           </Typography>
           <Typography variant="caption" color="#666">
-            {item.type} · Đã lưu vào {item.collection}
-          </Typography>
-          <Typography variant="caption" color="#999">
-            Đã lưu từ bài viết của {item.savedBy}
+            Đã lưu vào {item.collection}
           </Typography>
         </Box>
         <Button
           variant="contained"
           color="primary"
           sx={{ mr: 2, display: { xs: 'none', sm: 'inline-flex' } }}
-          onClick={handleAddToCollection} // Hiển thị popup khi bấm
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAddToCollection();
+          }}
         >
           Thêm vào bộ sưu tập
         </Button>
-        <IconButton sx={{ display: { xs: 'none', sm: 'inline-flex' } }}>
+        <IconButton
+          sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+          onClick={(e) => e.stopPropagation()}
+        >
           <MoreHoriz />
         </IconButton>
       </Paper>
 
-      {/* Hiển thị dialog */}
       <CollectionDialog
         open={openDialog}
         onClose={handleCloseDialog}

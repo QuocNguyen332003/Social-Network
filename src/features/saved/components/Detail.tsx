@@ -1,10 +1,10 @@
 import { Box, Button } from "@mui/material";
 import { useState } from "react";
-import Post from "../../../../shared/components/post/Post";
+import Post from "../../../shared/components/post/Post";
 import { useNavigate } from "react-router-dom";
-import { Interact, Article } from '../../../../interface/interface';
+import { Interact, Article } from '../../../interface/interface';
 
-const DetailArticle = () => {
+const Detail = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Article[]>([
     {
@@ -114,4 +114,6 @@ const DetailArticle = () => {
   );
 };
 
-export default DetailArticle;
+export default Detail;
+
+
