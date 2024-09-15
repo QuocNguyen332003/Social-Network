@@ -24,7 +24,8 @@ import NotificationPage from '../../features/notifications/containers/notificati
 import CollectionsMain from '../../features/collections/containers/CollectionsMain';
 import Collections from '../../features/collections/containers/collection/Collection';
 import DetailArticle from '../../features/collections/containers/article-collection/DetailArticle';
-import Detail from '../../features/saved/components/Detail';
+import DetailArticles from '../../features/new-feeds/containers/detail-article/DetailArticles';
+import NewFeedsContent from '../../features/new-feeds/components/NewFeedsContent'
 const Routes = () => {
   const router = createBrowserRouter([
     {
@@ -42,16 +43,20 @@ const Routes = () => {
     {
       path: '/forgot',
       element: <Forgot />,
-    },
+    }, 
     {
       path: '/new-feeds',
       element: <NewFeeds />,
       children: [
         {
-          path: ':postId',
-          element: <Detail />, // Default to the main content of the group (Trang chủ)
+          path: '',
+          element: <NewFeedsContent />, 
         },
-      ]
+        {
+          path: ':postId',
+          element: <DetailArticles />,
+        },
+      ],
     },
     {
       path: '/groups',

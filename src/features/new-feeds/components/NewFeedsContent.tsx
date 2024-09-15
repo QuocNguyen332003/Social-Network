@@ -1,11 +1,10 @@
-import { Box, Button } from "@mui/material";
-import { useState } from "react";
-import Post from "../../../shared/components/post/Post";
-import { useNavigate } from "react-router-dom";
-import { Interact, Article } from '../../../interface/interface';
+import { useState } from 'react';
+import { Box } from '@mui/material';
+import PostForm from '../../../shared/components/postForm/PostForm';
+import Post from '../../../shared/components/post/Post';
+import {Interact, Article} from '../../../interface/interface'
 
-const Detail = () => {
-  const navigate = useNavigate();
+const NewFeedsContent = () => {
   const [posts, setPosts] = useState<Article[]>([
     {
       _id: '1',
@@ -61,6 +60,24 @@ const Detail = () => {
     },
   ]);
 
+  // Xử lý khi gửi bài viết mới
+  const handlePostSubmit = (newPost: string, images: File[], visibility: string) => {
+    const newPostEntry: Article = {
+      _id: (posts.length + 1).toString(),
+      idHandler: 'Panda Media',
+      handleDate: null,
+      groupID: null,
+      content: newPost,
+      listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],
+      scope: visibility,
+      interact: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      _destroy: new Date(),
+    };
+    setPosts([newPostEntry, ...posts]);
+  };
+
   // Xử lý thêm comment mới
   const handleAddComment = (postId: string, newComment: Interact) => {
     setPosts((prevPosts) =>
@@ -71,6 +88,7 @@ const Detail = () => {
       )
     );
   };
+
 
   // Xử lý thêm reply cho comment
   const handleAddReply = (postId: string, commentId: string, newReply: Interact) => {
@@ -97,16 +115,8 @@ const Detail = () => {
   };
 
   return (
-    <Box sx={{
-      backgroundColor: '#e9e9e9',
-      padding: '20px'
-    }}>
-      <Button sx={{
-        backgroundColor: '#fff', width: '100%', borderRadius: 3,
-        marginBottom: '20px'
-      }} onClick={() => {navigate(-1)}}>
-        Quay lại
-      </Button>
+    <Box sx={{ padding: 2, height: '85vh' }}>
+      <PostForm onSubmit={handlePostSubmit} />
       {posts.map((post, index) => (
         <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} />
       ))}
@@ -114,6 +124,4 @@ const Detail = () => {
   );
 };
 
-export default Detail;
-
-
+export default NewFeedsContent;

@@ -1,22 +1,17 @@
+// src/path/to/SavedItemCard.tsx
 import React, { useState } from 'react';
 import { Box, Typography, Paper, Button, IconButton } from '@mui/material';
 import { MoreHoriz } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import CollectionDialog from './CollectionDialog';
-
-interface SavedItem {
-  _id: string;
-  content: string;
-  collection: string;
-  media: string;
-}
+import { Article } from '../../../interface/interface';
 
 interface SavedItemCardProps {
-  item: SavedItem;
+  article: Article;
   collections: string[];
 }
 
-const SavedItemCard: React.FC<SavedItemCardProps> = ({ item, collections }) => {
+const SavedItemCard: React.FC<SavedItemCardProps> = ({ article, collections }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
 
@@ -30,12 +25,14 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ item, collections }) => {
 
   const handleSelectCollection = (collection: string) => {
     console.log(`Thêm vào bộ sưu tập: ${collection}`);
+    // Thêm logic cập nhật bộ sưu tập nếu cần
   };
 
   const handleViewPost = () => {
-    // Điều hướng đến trang chi tiết bài viết, truyền dữ liệu bài viết qua state
-    navigate(`/new-feeds/${item._id}`, { state: { item } });
+    // Điều hướng đến trang chi tiết bài viết và truyền toàn bộ đối tượng Article qua state
+    navigate(`/new-feeds/${article._id}`, { state: { article } });
   };
+  
 
   return (
     <>
@@ -52,18 +49,20 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ item, collections }) => {
         onClick={handleViewPost}
       >
         <Box sx={{ width: { xs: '100%', sm: '20%' }, mb: { xs: 2, sm: 0 }, mr: { sm: 2 } }}>
-          <img
-            src={item.media}
-            alt={item.content}
-            style={{ width: '100%', display: 'block' }}
-          />
+          {article.listPhoto.length > 0 && (
+            <img
+              src={article.listPhoto[0]}
+              alt={article.content}
+              style={{ width: '100%', display: 'block', borderRadius: '8px' }}
+            />
+          )}
         </Box>
         <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
           <Typography variant="body1" fontWeight="bold" color="#000">
-            {item.content}
+            {article.content.length > 100 ? `${article.content.slice(0, 100)}...` : article.content}
           </Typography>
           <Typography variant="caption" color="#666">
-            Đã lưu vào {item.collection}
+            Đã lưu vào {article.scope}
           </Typography>
         </Box>
         <Button
