@@ -1,33 +1,11 @@
 import React from 'react';
 import { Box, Typography, Avatar, Button, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
-
-interface GroupProps {
-  _id: string;
-  groupName: string;
-  type: 'public' | 'private';
-  idAdmin: string;
-  introduction: string;
-  avt: string;
-  backGround: string;
-  members: {
-    count: number;
-    listUsers: { idUser: string; joinDate: Date }[];
-  };
-  articles: {
-    count: number;
-    listArticle: { idArticle: string; state: string }[];
-  };
-  rule: string[];
-  Administrators: { idUser: string; joinDate: Date }[];
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
+import {Group} from '../../../../../../interface/interface.ts'
 
 const AdminContent: React.FC = () => {
   // Lấy dữ liệu group từ Outlet context
-  const { group } = useOutletContext<{ group: GroupProps }>();
+  const { group } = useOutletContext<{ group: Group }>();
 
   return (
     <Box sx={{

@@ -3,4 +3,5 @@ export default interface AlbumItem {
     content: string;   
     collection: string;   
     media: string;   
-    savedBy: string; }
+    savedBy: string; 
+}

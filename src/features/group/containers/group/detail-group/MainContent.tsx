@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
 import { useLocation, Outlet } from 'react-router-dom';
 import Header from '../../../../../shared/components/header/Header';
@@ -6,45 +6,25 @@ import SidebarLeft from '../../../../../shared/components/sidebarLeft/SidebarLef
 import SidebarRight from '../../../../../shared/components/sidebarRight/SidebarRight';
 import GroupHeader from '../../../components/GroupHeader';
 import GroupTabs from '../../../components/GroupTabs';
-
-interface GroupProps {
-  _id: string;
-  groupName: string;
-  type: 'public' | 'private';
-  idAdmin: string;
-  introduction: string;
-  avt: string;
-  backGround: string;
-  members: {
-    count: number;
-    listUsers: { idUser: string; joinDate: Date }[];
-  };
-  articles: {
-    count: number;
-    listArticle: { idArticle: string; state: string }[];
-  };
-  rule: string[];
-  Administrators: { idUser: string; joinDate: Date }[];
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
+import { Group } from '../../../../../interface/interface';
 
 const MainContent: React.FC = () => {
   const location = useLocation();
-  
-  const group = location.state?.group as GroupProps | undefined;
+
+  // Tạo state cho group và setGroup
+  const [group, setGroup] = useState<Group | undefined>(() => {
+    const storedGroup = localStorage.getItem('groupData');
+    return storedGroup ? JSON.parse(storedGroup) : undefined;
+  });
 
   useEffect(() => {
-    if (group) {
-      localStorage.setItem('groupData', JSON.stringify(group));
+    if (location.state?.group) {
+      setGroup(location.state.group);
+      localStorage.setItem('groupData', JSON.stringify(location.state.group));
     }
-  }, [group]);
+  }, [location.state?.group]);
 
-  const storedGroup = localStorage.getItem('groupData');
-  const groupData = group || (storedGroup && JSON.parse(storedGroup));
-
-  if (!groupData) {
+  if (!group) {
     return <div>Không tìm thấy dữ liệu nhóm.</div>;
   }
 
@@ -56,9 +36,10 @@ const MainContent: React.FC = () => {
           <SidebarLeft />
         </Grid>
         <Grid item xs={7}>
-          <GroupHeader group={groupData} />
-          <GroupTabs groupId={groupData._id} />
-          <Outlet context={{ group: groupData }} />
+          <GroupHeader group={group} />
+          <GroupTabs groupId={group._id} />
+          {/* Truyền group và setGroup thông qua Outlet */}
+          <Outlet context={{ group, setGroup }} />
         </Grid>
         <Grid item xs={2.5}>
           <SidebarRight />

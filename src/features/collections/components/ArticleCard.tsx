@@ -32,7 +32,7 @@ const ArticleCard: React.FC<ArticleCardCardProps> = ({ item }) => {
           <img
             src={item.media}
             alt={item.content}
-            style={{ width: '100px', filter: 'grayscale(100%)', display: 'block', borderRadius: 10 }}
+            style={{ width: '100px', display: 'block', borderRadius: 10 }}
           />
         </Box>
         <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' },

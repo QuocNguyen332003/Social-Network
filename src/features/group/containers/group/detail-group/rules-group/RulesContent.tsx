@@ -1,32 +1,10 @@
 import React from 'react';
 import { Box, Typography, Paper, Button, Divider } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
-
-interface GroupProps {
-  _id: string;
-  groupName: string;
-  type: 'public' | 'private';
-  idAdmin: string;
-  introduction: string;
-  avt: string;
-  backGround: string;
-  members: {
-    count: number;
-    listUsers: { idUser: string; joinDate: Date }[];
-  };
-  articles: {
-    count: number;
-    listArticle: { idArticle: string; state: string }[];
-  };
-  rule: string[];
-  Administrators: { idUser: string; joinDate: Date }[];
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
+import {Group} from '../../../../../../interface/interface.ts'
 
 const RulesContent: React.FC = () => {
-  const context = useOutletContext<{ group: GroupProps }>(); // Lấy dữ liệu từ Outlet context
+  const context = useOutletContext<{ group: Group }>(); // Lấy dữ liệu từ Outlet context
 
   console.log("Context in RulesContent: ", context); // Kiểm tra xem context có dữ liệu hay không
 

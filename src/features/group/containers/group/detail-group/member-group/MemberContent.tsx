@@ -1,32 +1,11 @@
 import React from 'react';
 import { Box, Avatar, Button, List, ListItem, ListItemAvatar, ListItemText, Typography, Divider } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
+import {Group} from '../../../../../../interface/interface.ts'
 
-interface GroupProps {
-  _id: string;
-  groupName: string;
-  type: 'public' | 'private';
-  idAdmin: string;
-  introduction: string;
-  avt: string;
-  backGround: string;
-  members: {
-    count: number;
-    listUsers: { idUser: string; joinDate: Date }[];
-  };
-  articles: {
-    count: number;
-    listArticle: { idArticle: string; state: string }[];
-  };
-  rule: string[];
-  Administrators: { idUser: string; joinDate: Date }[];
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
 
 const MemberContent: React.FC = () => {
-  const { group } = useOutletContext<{ group: GroupProps }>();
+  const { group } = useOutletContext<{ group: Group }>();
 
   console.log('Group data in MemberContent: ', group); // Debug
   

@@ -1,65 +1,23 @@
 import { Box, Button } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Post from "../../../../shared/components/post/Post";
-import { useNavigate } from "react-router-dom";
 import { Interact, Article } from '../../../../interface/interface';
 
-const DetailArticle = () => {
+const DetailArticles = () => {
   const navigate = useNavigate();
-  const [posts, setPosts] = useState<Article[]>([
-    {
-      _id: '1',
-      idHandler: 'Panda Media',
-      handleDate: null,
-      groupID: null,
-      content:
-        "[Historical Fact] The West first learned of the giant panda on 11 March 1869, when the French missionary Armand David received a skin from a hunter. In 1936, Ruth Harkness became the first Westerner to bring back a live giant panda.",
-      scope: 'Public',
-      listPhoto: [],
-      interact: [
-        {
-          _id: '1-1',
-          emoticons: [],
-          comment: {
-            _iduser: 'JohnDoe',
-            content: 'Wow, that’s interesting!',
-            img: [],
-            replyComment: [],
-          },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          _id: '1-2',
-          emoticons: [],
-          comment: {
-            _iduser: 'JaneDoe',
-            content: 'I never knew that!',
-            img: [],
-            replyComment: [
-              {
-                _id: '1-2-1',
-                emoticons: [],
-                comment: {
-                  _iduser: 'PandaLover',
-                  content: 'Yes, it’s a fascinating history!',
-                  img: [],
-                  replyComment: [],
-                },
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              },
-            ],
-          },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      _destroy: new Date(),
-    },
-  ]);
+  const location = useLocation();
+  
+  // Lấy dữ liệu bài viết từ state được truyền qua navigate
+  const article = location.state?.article as Article;
+
+  const [posts, setPosts] = useState<Article[]>([]);
+
+  useEffect(() => {
+    if (article) {
+      setPosts([article]); // Thêm bài viết vào mảng posts
+    }
+  }, [article]);
 
   // Xử lý thêm comment mới
   const handleAddComment = (postId: string, newComment: Interact) => {
@@ -114,4 +72,4 @@ const DetailArticle = () => {
   );
 };
 
-export default DetailArticle;
+export default DetailArticles;

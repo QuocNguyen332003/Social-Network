@@ -1,35 +1,12 @@
 import React from 'react';
 import { Card, CardContent, CardMedia, Typography, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import {Group} from '../../../interface/interface'
 
 interface GroupCardProps {
-  group: GroupProps;
+  group: Group;
   userGroups: string[];
 }
-
-interface GroupProps {
-  _id: string;
-  groupName: string;
-  type: 'public' | 'private';
-  idAdmin: string;
-  introduction: string;
-  avt: string;
-  backGround: string;
-  members: {
-    count: number;
-    listUsers: { idUser: string; joinDate: Date }[];
-  };
-  articles: {
-    count: number;
-    listArticle: { idArticle: string; state: string }[];
-  };
-  rule: string[];
-  Administrators: { idUser: string; joinDate: Date }[];
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
-
 const GroupCard: React.FC<GroupCardProps> = ({ group, userGroups }) => {
   const navigate = useNavigate();
 

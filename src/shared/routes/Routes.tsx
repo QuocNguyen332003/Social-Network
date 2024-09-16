@@ -23,7 +23,9 @@ import SavedItems from '../../features/saved/containers/saved/SavedItems';
 import NotificationPage from '../../features/notifications/containers/notifications/NotificationPage';
 import CollectionsMain from '../../features/collections/containers/CollectionsMain';
 import Collections from '../../features/collections/containers/collection/Collection';
-import DetailArticle from '../../features/collections/containers/article-collection/DetailArticle';
+import DetailArticle from '../../features/collections/containers/article-collection/DetailArticle'
+import DetailArticles from '../../features/new-feeds/containers/detail-article/DetailArticles';
+import NewFeedsContent from '../../features/new-feeds/components/NewFeedsContent'
 import MyFriendsRequest from '../../features/friends/containers/my-friend-request/MyFriendsRequest';
 const Routes = () => {
   const router = createBrowserRouter([
@@ -42,18 +44,28 @@ const Routes = () => {
     {
       path: '/forgot',
       element: <Forgot />,
-    },
+    }, 
     {
       path: '/new-feeds',
       element: <NewFeeds />,
+      children: [
+        {
+          path: '',
+          element: <NewFeedsContent />, 
+        },
+        {
+          path: ':postId',
+          element: <DetailArticles />,
+        },
+      ],
     },
     {
       path: '/groups',
       element: <Group />,
     },
     {
-      path: '/saved',
-      element: <SavedItems />,
+      path: '/saved', 
+      element: <SavedItems/> // Protect this route
     },
     {
       path: '/messages', 
