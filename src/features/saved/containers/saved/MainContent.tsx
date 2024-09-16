@@ -1,5 +1,3 @@
- 
-// src/path/to/MainContent.tsx
 import React from 'react';
 import { Box, Typography, Grid } from '@mui/material';
 import SavedItemCard from '../../components/SavedItemCard';
@@ -7,22 +5,21 @@ import { User, Article } from '../../../../interface/interface';
 
 interface MainContentProps {
   user: User;
+  setUser: React.Dispatch<React.SetStateAction<User>>; // Add setUser prop to update the user
   articles: Article[];
   selectedCollectionId: string | null; // Truyền collectionId để lọc bài viết
 }
 
-
-const MainContent: React.FC<MainContentProps> = ({ user, articles, selectedCollectionId }) => {
+const MainContent: React.FC<MainContentProps> = ({ user, setUser, articles, selectedCollectionId }) => {
   // Lọc các bài viết dựa trên bộ sưu tập được chọn
   const filteredArticles = selectedCollectionId
-    ? articles.filter(article => 
+    ? articles.filter(article =>
         user.collections
           .find(collection => collection._id === selectedCollectionId)
           ?.items.includes(article._id)
       )
-    : articles.filter(article => 
-        user.collections
-          .some(collection => collection.items.includes(article._id))
+    : articles.filter(article =>
+        user.collections.some(collection => collection.items.includes(article._id))
       );
 
   return (
@@ -37,6 +34,8 @@ const MainContent: React.FC<MainContentProps> = ({ user, articles, selectedColle
             <SavedItemCard
               article={article}
               collections={user.collections.map(col => col.name)}
+              user={user}             // Pass user prop
+              setUser={setUser}         // Pass setUser prop
             />
           </Grid>
         ))}

@@ -106,22 +106,29 @@ export interface Hobby {
   
 
 // Interact Interface
-export interface Interact {
-    _id: string;
-    emoticons: Array<{
-      typeEmoticons: string;
-      _iduser: string;
-    }>;
-    comment: {
-      _iduser: string;
-      content: string;
-      img: string[];
-      replyComment: Array<Interact>;
-    };
+export interface Emoticon {
+    typeEmoticons: string;
+    _iduser: string;
+  }
+  
+  export interface Comment {
+    _iduser: string;
+    content: string;
+    img: string[];
+    replyComment: Array<Comment>; // Đệ quy: bình luận có thể có các bình luận con
+    emoticons: Array<Emoticon>;
     createdAt: Date;
     updatedAt: Date;
     _destroy?: Date;
-}
+  }
+  
+  export interface Interact {
+    _id: string;
+    emoticons: Array<Emoticon>;
+    comment: Array<Comment>;
+  }
+  
+  
     // Article Interface
 export interface Article {
     _id: string;
@@ -131,7 +138,7 @@ export interface Article {
     content: string;
     listPhoto: string[];
     scope: string;
-    interact: Interact[];
+    interact: Interact;
     createdAt: Date;
     updatedAt: Date;
     _destroy: Date;

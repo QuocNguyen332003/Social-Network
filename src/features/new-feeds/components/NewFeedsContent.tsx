@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react';
 import { Box } from '@mui/material';
 import PostForm from '../../../shared/components/postForm/PostForm';
 import Post from '../../../shared/components/post/Post';
-import {Interact, Article} from '../../../interface/interface'
+import { Interact, Article, Comment } from '../../../interface/interface';
 
 const NewFeedsContent = () => {
   const [posts, setPosts] = useState<Article[]>([
@@ -15,45 +16,40 @@ const NewFeedsContent = () => {
         "[Historical Fact] The West first learned of the giant panda on 11 March 1869, when the French missionary Armand David received a skin from a hunter. In 1936, Ruth Harkness became the first Westerner to bring back a live giant panda.",
       scope: 'Public',
       listPhoto: [],
-      interact: [
-        {
-          _id: '1-1',
-          emoticons: [],
-          comment: {
+      interact: {
+        _id: '1',
+        emoticons: [],
+        comment: [
+          {
             _iduser: 'JohnDoe',
             content: 'Wow, that’s interesting!',
             img: [],
             replyComment: [],
+            emoticons: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
           },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          _id: '1-2',
-          emoticons: [],
-          comment: {
+          {
             _iduser: 'JaneDoe',
             content: 'I never knew that!',
             img: [],
             replyComment: [
               {
-                _id: '1-2-1',
+                _iduser: 'PandaLover',
+                content: 'Yes, it’s a fascinating history!',
+                img: [],
+                replyComment: [],
                 emoticons: [],
-                comment: {
-                  _iduser: 'PandaLover',
-                  content: 'Yes, it’s a fascinating history!',
-                  img: [],
-                  replyComment: [],
-                },
                 createdAt: new Date(),
                 updatedAt: new Date(),
               },
             ],
+            emoticons: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
           },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ],
+        ],
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
       _destroy: new Date(),
@@ -70,7 +66,11 @@ const NewFeedsContent = () => {
       content: newPost,
       listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],
       scope: visibility,
-      interact: [],
+      interact: {
+        _id: `interact-${Date.now()}`,
+        emoticons: [],
+        comment: [],
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
       _destroy: new Date(),
@@ -79,35 +79,31 @@ const NewFeedsContent = () => {
   };
 
   // Xử lý thêm comment mới
-  const handleAddComment = (postId: string, newComment: Interact) => {
+  const handleAddComment = (postId: string, newComment: Comment) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post._id === postId
-          ? { ...post, interact: [...post.interact, { ...newComment, _id: `comment-${Date.now()}`, createdAt: new Date(), updatedAt: new Date() }] }
+          ? { ...post, interact: { ...post.interact, comment: [...post.interact.comment, newComment] } }
           : post
       )
     );
   };
 
-
   // Xử lý thêm reply cho comment
-  const handleAddReply = (postId: string, commentId: string, newReply: Interact) => {
+  const handleAddReply = (postId: string, commentId: string, newReply: Comment) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) => {
         if (post._id === postId) {
-          const updatedComments = post.interact.map((comment) => {
-            if (comment._id === commentId) {
+          const updatedComments = post.interact.comment.map((comment) => {
+            if (comment._iduser === commentId) {
               return {
                 ...comment,
-                comment: {
-                  ...comment.comment,
-                  replyComment: [...comment.comment.replyComment, { ...newReply, _id: `reply-${Date.now()}`, createdAt: new Date(), updatedAt: new Date() }],
-                },
+                replyComment: [...comment.replyComment, newReply],
               };
             }
             return comment;
           });
-          return { ...post, interact: updatedComments };
+          return { ...post, interact: { ...post.interact, comment: updatedComments } };
         }
         return post;
       })

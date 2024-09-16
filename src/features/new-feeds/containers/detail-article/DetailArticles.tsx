@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Post from "../../../../shared/components/post/Post";
-import { Interact, Article } from '../../../../interface/interface';
+import { Interact, Article, Comment } from '../../../../interface/interface';
 
 const DetailArticles = () => {
   const navigate = useNavigate();
@@ -20,34 +21,43 @@ const DetailArticles = () => {
   }, [article]);
 
   // Xử lý thêm comment mới
-  const handleAddComment = (postId: string, newComment: Interact) => {
+  const handleAddComment = (postId: string, newComment: Comment) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post._id === postId
-          ? { ...post, interact: [...post.interact, { ...newComment, _id: `comment-${Date.now()}`, createdAt: new Date(), updatedAt: new Date() }] }
+          ? {
+              ...post,
+              interact: {
+                ...post.interact,
+                comment: [...post.interact.comment, newComment], // Thêm comment vào mảng comment
+              },
+            }
           : post
       )
     );
   };
 
   // Xử lý thêm reply cho comment
-  const handleAddReply = (postId: string, commentId: string, newReply: Interact) => {
+  const handleAddReply = (postId: string, commentId: string, newReply: Comment) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) => {
         if (post._id === postId) {
-          const updatedComments = post.interact.map((comment) => {
-            if (comment._id === commentId) {
+          const updatedComments = post.interact.comment.map((comment) => {
+            if (comment._iduser === commentId) {
               return {
                 ...comment,
-                comment: {
-                  ...comment.comment,
-                  replyComment: [...comment.comment.replyComment, { ...newReply, _id: `reply-${Date.now()}`, createdAt: new Date(), updatedAt: new Date() }],
-                },
+                replyComment: [...comment.replyComment, newReply], // Thêm reply vào mảng replyComment
               };
             }
             return comment;
           });
-          return { ...post, interact: updatedComments };
+          return {
+            ...post,
+            interact: {
+              ...post.interact,
+              comment: updatedComments, // Cập nhật lại mảng comment
+            },
+          };
         }
         return post;
       })
@@ -62,7 +72,7 @@ const DetailArticles = () => {
       <Button sx={{
         backgroundColor: '#fff', width: '100%', borderRadius: 3,
         marginBottom: '20px'
-      }} onClick={() => {navigate(-1)}}>
+      }} onClick={() => navigate(-1)}>
         Quay lại
       </Button>
       {posts.map((post, index) => (

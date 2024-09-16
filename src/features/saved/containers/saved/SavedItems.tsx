@@ -1,3 +1,4 @@
+ 
 import React, { useState } from 'react';
 import { Box, Grid } from '@mui/material';
 import Header from '../../../../shared/components/header/Header';
@@ -5,8 +6,8 @@ import SavedSidebar from '../../components/SavedSidebar';
 import MainContent from './MainContent';
 import { User, Article } from '../../../../interface/interface';
 
-// Mock user and articles data here (as in your example)
-const user: User = {
+// Mock user and articles data
+const initialUserData: User = {
   _id: 'user123',
   account: {
     email: 'user@example.com',
@@ -69,7 +70,11 @@ const articles: Article[] = [
     content: 'This is the first article content',
     listPhoto: ['/src/assets/images/avt.png'],
     scope: 'public',
-    interact: [],
+    interact: {
+      _id: 'interact1',
+      emoticons: [],
+      comment: [],
+    },
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
@@ -82,7 +87,11 @@ const articles: Article[] = [
     content: 'This is the second article content',
     listPhoto: ['/src/assets/images/avt.png'],
     scope: 'public',
-    interact: [],
+    interact: {
+      _id: 'interact2',
+      emoticons: [],
+      comment: [],
+    },
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
@@ -95,7 +104,11 @@ const articles: Article[] = [
     content: 'This is the third article content',
     listPhoto: ['/src/assets/images/avt.png'],
     scope: 'public',
-    interact: [],
+    interact: {
+      _id: 'interact3',
+      emoticons: [],
+      comment: [],
+    },
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
@@ -103,43 +116,24 @@ const articles: Article[] = [
 ];
 
 const SavedItems = () => {
-  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null); // Quản lý bộ sưu tập được chọn
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
+  const [user, setUser] = useState<User>(initialUserData); // State for user data
 
   return (
     <>
       <Header />
       <Box sx={{ height: '100vh' }}>
         <Grid container sx={{ height: '100%' }}>
-          <Grid
-            item
-            xs={12}
-            sm={3}
-            sx={{
-              height: { xs: 'auto', sm: '100%' },
-            }}
-          >
-            <Box
-              sx={{
-                height: { xs: 'auto', sm: '100%' },
-                marginRight: { xs: 0, sm: 2 },
-              }}
-            >
-              {/* Truyền callback để chọn bộ sưu tập */}
-              <SavedSidebar user={user} onSelectCollection={setSelectedCollectionId} />
-            </Box>
+          <Grid item xs={12} sm={3}>
+            <SavedSidebar user={user} onSelectCollection={setSelectedCollectionId} />
           </Grid>
-
-          <Grid
-            item
-            xs={12}
-            sm={9}
-            sx={{
-              overflowY: 'auto',
-              backgroundColor: '#e9e9e9',
-            }}
-          >
-            {/* Truyền collectionId được chọn xuống MainContent */}
-            <MainContent user={user} articles={articles} selectedCollectionId={selectedCollectionId} />
+          <Grid item xs={12} sm={9}>
+            <MainContent
+              user={user}
+              setUser={setUser}                // Pass setUser to MainContent
+              articles={articles}              // Your articles data
+              selectedCollectionId={selectedCollectionId}
+            />
           </Grid>
         </Grid>
       </Box>
@@ -147,4 +141,4 @@ const SavedItems = () => {
   );
 };
 
-export default SavedItems
+export default SavedItems;

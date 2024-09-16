@@ -1,19 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 import { Box, Typography, Avatar, Paper, Button, IconButton, Collapse, TextField, Menu, MenuItem } from '@mui/material';
 import { MoreHoriz, Favorite, Comment, Share, CardGiftcard, ThumbUpAlt, Reply } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
-import {Interact, Article} from '../../../interface/interface'
-
+import { Comment as CommentType, Article, Emoticon } from '../../../interface/interface';
 
 interface PostComponentProps {
   post: Article;
-  onAddComment: (postId: string, newComment: Interact) => void;
-  onAddReply: (postId: string, commentId: string, newReply: Interact) => void;
+  onAddComment: (postId: string, newComment: CommentType) => void;
+  onAddReply: (postId: string, commentId: string, newReply: CommentType) => void;
 }
 
 const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   const [showComments, setShowComments] = useState(false);
-  const [likedComments, setLikedComments] = useState<string[]>([]);
+  const [likedPosts, setLikedPosts] = useState<string[]>([]);
+  const [likedComments, setLikedComments] = useState<{ [key: string]: boolean }>({}); // Lưu trạng thái like của comment
   const [replyInputs, setReplyInputs] = useState<{ [key: string]: boolean }>({});
   const [replyTexts, setReplyTexts] = useState<{ [key: string]: string }>({});
   const [newComment, setNewComment] = useState('');
@@ -21,16 +22,78 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
+  // Tính tổng số lượt like cho cả bài viết và bình luận
+  const totalPostLikes = post.interact.emoticons.filter(emoticon => emoticon.typeEmoticons === 'like').length;
+
+  // Tính tổng số bình luận (bao gồm cả bình luận trả lời)
+  const totalComments = post.interact.comment.reduce((acc, comment) => {
+    const replyCount = comment.replyComment.length;
+    return acc + 1 + replyCount;
+  }, 0);
+
   const handleToggleComments = () => {
     setShowComments(!showComments);
   };
 
   const handleLikeComment = (commentId: string) => {
-    setLikedComments((prevLikedComments) =>
-      prevLikedComments.includes(commentId)
-        ? prevLikedComments.filter((id) => id !== commentId)
-        : [...prevLikedComments, commentId]
-    );
+    setLikedComments((prevLikedComments) => ({
+      ...prevLikedComments,
+      [commentId]: !prevLikedComments[commentId],
+    }));
+
+    post.interact.comment = post.interact.comment.map((comment) => {
+      if (comment._iduser === commentId) {
+        const isLiked = likedComments[commentId];
+
+        if (isLiked) {
+          // Nếu đã like, thì xóa like khỏi comment
+          comment.emoticons = comment.emoticons.filter(
+            (emoticon) => emoticon._iduser !== 'CurrentUser'
+          );
+        } else {
+          // Nếu chưa like, thì thêm like vào comment
+          comment.emoticons.push({ typeEmoticons: 'like', _iduser: 'CurrentUser' });
+        }
+      }
+      return comment;
+    });
+  };
+
+  const handleLikeReply = (commentId: string, replyId: string) => {
+    post.interact.comment = post.interact.comment.map((comment) => {
+      if (comment._iduser === commentId) {
+        comment.replyComment = comment.replyComment.map((reply) => {
+          if (reply._iduser === replyId) {
+            const isLiked = likedComments[replyId];
+
+            if (isLiked) {
+              reply.emoticons = reply.emoticons.filter(
+                (emoticon) => emoticon._iduser !== 'CurrentUser'
+              );
+            } else {
+              reply.emoticons.push({ typeEmoticons: 'like', _iduser: 'CurrentUser' });
+            }
+          }
+          return reply;
+        });
+      }
+      return comment;
+    });
+
+    setLikedComments((prevLikedComments) => ({
+      ...prevLikedComments,
+      [replyId]: !prevLikedComments[replyId],
+    }));
+  };
+
+  const handleLikePost = (postId: string) => {
+    if (likedPosts.includes(postId)) {
+      setLikedPosts(likedPosts.filter((id) => id !== postId));
+      post.interact.emoticons = post.interact.emoticons.filter(emoticon => emoticon._iduser !== 'CurrentUser');
+    } else {
+      setLikedPosts([...likedPosts, postId]);
+      post.interact.emoticons.push({ typeEmoticons: 'like', _iduser: 'CurrentUser' });
+    }
   };
 
   const handleReplyToComment = (commentId: string) => {
@@ -50,15 +113,12 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   const handleSubmitReply = (commentId: string) => {
     const replyText = replyTexts[commentId];
     if (replyText.trim()) {
-      const reply: Interact = {
-        _id: `reply-${Date.now()}`,
+      const reply: CommentType = {
+        _iduser: 'CurrentUser',
+        content: replyText,
+        img: [],
+        replyComment: [],
         emoticons: [],
-        comment: {
-          _iduser: 'CurrentUser',
-          content: replyText,
-          img: [],
-          replyComment: [],
-        },
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -80,15 +140,12 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
 
   const handleSubmitNewComment = () => {
     if (newComment.trim()) {
-      const comment: Interact = {
-        _id: `comment-${Date.now()}`,
+      const comment: CommentType = {
+        _iduser: 'CurrentUser',
+        content: newComment,
+        img: [],
+        replyComment: [],
         emoticons: [],
-        comment: {
-          _iduser: 'CurrentUser',
-          content: newComment,
-          img: [],
-          replyComment: [],
-        },
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -163,17 +220,21 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
       )}
 
       <Box display="flex" alignItems="center" sx={{ marginTop: 2 }}>
-        <ThumbUpAlt fontSize="small" sx={{ color: '#2e7d32', marginRight: 1 }} />
-        <Favorite fontSize="small" sx={{ color: '#d32f2f', marginRight: 1 }} />
+        <Favorite fontSize="small" sx={{ color: '#d32f2f' }} />
         <Typography variant="body2" sx={{ color: '#757575', marginLeft: 1 }}>
-          {post.interact.length || 0} likes - {post.interact.length || 0} bình luận
+          {totalPostLikes} lượt thích - {totalComments} bình luận
         </Typography>
       </Box>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginTop: 2 }}>
         <Box>
-          <Button startIcon={<Favorite />} size="small" sx={{ color: '#424242', marginRight: 2, '&:hover': { backgroundColor: '#f5f5f5' } }}>
-            Yêu thích
+          <Button
+            startIcon={<Favorite />}
+            size="small"
+            sx={{ color: likedPosts.includes(post._id) ? '#d32f2f' : '#424242', marginRight: 2, '&:hover': { backgroundColor: '#f5f5f5' } }}
+            onClick={() => handleLikePost(post._id)}
+          >
+            {likedPosts.includes(post._id) ? 'Bỏ thích' : 'Yêu thích'}
           </Button>
           <Button startIcon={<Comment />} size="small" sx={{ color: '#424242', marginRight: 2, '&:hover': { backgroundColor: '#f5f5f5' } }} onClick={handleToggleComments}>
             Bình luận
@@ -204,94 +265,100 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
             </Button>
           </Box>
 
-          {post.interact.length > 0 ? (
+          {post.interact.comment.length > 0 ? (
             <Box>
-              {post.interact.map((comment: Interact, index: number) => (
-                <Box key={index} sx={{ marginBottom: 2, padding: 2, borderRadius: 2, backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                  <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
-                    {comment.comment._iduser}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
-                    {comment.comment.content}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
-                    {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-                  </Typography>
+              {post.interact.comment.map((comment, index) => {
+                const commentLikes = comment.emoticons.filter(emoticon => emoticon.typeEmoticons === 'like').length;
+                return (
+                  <Box key={index} sx={{ marginBottom: 2, padding: 2, borderRadius: 2, backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                    <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
+                      {comment._iduser}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
+                      {comment.content}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
+                      {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                    </Typography>
 
-                  <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
-                    <Button
-                      size="small"
-                      startIcon={<ThumbUpAlt />}
-                      sx={{ color: likedComments.includes(comment._id) ? '#2e7d32' : '#757575', textTransform: 'none' }}
-                      onClick={() => handleLikeComment(comment._id)}
-                    >
-                      {likedComments.includes(comment._id) ? 'Bỏ thích' : 'Thích'}
-                    </Button>
-                    <Button
-                      size="small"
-                      startIcon={<Reply />}
-                      sx={{ color: '#757575', textTransform: 'none' }}
-                      onClick={() => handleReplyToComment(comment._id)}
-                    >
-                      Trả lời
-                    </Button>
-                  </Box>
-
-                  {replyInputs[comment._id] && (
-                    <Box sx={{ marginTop: 1 }}>
-                      <TextField
-                        fullWidth
-                        variant="outlined"
-                        size="small"
-                        placeholder="Nhập trả lời của bạn..."
-                        value={replyTexts[comment._id] || ''}
-                        onChange={(e) => handleReplyChange(comment._id, e.target.value)}
-                        sx={{ marginBottom: 1, borderRadius: '8px', backgroundColor: '#fff' }}
-                      />
+                    <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
                       <Button
-                        variant="contained"
                         size="small"
-                        onClick={() => handleSubmitReply(comment._id)}
+                        startIcon={<ThumbUpAlt />}
+                        sx={{ color: likedComments[comment._iduser] ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                        onClick={() => handleLikeComment(comment._iduser)}
                       >
-                        Gửi
+                        {likedComments[comment._iduser] ? 'Bỏ thích' : 'Thích'} ({commentLikes})
+                      </Button>
+                      <Button
+                        size="small"
+                        startIcon={<Reply />}
+                        sx={{ color: '#757575', textTransform: 'none' }}
+                        onClick={() => handleReplyToComment(comment._iduser)}
+                      >
+                        Trả lời
                       </Button>
                     </Box>
-                  )}
 
-                  {comment.comment.replyComment.map((reply: Interact, replyIndex: number) => (
-                    <Box key={replyIndex} sx={{ marginTop: 2, paddingLeft: 2, borderLeft: '2px solid #bdbdbd' }}>
-                      <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
-                        {reply.comment._iduser}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
-                        {reply.comment.content}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
-                        {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
-                      </Typography>
-
-                      <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
-                        <Button
+                    {replyInputs[comment._iduser] && (
+                      <Box sx={{ marginTop: 1 }}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
                           size="small"
-                          startIcon={<ThumbUpAlt />}
-                          sx={{ color: likedComments.includes(reply._id) ? '#2e7d32' : '#757575', textTransform: 'none' }}
-                          onClick={() => handleLikeComment(reply._id)}
-                        >
-                          {likedComments.includes(reply._id) ? 'Bỏ thích' : 'Thích'}
-                        </Button>
+                          placeholder="Nhập trả lời của bạn..."
+                          value={replyTexts[comment._iduser] || ''}
+                          onChange={(e) => handleReplyChange(comment._iduser, e.target.value)}
+                          sx={{ marginBottom: 1, borderRadius: '8px', backgroundColor: '#fff' }}
+                        />
                         <Button
+                          variant="contained"
                           size="small"
-                          startIcon={<Reply />}
-                          sx={{ color: '#757575', textTransform: 'none' }}
-                          onClick={() => handleReplyToComment(reply._id)}
+                          onClick={() => handleSubmitReply(comment._iduser)}
                         >
-                          Trả lời
+                          Gửi
                         </Button>
                       </Box>
-                    </Box>
-                  ))}
-                </Box>
-              ))}
+                    )}
+
+                    {comment.replyComment.map((reply, replyIndex) => {
+                      const replyLikes = reply.emoticons.filter(emoticon => emoticon.typeEmoticons === 'like').length;
+                      return (
+                        <Box key={replyIndex} sx={{ marginTop: 2, paddingLeft: 2, borderLeft: '2px solid #bdbdbd' }}>
+                          <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
+                            {reply._iduser}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
+                            {reply.content}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
+                            {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
+                          </Typography>
+
+                          <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
+                            <Button
+                              size="small"
+                              startIcon={<ThumbUpAlt />}
+                              sx={{ color: likedComments[reply._iduser] ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                              onClick={() => handleLikeReply(comment._iduser, reply._iduser)}
+                            >
+                              {likedComments[reply._iduser] ? 'Bỏ thích' : 'Thích'} ({replyLikes})
+                            </Button>
+                            <Button
+                              size="small"
+                              startIcon={<Reply />}
+                              sx={{ color: '#757575', textTransform: 'none' }}
+                              onClick={() => handleReplyToComment(reply._iduser)}
+                            >
+                              Trả lời
+                            </Button>
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                );
+              })}
             </Box>
           ) : (
             <Typography variant="body2" color="textSecondary">
