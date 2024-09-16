@@ -5,9 +5,15 @@ import ProfileHeader from '../components/ProfileHeader';
 import ProfileTabs from '../components/ProfileTabs';
 import SidebarRight from '../../../shared/components/sidebarRight/SidebarRight';
 import { Outlet } from 'react-router-dom';
+import { useProfile } from './useProfile';
 
 
 const Profile = () => {
+  const {myUser} = useProfile();
+
+  if (myUser == null) {
+    return <></>;
+  }
   return (
     <>
       <Header />
@@ -27,8 +33,8 @@ const Profile = () => {
             padding: '0 20px'
           }}
         >
-          <ProfileHeader/>
-          <ProfileTabs userID={'Phan Minh Quan'}/>
+          <ProfileHeader myUser={myUser} />
+          <ProfileTabs userID={myUser._id}/>
           <Outlet/>  
         </Grid>
         <Grid item xs={2.5}>
@@ -40,3 +46,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

@@ -7,14 +7,15 @@ import AlbumItem from "./AlbumItem";
 interface AlbumProps {
     title: string;
     collections: {label: string; data: AlbumItem[]}[];
+    currCollection: number;
+    setCurrCollection: (index: number) => void;
 }
-const Album = ({title, collections}: AlbumProps) => {
+const Album = ({title, collections, currCollection, setCurrCollection}: AlbumProps) => {
     const maxCard = 5;
-    const [currCollection, setCurrCollection] = useState(0);
     const [showAll, setShowAll] = useState(false);
     const displayedItems = showAll ? collections[currCollection].data : collections[currCollection].data.slice(0, maxCard);
     return (
-        <Box 
+        <Box id ="album"
           sx={{ 
             padding: '16px', 
             backgroundColor: '#fff',

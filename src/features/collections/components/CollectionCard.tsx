@@ -4,12 +4,13 @@ import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import VideoCard from "../../../shared/components/video-card/VideoCard";
 interface CollectionCardProps{
+    id: string;
     title: string;
     type: string;
     data: { link: string }[];
 }
 
-const CollectionCard = ({title, type, data}: CollectionCardProps) => {
+const CollectionCard = ({id, title, type, data}: CollectionCardProps) => {
     
     const tabs = ["Ảnh của bạn"];
     const [currTab, setCurrTab] = useState(0);
@@ -19,7 +20,7 @@ const CollectionCard = ({title, type, data}: CollectionCardProps) => {
     const [showAll, setShowAll] = useState(false);
     const displayedItems = showAll ? data : type === "img"? data.slice(0, 11): data.slice(0, 7);
   return (
-    <Box 
+    <Box id={id}
       sx={{ 
         padding: '16px', 
         backgroundColor: '#fff',
