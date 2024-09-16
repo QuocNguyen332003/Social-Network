@@ -1,9 +1,15 @@
 import { Search } from "@mui/icons-material";
 import { Box, IconButton, TextField, Typography } from "@mui/material";
 import ButtonCreateMessage from "../../components/ButtonCreateMessage";
-import DialogList from "../../components/DialogList";
+import ChatList from "./ChatList";
+import { DataChatListProps } from "../useChatList";
 
-function ListMesssages() {
+export type ListMessagesProps = {
+  data: DataChatListProps[];
+  changeChat: (userID: string) => void;
+}
+
+const ListMesssages = ({data, changeChat} : ListMessagesProps) => {
   return (
     <Box 
       sx={{ 
@@ -42,7 +48,7 @@ function ListMesssages() {
             </Box>
         </Box>
         <ButtonCreateMessage/>
-        <DialogList/>
+        <ChatList data={data} changeChat={changeChat}/>
     </Box>
   );
 }

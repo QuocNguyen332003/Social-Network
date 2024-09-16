@@ -1,18 +1,23 @@
 import { Box, Typography } from "@mui/material";
 import FriendsCard from "../../components/FriendsCard";
 import { BoxButtonRequest } from "../../components/BoxButton";
-
-const dataTest = [
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."},
-  {avt: "/src/assets/images/avt.png", name: "Phan Minh Quân", message: "Use the Base UI Button for complete ownership of the component's design, with no Material UI or Joy UI styles to override. This unstyled version of the component is the ideal choice for heavy customization with a smaller bundle size."}
-]
+import { useRequestFriend } from "./useRequestFriend";
+import { useDialogRequestFriend } from "./useDialogRequestFriend";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 function App() {  
+  const {data, AcceptsFriend, RefuseFriend} = useRequestFriend();
+  const {showDialog,message, setShowDialog, SetValueDialog} = useDialogRequestFriend();
+
+  const PressAcceptsFriend = (userID: String, name: string) => {
+    AcceptsFriend(userID);
+    SetValueDialog(`Bạn và ${name} đã trở thành bạn bè`);
+  }
+
+  const PressRefuseFriend = (userID: String, name: string) => {
+      RefuseFriend(userID);
+      SetValueDialog(`Bạn đã từ chối lời mời của ${name}`);
+  }
   return (
     <Box 
       sx={{ 
@@ -30,7 +35,21 @@ function App() {
       sx={{fontWeight: 'bold'}}>
         Lời mời kết bạn
       </Typography>
-      {dataTest.map((item) => <FriendsCard avt={item.avt} name={item.name} message={item.message} BoxButton={BoxButtonRequest}/>)}
+      {data.map((item) => <FriendsCard 
+        avt={item.avt} 
+        name={item.name} 
+        message={item.aboutMe}>
+          <BoxButtonRequest FuncButton={[() => {PressRefuseFriend(item.userID, item.name)}, 
+                                        ()=> {PressAcceptsFriend(item.userID, item.name)}]}/>
+        </FriendsCard>)}
+      <ConfirmDialog
+        title = {"Thông Báo"}
+        open={showDialog}
+        onClose={() => { setShowDialog(false); } }
+        message={message} 
+        textOnClose={"OK"}
+        actions={[]}        
+        />
     </Box>
   );
 }

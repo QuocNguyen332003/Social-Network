@@ -1,13 +1,15 @@
 import { Box } from "@mui/material";
 import MessageCard from "./MessageCard";
+import { DataChatListProps } from "../containers/useChatList";
 
-const HeaderMessages = () => {
+type HeaderMessageProps = {
+  dataConversation: DataChatListProps;
+}
+
+const HeaderMessages = ({dataConversation}: HeaderMessageProps) => {
   return (
     <Box>
-        <MessageCard avt={"src/assets/images/avt.png"} 
-            name={"Phan Minh Quan"} 
-            lastMessage={"Send to a paid message"} 
-            date={new Date()} 
+        <MessageCard dataCard={dataConversation} 
             onClick={function (): void {} }
         />
     </Box>

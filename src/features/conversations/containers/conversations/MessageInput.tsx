@@ -1,15 +1,32 @@
 import { Box, Button, IconButton, TextField } from "@mui/material";
+import SendIcon from '@mui/icons-material/Send';
+import { useState } from "react";
 
-function MessageInput() {
+interface MessageInputProps{
+  sendMessage: (type: string, data: string, userID: string) => void;
+  userID: string;
+}
+
+const MessageInput = ({sendMessage, userID}: MessageInputProps) => {
+  const [text, setText] = useState<string>("");
+  const handlePressSend = () => {
+    if (text != ""){
+      sendMessage("text", text, userID);
+      setText("");
+    }
+  }
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setText(event.target.value);
+  };
   return (
     <Box 
       sx={{ 
-        height: '17vh', 
-        display: 'flex', flexDirection: 'column', justifyContent: 'space-around'
+        display: 'flex', flexDirection: 'column', justifyContent: 'space-around', padding: '20px'
       }}
     >
         <TextField id="standard-basic" label="Nhấn vào đây..." variant="standard" 
-            sx={{ margin: '10px 50px',
+        value={text} onChange={handleChange}
+            sx={{ margin: '10px 0px', borderBottom: '1px solid black',
                 "& .MuiInput-underline:before": {
                   borderBottom: "none",
                 },
@@ -21,7 +38,7 @@ function MessageInput() {
                 },
               }}
         />
-        <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '10px 20px'}}>
+        <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
             <Box>
             <IconButton color="secondary" aria-label="add an alarm">
                 <img
@@ -59,7 +76,10 @@ function MessageInput() {
                 />
             </IconButton>
             </Box>
-            <Button variant="contained">Gửi</Button>
+            <Button variant="contained" endIcon={<SendIcon />}
+            onClick={handlePressSend}>
+              Send
+            </Button>
         </Box>
     </Box>
   );

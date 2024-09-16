@@ -23,9 +23,10 @@ import SavedItems from '../../features/saved/containers/saved/SavedItems';
 import NotificationPage from '../../features/notifications/containers/notifications/NotificationPage';
 import CollectionsMain from '../../features/collections/containers/CollectionsMain';
 import Collections from '../../features/collections/containers/collection/Collection';
-import DetailArticle from '../../features/collections/containers/article-collection/DetailArticle';
+import DetailArticle from '../../features/collections/containers/article-collection/DetailArticle'
 import DetailArticles from '../../features/new-feeds/containers/detail-article/DetailArticles';
 import NewFeedsContent from '../../features/new-feeds/components/NewFeedsContent'
+import MyFriendsRequest from '../../features/friends/containers/my-friend-request/MyFriendsRequest';
 const Routes = () => {
   const router = createBrowserRouter([
     {
@@ -115,6 +116,10 @@ const Routes = () => {
         {
           path: 'friends-suggest',
           element: <FriendsSuggest />,
+        },
+        {
+          path: 'my-friends-request',
+          element: <MyFriendsRequest />,
         },
       ],
     },

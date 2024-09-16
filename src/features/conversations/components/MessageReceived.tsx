@@ -1,4 +1,5 @@
 import { Box, Typography} from "@mui/material";
+import VideoCard from "../../../shared/components/video-card/VideoCard";
 
 export enum Position {
     Top = "top",
@@ -10,13 +11,13 @@ export enum Position {
 interface MessageCardProps {
     avt: string;
     date: Date;
-    text: string;
-    link: string;
+    type: string;
+    data: string;
     displayAvt: boolean;
     positionMessage: Position;
   }
 
-function MessageReceived({avt, date, text, link, displayAvt, positionMessage}: MessageCardProps) {
+function MessageReceived({avt, date, type, data, displayAvt, positionMessage}: MessageCardProps) {
 
   return (
     <Box sx={{display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-end'}}>
@@ -32,14 +33,14 @@ function MessageReceived({avt, date, text, link, displayAvt, positionMessage}: M
           )}
         </Box>
         <Box>
-            {link != "" && (
+            {type == "image" && (
                 <img
-                src= {link}
+                src= {data}
                 alt=""
                 style={{maxWidth: '100px'}}
               />
             )}
-            {text != "" && (
+            {type == "text" && (
                 <Typography variant="subtitle2" component="h2" color='#333' fontWeight='regular'
                     sx={[{ 
                     fontWeight: '400',
@@ -48,8 +49,11 @@ function MessageReceived({avt, date, text, link, displayAvt, positionMessage}: M
                     }, positionMessage===Position.Top?{borderTopLeftRadius: 20}: 
                        positionMessage===Position.Bottom?{borderBottomLeftRadius: 20}:
                        positionMessage===Position.Alone?{borderBottomLeftRadius: 20, borderTopLeftRadius: 20}:{}]}>
-                    {text}
+                    {data}
                 </Typography>)}
+            {type == "video" && (
+                <VideoCard linkVideo={data}/>
+            )}
         </Box>
     </Box>
   );
