@@ -18,7 +18,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ userID }) => {
 
   const currentTab = tabMap[location.pathname.split('/').pop() || ''] || 0; 
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
 
     const pathMap = ['', 'image', 'video'];
     navigate(`/profile/${userID}/${pathMap[newValue]}`);

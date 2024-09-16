@@ -2,10 +2,23 @@ import { Add } from "@mui/icons-material";
 import { Avatar, Box, Button, List, ListItem, ListItemText, Typography } from "@mui/material"
 import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
+import { CollectionContextType } from "../useCollection";
 
-const SidebarRightCollections = () => {
+const SidebarRightCollections = ({setCurrCollection}: CollectionContextType) => {
   const collections = ['SG', 'TV & Phim ảnh'];
-  const categorys = [{label: 'Hình ảnh', icon: <CropOriginalIcon/>}, {label: 'Video', icon: <SlowMotionVideoIcon/>}];
+  const categorys = [
+    { label: 'Hình ảnh', icon: <CropOriginalIcon />, id: 'collection-image' },
+    { label: 'Video', icon: <SlowMotionVideoIcon />, id: 'collection-video' },
+    // Thêm các danh mục khác nếu cần
+  ]
+
+  const handleScroll = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
     return(
     <Box sx={{padding: '10px'}}>
       <Typography
@@ -24,6 +37,7 @@ const SidebarRightCollections = () => {
           <ListItem
             button
             key={index}
+            onClick={() => handleScroll(category.id)}
             sx={{
               borderRadius: 2,
               backgroundColor: '#f5f5f5',
@@ -59,6 +73,7 @@ const SidebarRightCollections = () => {
           <ListItem
             button
             key={index}
+            onClick={() => {handleScroll("album"); setCurrCollection(index)}}
             sx={{
               borderRadius: 2,
               backgroundColor: '#f5f5f5',

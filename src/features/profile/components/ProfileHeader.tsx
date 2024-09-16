@@ -2,9 +2,13 @@ import { Box, Typography, Button, Avatar, IconButton } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import ShareIcon from '@mui/icons-material/Share';
 import { useNavigate } from 'react-router-dom';
+import { User } from '../../../interface/interface';
 
-const userID = 'Phan Minh Quan'
-const ProfileHeader = () => {
+export type DataUser = {
+  myUser: User;
+}
+
+const ProfileHeader = ({myUser}: DataUser) => {
   const navigate = useNavigate();
   return (
     <Box
@@ -19,7 +23,7 @@ const ProfileHeader = () => {
     >
       <Box
       sx={{
-        backgroundImage: 'url(/src/assets/images/background-group-test.jpg)',
+        backgroundImage: `url(${myUser.backGround[myUser.backGround.length - 1]})`,
         height: '300px',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -31,14 +35,14 @@ const ProfileHeader = () => {
       {/* Group Info and Avatar */}
       <Box sx={{ position: 'absolute', bottom: '20px', left: '16px', display: 'flex', alignItems: 'center' }}>
         <IconButton sx={{padding: 0}}>
-          <Avatar src="/src/assets/images/avt.png" sx={{ width: '150px', height: '150px', border: '4px solid white' }} />
+          <Avatar src={myUser.avt[myUser.avt.length - 1]} sx={{ width: '150px', height: '150px', border: '4px solid white' }} />
         </IconButton>
         <Box sx={{ marginLeft: '16px', marginTop: '10px'}}>
           <Typography variant="h5" color="black" fontWeight="bold">
-            Phan Minh Quan
+            {myUser.firstName + " " + myUser.lastName}
           </Typography>
           <Typography variant="body1" color="black">
-            @MquanArt
+            {myUser.userName}
           </Typography>
         </Box>
       </Box>
@@ -50,7 +54,7 @@ const ProfileHeader = () => {
             backgroundColor: '#e9e9e9',
             color: '#150aa1',  textTransform: 'none',
            }} 
-           onClick={()=> {navigate(`/edit-profile/${userID}`)}}
+           onClick={()=> {navigate(`/edit-profile/${myUser._id}`)}}
           >
           Chỉnh sửa
         </Button>

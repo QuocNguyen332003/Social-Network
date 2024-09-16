@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IconButton, Avatar, Menu, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const userID = "Phan Minh Quan";
+const userID = "u123";
 
 const UserAvatarMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

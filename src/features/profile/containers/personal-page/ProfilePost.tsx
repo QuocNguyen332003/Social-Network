@@ -4,8 +4,6 @@ import { useState } from "react";
 import Post from "../../../../shared/components/post/Post";
 import { Article, Comment } from '../../../../interface/interface';
 
-// Định nghĩa cấu trúc Emoticon, Comment, Interact, và Article
-
 const ProfilePost = () => {
   const [posts, setPosts] = useState<Article[]>([
     {
@@ -47,6 +45,7 @@ const ProfilePost = () => {
     },
   ]);
 
+
   const handlePostSubmit = (newPost: string, images: File[]) => {
     const newPostEntry: Article = {
       _id: (posts.length + 1).toString(),
@@ -77,6 +76,7 @@ const ProfilePost = () => {
       )
     );
   };
+
 
   const handleAddReply = (postId: string, commentId: string, newReply: Comment) => {
     setPosts((prevPosts) =>

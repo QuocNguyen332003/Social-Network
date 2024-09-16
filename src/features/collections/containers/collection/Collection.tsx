@@ -1,8 +1,10 @@
 import { Box } from "@mui/material";
 import CollectionCard from "../../components/CollectionCard";
 import Album from "../../components/Album";
+import { useCollectionContext } from "../../useCollection";
 
 const Collections = () => {
+    const { currCollection, setCurrCollection } = useCollectionContext();
     const dataTestImg = [
         {link: "/src/assets/images/avt.png"},{link: "/src/assets/images/avt.png"},{link: "/src/assets/images/avt.png"},
         {link: "/src/assets/images/background-login.png"},{link: "/src/assets/images/avt.png"},{link: "/src/assets/images/avt.png"},
@@ -109,9 +111,9 @@ const Collections = () => {
       }}
       
     >
-      <CollectionCard title={"Ảnh"} type={"img"} data={dataTestImg}/>
-      <CollectionCard title={"Video"} type={"video"} data={dataTestVideo}/>
-      <Album title={"Album"} collections={dataAlbum}/>
+      <CollectionCard title={"Ảnh"} type={"img"} data={dataTestImg} id={'collection-image'}/>
+      <CollectionCard title={"Video"} type={"video"} data={dataTestVideo} id={'collection-video'}/>
+      <Album title={"Album"} collections={dataAlbum} currCollection={currCollection} setCurrCollection={setCurrCollection}/>
     </Box>
   );
 }
