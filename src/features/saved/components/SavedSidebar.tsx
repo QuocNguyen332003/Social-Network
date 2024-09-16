@@ -1,7 +1,7 @@
-import React from 'react';
-import { Box, Typography, List, ListItem, ListItemText, Avatar, Divider, Button } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, List, ListItem, ListItemText, Avatar, Divider, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import { User } from '../../../interface/interface'; 
+import { User } from '../../../interface/interface';
 
 interface SavedSidebarProps {
   user: User;
@@ -9,6 +9,38 @@ interface SavedSidebarProps {
 }
 
 const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection }) => {
+  const [openDialog, setOpenDialog] = useState(false); // Quản lý hộp thoại
+  const [newCollectionName, setNewCollectionName] = useState(''); // Quản lý tên bộ sưu tập mới
+
+  // Xử lý mở/đóng hộp thoại
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setNewCollectionName(''); // Reset tên sau khi đóng
+  };
+
+  // Xử lý khi click vào nút "Tạo bộ sưu tập mới"
+  const handleCreateCollection = () => {
+    if (newCollectionName.trim()) {
+      const newCollection = {
+        _id: `collection${user.collections.length + 1}`,
+        name: newCollectionName,
+        items: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        _destroy: new Date(),
+      };
+
+      // Thêm bộ sưu tập mới vào danh sách bộ sưu tập của user
+      user.collections.push(newCollection);
+
+      handleCloseDialog(); // Đóng hộp thoại sau khi tạo xong
+    }
+  };
+
   const handleSavedClick = () => {
     onSelectCollection(null); // Khi click vào "Mục đã lưu" thì đặt collectionId là null (hiển thị tất cả bài viết)
   };
@@ -128,12 +160,33 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection })
           backgroundColor: '#1e88e5',
           fontSize: { xs: '0.9rem', sm: '1rem' },
           ':hover': { backgroundColor: '#1565c0' },
-          marginTop: 'auto',
         }}
         startIcon={<Add />}
+        onClick={handleOpenDialog} // Mở hộp thoại tạo bộ sưu tập mới
       >
         Tạo bộ sưu tập mới
       </Button>
+
+      {/* Dialog tạo bộ sưu tập mới */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Tạo bộ sưu tập mới</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Tên bộ sưu tập"
+            fullWidth
+            value={newCollectionName}
+            onChange={(e) => setNewCollectionName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Hủy</Button>
+          <Button onClick={handleCreateCollection} variant="contained">
+            Tạo
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

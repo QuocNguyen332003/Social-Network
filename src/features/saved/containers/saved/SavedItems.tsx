@@ -1,3 +1,4 @@
+ 
 import React, { useState } from 'react';
 import { Box, Grid } from '@mui/material';
 import Header from '../../../../shared/components/header/Header';
@@ -6,7 +7,7 @@ import MainContent from './MainContent';
 import { User, Article } from '../../../../interface/interface';
 
 // Mock user and articles data
-const user: User = {
+const initialUserData: User = {
   _id: 'user123',
   account: {
     email: 'user@example.com',
@@ -72,7 +73,7 @@ const articles: Article[] = [
     interact: {
       _id: 'interact1',
       emoticons: [],
-      comment: [], // Nếu không có bình luận
+      comment: [],
     },
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -89,7 +90,7 @@ const articles: Article[] = [
     interact: {
       _id: 'interact2',
       emoticons: [],
-      comment: [], // Nếu không có bình luận
+      comment: [],
     },
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -106,7 +107,7 @@ const articles: Article[] = [
     interact: {
       _id: 'interact3',
       emoticons: [],
-      comment: [], // Nếu không có bình luận
+      comment: [],
     },
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -114,54 +115,24 @@ const articles: Article[] = [
   },
 ];
 
-
 const SavedItems = () => {
-  // Quản lý bộ sưu tập được chọn
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
+  const [user, setUser] = useState<User>(initialUserData); // State for user data
 
   return (
     <>
       <Header />
       <Box sx={{ height: '100vh' }}>
         <Grid container sx={{ height: '100%' }}>
-          {/* Sidebar chứa danh sách các bộ sưu tập */}
-          <Grid
-            item
-            xs={12}
-            sm={3}
-            sx={{
-              height: { xs: 'auto', sm: '100%' },
-            }}
-          >
-            <Box
-              sx={{
-                height: { xs: 'auto', sm: '100%' },
-                marginRight: { xs: 0, sm: 2 },
-              }}
-            >
-              {/* Truyền callback để chọn bộ sưu tập */}
-              <SavedSidebar
-                user={user}
-                onSelectCollection={setSelectedCollectionId} // Cập nhật bộ sưu tập được chọn
-              />
-            </Box>
+          <Grid item xs={12} sm={3}>
+            <SavedSidebar user={user} onSelectCollection={setSelectedCollectionId} />
           </Grid>
-
-          {/* Nội dung chính hiển thị các bài viết của bộ sưu tập được chọn */}
-          <Grid
-            item
-            xs={12}
-            sm={9}
-            sx={{
-              overflowY: 'auto',
-              backgroundColor: '#e9e9e9',
-            }}
-          >
-            {/* Truyền collectionId được chọn xuống MainContent */}
+          <Grid item xs={12} sm={9}>
             <MainContent
               user={user}
-              articles={articles}
-              selectedCollectionId={selectedCollectionId} // Hiển thị các bài viết thuộc bộ sưu tập được chọn
+              setUser={setUser}                // Pass setUser to MainContent
+              articles={articles}              // Your articles data
+              selectedCollectionId={selectedCollectionId}
             />
           </Grid>
         </Grid>
