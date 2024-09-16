@@ -2,6 +2,7 @@ import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/mat
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupIcon from '@mui/icons-material/Group';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useNavigate } from 'react-router-dom'; // Thêm hook useNavigate
 
 const SidebarLeftFriends = () => {
@@ -30,6 +31,12 @@ const SidebarLeftFriends = () => {
             <GroupAddIcon sx={{ color: '#8b9dc3' }} />
           </ListItemIcon>
           <ListItemText primary="Lời mời kết bạn" />
+        </ListItem>
+        <ListItem button onClick={() => navigate('/friends/my-friends-request')}>
+          <ListItemIcon>
+            <PersonAddIcon sx={{ color: '#8b9dc3' }} />
+          </ListItemIcon>
+          <ListItemText primary="Lời mời kết bạn của tôi" />
         </ListItem>
       </List>
     </div>

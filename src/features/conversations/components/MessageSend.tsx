@@ -1,28 +1,29 @@
 import { Box, Typography} from "@mui/material";
 import { Position } from "./MessageReceived";
+import VideoCard from "../../../shared/components/video-card/VideoCard";
 
 interface MessageCardProps {
     avt: string;
     date: Date;
-    text: string;
-    link: string;
+    type: string;
+    data: string;
     displayAvt: boolean;
     positionMessage: Position;
   }
 
-function MessageSend({avt, date, text, link, displayAvt, positionMessage}: MessageCardProps) {
+function MessageSend({avt, date, type, data, displayAvt, positionMessage}: MessageCardProps) {
 
   return (
     <Box sx={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
         <Box>
-            {link != "" && (
+            {type == "image" && (
                 <img
-                src= {link}
+                src= {data}
                 alt=""
                 style={{maxWidth: '100px'}}
               />
             )}
-            {text != "" && (
+            {type == "text" && (
                 <Typography variant="subtitle2" component="h2" color='#333' fontWeight='regular'
                     sx={[{ 
                     fontWeight: '400', color: '#fff',
@@ -31,8 +32,11 @@ function MessageSend({avt, date, text, link, displayAvt, positionMessage}: Messa
                     }, positionMessage===Position.Top?{borderTopRightRadius: 20}: 
                        positionMessage===Position.Bottom?{borderBottomRightRadius: 20}:
                        positionMessage===Position.Alone?{borderBottomRightRadius: 20, borderTopRightRadius: 20}:{}]}>
-                    {text}
+                    {data}
                 </Typography>)}
+            {type == "video" && (
+                <VideoCard linkVideo={data}/>
+            )}
         </Box>
         <Box
           sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', 

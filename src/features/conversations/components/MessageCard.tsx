@@ -1,16 +1,16 @@
 import { Box, Typography} from "@mui/material";
-
+import { DataChatListProps } from "../containers/useChatList";
 interface MessageCardProps {
-    avt: string;
-    name: string;
-    lastMessage: string;
-    date: Date;
+    dataCard: DataChatListProps;
     onClick: () => void;
   }
 
-function MessageCard({avt, name, lastMessage, date, onClick}: MessageCardProps) {
+const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
 
-  const formattedDate = date.toLocaleDateString('en-US', {
+  if (!dataCard || !dataCard.sendDate) {
+    return null;
+  }
+  const formattedDate = dataCard.sendDate.toLocaleDateString('en-US', {
     month: 'long', 
     day: 'numeric'
   });
@@ -36,33 +36,36 @@ function MessageCard({avt, name, lastMessage, date, onClick}: MessageCardProps) 
         <Box
           sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 10px'}}>
           <img
-            src= {avt}
+            src= {dataCard.avt}
             alt="Ảnh đại diện"
             style={{width: '30px', height: '30px', borderRadius: 50 }}
           />
         </Box>
         <Box sx={{width: '100%'}}>
             <Box display='flex' justifyContent='space-between'>
-                <Typography variant="subtitle2" component="h2" fontWeight='bold'>
-                    {name}
+                <Typography variant="subtitle2" component="h2" fontWeight={dataCard.isRead? 'regular': 'bold'}>
+                    {dataCard.name}
                 </Typography>
                 <Typography variant="subtitle2" component="h2" color='#333' fontWeight='regular'>
                     {formattedDate}
                 </Typography>
             </Box>
-            <Typography variant="body2" component="h2" 
-              sx={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                textAlign: "left",
-                fontSize: 12,
-              }}
-            >
-            {lastMessage}
-            </Typography>
+            <Box sx={{display: 'flex', justifyContent: 'space-between'}} >
+              <Typography variant="body2" component="h2" 
+                sx={[{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  textAlign: "left",
+                  fontSize: 12,
+                }, dataCard.isRead? {}: {fontWeight: 'bold'}]}
+              >
+              {dataCard.lastMessage.message}
+              </Typography>
+                {!dataCard.isRead && <div style={{width: '8px', height: '8px', backgroundColor: 'black', borderRadius: 50}}/>}
+            </Box>
         </Box>
     </Box>
     </button>

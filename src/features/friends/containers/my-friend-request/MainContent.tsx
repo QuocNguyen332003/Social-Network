@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import FriendsCard from "../../components/FriendsCard";
-import { BoxButtonSuggest } from "../../components/BoxButton";
+import { BoxButtonMyRequest } from "../../components/BoxButton";
 import { useRequestFriend } from "./useRequestFriend";
 import { useDialogRequestFriend } from "./useDialogRequestFriend";
 import ConfirmDialog from "../../components/ConfirmDialog";
@@ -9,9 +9,9 @@ function App() {
   const {data, SendAddFriend} = useRequestFriend();
   const {showDialog,message, setShowDialog, SetValueDialog} = useDialogRequestFriend();
 
-  const PressAddFiend = (userID: string, name: string) => {
+  const PressRecallFiend = (userID: string, name: string) => {
     SendAddFriend(userID);
-    SetValueDialog(`Bạn đã gửi lời mời kết bạn đến ${name}`)
+    SetValueDialog(`Bạn đã thu hồi lời mời kết bạn với ${name}`)
   }
   return (
     <Box 
@@ -34,7 +34,7 @@ function App() {
         avt={item.avt} 
         name={item.name} 
         message={item.aboutMe}>
-          <BoxButtonSuggest FuncButton={[() => {PressAddFiend(item.userID, item.name)}]}/>
+          <BoxButtonMyRequest FuncButton={[() => {PressRecallFiend(item.userID, item.name)}]}/>
         </FriendsCard>)}
       <ConfirmDialog
         title = {"Thông Báo"}
