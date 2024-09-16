@@ -2,122 +2,93 @@ import { Box } from "@mui/material";
 import PostForm from "../../../../shared/components/postForm/PostForm";
 import { useState } from "react";
 import Post from "../../../../shared/components/post/Post";
+import { Article, Comment } from '../../../../interface/interface';
 
-interface EmoticonProps {
-  typeEmoticons: string;
-  _iduser: string;
-}
-
-interface CommentProps {
-  _id: string;
-  _iduser: string;
-  content: string;
-  img?: string[];
-  replyComment?: CommentProps[];
-  emoticons?: EmoticonProps[];
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
-
-interface PostData {
-  _id: string;
-  idAuthor: string;
-  startDate: Date;
-  groupID?: string;
-  changeDate?: Date;
-  content: string;
-  img?: string[];
-  scope: string;
-  emoticons?: EmoticonProps[];
-  comments?: CommentProps[];
-  createdAt: Date;
-  updatedAt: Date;
-  _destroy?: Date;
-}
+// Định nghĩa cấu trúc Emoticon, Comment, Interact, và Article
 
 const ProfilePost = () => {
-  const [posts, setPosts] = useState<PostData[]>([
+  const [posts, setPosts] = useState<Article[]>([
     {
       _id: '1',
-      idAuthor: 'Panda Media',
-      startDate: new Date(),
-      content:
-        "[Historical Fact] The West first learned of the giant panda on 11 March 1869, when the French missionary Armand David received a skin from a hunter. In 1936, Ruth Harkness became the first Westerner to bring back a live giant panda.",
+      idHandler: 'Panda Media',
+      handleDate: new Date(),
+      groupID: null,
+      content: 'This is a sample post content about pandas.',
+      listPhoto: ['/static/images/panda1.jpg', '/static/images/panda2.jpg'],
       scope: 'Public',
-      comments: [
-        {
-          _id: 'comment-1',
-          _iduser: 'JohnDoe',
-          content: 'Wow, that’s interesting!',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          replyComment: [],
-          emoticons: [],
-        },
-        {
-          _id: 'comment-2',
-          _iduser: 'JaneDoe',
-          content: 'I never knew that!',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          replyComment: [
-            {
-              _id: 'comment-3',
-              _iduser: 'PandaLover',
-              content: 'Yes, it’s a fascinating history!',
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              replyComment: [],
-              emoticons: [],
-            },
-          ],
-          emoticons: [],
-        },
-      ],
+      interact: {
+        _id: 'interact-1',
+        emoticons: [{ typeEmoticons: 'like', _iduser: 'user1' }],
+        comment: [
+          {
+            _iduser: 'JohnDoe',
+            content: 'Wow, that’s interesting!',
+            img: [],
+            replyComment: [
+              {
+                _iduser: 'JaneDoe',
+                content: 'Yes, it’s amazing!',
+                img: [],
+                replyComment: [],
+                emoticons: [],
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              },
+            ],
+            emoticons: [{ typeEmoticons: 'like', _iduser: 'user2' }],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
-      emoticons: [],
+      _destroy: new Date(),
     },
   ]);
 
   const handlePostSubmit = (newPost: string, images: File[]) => {
-    const newPostEntry: PostData = {
+    const newPostEntry: Article = {
       _id: (posts.length + 1).toString(),
-      idAuthor: 'Panda Media',
-      startDate: new Date(),
+      idHandler: 'Panda Media',
+      handleDate: new Date(),
+      groupID: null,
       content: newPost,
-      img: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : undefined,
+      listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],
       scope: 'Public',
-      comments: [],
-      emoticons: [],
+      interact: {
+        _id: `interact-${posts.length + 1}`,
+        emoticons: [],
+        comment: [],
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
+      _destroy: new Date(),
     };
     setPosts([newPostEntry, ...posts]);
   };
 
-  const handleAddComment = (postId: string, newComment: CommentProps) => {
+  const handleAddComment = (postId: string, newComment: Comment) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post._id === postId
-          ? { ...post, comments: [...post.comments!, newComment] }
+          ? { ...post, interact: { ...post.interact, comment: [...post.interact.comment, newComment] } }
           : post
       )
     );
   };
 
-  const handleAddReply = (postId: string, commentId: string, newReply: CommentProps) => {
+  const handleAddReply = (postId: string, commentId: string, newReply: Comment) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) => {
         if (post._id === postId) {
-          const updatedComments = post.comments!.map((comment) => {
-            if (comment._id === commentId) {
-              return { ...comment, replyComment: [...comment.replyComment!, newReply] };
+          const updatedComments = post.interact.comment.map((comment) => {
+            if (comment._iduser === commentId) {
+              return { ...comment, replyComment: [...comment.replyComment, newReply] };
             }
             return comment;
           });
-          return { ...post, comments: updatedComments };
+          return { ...post, interact: { ...post.interact, comment: updatedComments } };
         }
         return post;
       })
@@ -125,12 +96,9 @@ const ProfilePost = () => {
   };
 
   return (
-    <Box sx={{
-      backgroundColor: '#e9e9e9',
-      padding: '20px 0'
-    }}>
-        <PostForm onSubmit={handlePostSubmit} />
-        {posts.map((post, index) => (
+    <Box sx={{ backgroundColor: '#e9e9e9', padding: '20px 0' }}>
+      <PostForm onSubmit={handlePostSubmit} />
+      {posts.map((post, index) => (
         <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} />
       ))}
     </Box>

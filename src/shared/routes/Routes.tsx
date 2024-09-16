@@ -27,6 +27,8 @@ import DetailArticle from '../../features/collections/containers/article-collect
 import DetailArticles from '../../features/new-feeds/containers/detail-article/DetailArticles';
 import NewFeedsContent from '../../features/new-feeds/components/NewFeedsContent'
 import MyFriendsRequest from '../../features/friends/containers/my-friend-request/MyFriendsRequest';
+
+
 const Routes = () => {
   const router = createBrowserRouter([
     {

@@ -5,7 +5,7 @@ import SavedSidebar from '../../components/SavedSidebar';
 import MainContent from './MainContent';
 import { User, Article } from '../../../../interface/interface';
 
-// Mock user and articles data here (as in your example)
+// Mock user and articles data
 const user: User = {
   _id: 'user123',
   account: {
@@ -69,7 +69,11 @@ const articles: Article[] = [
     content: 'This is the first article content',
     listPhoto: ['/src/assets/images/avt.png'],
     scope: 'public',
-    interact: [],
+    interact: {
+      _id: 'interact1',
+      emoticons: [],
+      comment: [], // Nếu không có bình luận
+    },
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
@@ -82,7 +86,11 @@ const articles: Article[] = [
     content: 'This is the second article content',
     listPhoto: ['/src/assets/images/avt.png'],
     scope: 'public',
-    interact: [],
+    interact: {
+      _id: 'interact2',
+      emoticons: [],
+      comment: [], // Nếu không có bình luận
+    },
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
@@ -95,21 +103,28 @@ const articles: Article[] = [
     content: 'This is the third article content',
     listPhoto: ['/src/assets/images/avt.png'],
     scope: 'public',
-    interact: [],
+    interact: {
+      _id: 'interact3',
+      emoticons: [],
+      comment: [], // Nếu không có bình luận
+    },
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
   },
 ];
 
+
 const SavedItems = () => {
-  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null); // Quản lý bộ sưu tập được chọn
+  // Quản lý bộ sưu tập được chọn
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
 
   return (
     <>
       <Header />
       <Box sx={{ height: '100vh' }}>
         <Grid container sx={{ height: '100%' }}>
+          {/* Sidebar chứa danh sách các bộ sưu tập */}
           <Grid
             item
             xs={12}
@@ -125,10 +140,14 @@ const SavedItems = () => {
               }}
             >
               {/* Truyền callback để chọn bộ sưu tập */}
-              <SavedSidebar user={user} onSelectCollection={setSelectedCollectionId} />
+              <SavedSidebar
+                user={user}
+                onSelectCollection={setSelectedCollectionId} // Cập nhật bộ sưu tập được chọn
+              />
             </Box>
           </Grid>
 
+          {/* Nội dung chính hiển thị các bài viết của bộ sưu tập được chọn */}
           <Grid
             item
             xs={12}
@@ -139,7 +158,11 @@ const SavedItems = () => {
             }}
           >
             {/* Truyền collectionId được chọn xuống MainContent */}
-            <MainContent user={user} articles={articles} selectedCollectionId={selectedCollectionId} />
+            <MainContent
+              user={user}
+              articles={articles}
+              selectedCollectionId={selectedCollectionId} // Hiển thị các bài viết thuộc bộ sưu tập được chọn
+            />
           </Grid>
         </Grid>
       </Box>
@@ -147,4 +170,4 @@ const SavedItems = () => {
   );
 };
 
-export default SavedItems
+export default SavedItems;
