@@ -10,7 +10,7 @@ const DetailArticle = () => {
   const [posts, setPosts] = useState<Article[]>([
     {
       _id: '1',
-      isShare: false,
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'Panda Media',
       handleDate: null,
       groupID: null,

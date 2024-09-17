@@ -62,7 +62,7 @@ const initialUserData: User = {
 const articles: Article[] = [
   {
     _id: 'article1',
-    isShare: false,
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'John Doe',
     handleDate: new Date(),
     groupID: 'group1',
@@ -80,7 +80,7 @@ const articles: Article[] = [
   },
   {
     _id: 'article2',
-    isShare: false,
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'Jane Doe',
     handleDate: new Date(),
     groupID: 'group2',
@@ -98,7 +98,7 @@ const articles: Article[] = [
   },
   {
     _id: 'article3',
-    isShare: false,
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'John Smith',
     handleDate: new Date(),
     groupID: 'group3',

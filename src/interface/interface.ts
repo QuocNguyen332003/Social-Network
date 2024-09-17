@@ -128,7 +128,7 @@ export interface Emoticon {
     // Article Interface
 export interface Article {
     _id: string;
-    isShare: boolean
+    sharedPostId: string | null; // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: string | null;
     handleDate: Date | null;
     groupID: string | null;

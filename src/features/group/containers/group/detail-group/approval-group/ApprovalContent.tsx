@@ -9,7 +9,7 @@ import {Group} from '../../../../../../interface/interface.ts'
 const mockArticles: Article[] = [
   {
     _id: 'article1',
-    isShare: false,
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'John Doe',
     handleDate: new Date(),
     groupID: 'group1',
@@ -27,7 +27,7 @@ const mockArticles: Article[] = [
   },
   {
     _id: 'article2',
-    isShare: false,
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'Jane Doe',
     handleDate: new Date(),
     groupID: 'group2',
@@ -45,7 +45,7 @@ const mockArticles: Article[] = [
   },
   {
     _id: 'article3',
-    isShare: false,
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'John Smith',
     handleDate: new Date(),
     groupID: 'group3',

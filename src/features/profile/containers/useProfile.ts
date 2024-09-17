@@ -134,12 +134,7 @@ const user: User[] = [
     groups: ["group1", "group2"],
     hobbies: ["reading", "coding", "traveling"],
     listArticle: ["article1", "article2", "article3"],
-    listArticleShare: [
-      {
-        id_article: "article1",
-        id_tuongtac: "interaction1"
-      }
-    ],
+    aboutMe: 'Hello',
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-09-01"),
     _destroy: new Date("2025-01-01")
@@ -187,12 +182,7 @@ const user: User[] = [
     groups: ["group1", "group2"],
     hobbies: ["reading", "coding", "traveling"],
     listArticle: ["article1", "article2", "article3"],
-    listArticleShare: [
-      {
-        id_article: "article1",
-        id_tuongtac: "interaction1"
-      }
-    ],
+    aboutMe: 'Hello',
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-09-01"),
     _destroy: new Date("2025-01-01")
@@ -240,12 +230,7 @@ const user: User[] = [
     groups: ["group1", "group2"],
     hobbies: ["reading", "coding", "traveling"],
     listArticle: ["article1", "article2", "article3"],
-    listArticleShare: [
-      {
-        id_article: "article1",
-        id_tuongtac: "interaction1"
-      }
-    ],
+    aboutMe: 'Hello',
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-09-01"),
     _destroy: new Date("2025-01-01")
@@ -293,12 +278,7 @@ const user: User[] = [
     groups: ["group1", "group2"],
     hobbies: ["reading", "coding", "traveling"],
     listArticle: ["article1", "article2", "article3"],
-    listArticleShare: [
-      {
-        id_article: "article1",
-        id_tuongtac: "interaction1"
-      }
-    ],
+    aboutMe: 'Hello',
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-09-01"),
     _destroy: new Date("2025-01-01")
@@ -346,12 +326,7 @@ const user: User[] = [
     groups: ["group1", "group2"],
     hobbies: ["reading", "coding", "traveling"],
     listArticle: ["article1", "article2", "article3"],
-    listArticleShare: [
-      {
-        id_article: "article1",
-        id_tuongtac: "interaction1"
-      }
-    ],
+    aboutMe: 'Hello',
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-09-01"),
     _destroy: new Date("2025-01-01")
@@ -399,12 +374,7 @@ const user: User[] = [
     groups: ["group1", "group2"],
     hobbies: ["reading", "coding", "traveling"],
     listArticle: ["article1", "article2", "article3"],
-    listArticleShare: [
-      {
-        id_article: "article1",
-        id_tuongtac: "interaction1"
-      }
-    ],
+    aboutMe: 'Hello',
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-09-01"),
     _destroy: new Date("2025-01-01")

@@ -8,6 +8,7 @@ const ProfilePost = () => {
   const [posts, setPosts] = useState<Article[]>([
     {
       _id: '1',
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'Panda Media',
       handleDate: new Date(),
       groupID: null,
@@ -49,6 +50,7 @@ const ProfilePost = () => {
   const handlePostSubmit = (newPost: string, images: File[]) => {
     const newPostEntry: Article = {
       _id: (posts.length + 1).toString(),
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'Panda Media',
       handleDate: new Date(),
       groupID: null,
