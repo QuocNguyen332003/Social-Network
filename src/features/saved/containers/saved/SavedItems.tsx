@@ -23,6 +23,7 @@ const initialUserData: User = {
   ],
   avt: ['/static/images/avatar.png'],
   backGround: ['/static/images/background.png'],
+  aboutMe: 'Hello',
   status: 'active',
   createDate: '2022-01-01',
   details: {
@@ -52,9 +53,6 @@ const initialUserData: User = {
   groups: ['group1', 'group2'],
   hobbies: ['Gaming', 'Reading'],
   listArticle: ['article1', 'article2'],
-  listArticleShare: [
-    { id_article: 'article1', id_tuongtac: 'interaction1' },
-  ],
   createdAt: new Date(),
   updatedAt: new Date(),
   _destroy: new Date(),
@@ -64,6 +62,7 @@ const initialUserData: User = {
 const articles: Article[] = [
   {
     _id: 'article1',
+    isShare: false,
     idHandler: 'John Doe',
     handleDate: new Date(),
     groupID: 'group1',
@@ -81,6 +80,7 @@ const articles: Article[] = [
   },
   {
     _id: 'article2',
+    isShare: false,
     idHandler: 'Jane Doe',
     handleDate: new Date(),
     groupID: 'group2',
@@ -98,6 +98,7 @@ const articles: Article[] = [
   },
   {
     _id: 'article3',
+    isShare: false,
     idHandler: 'John Smith',
     handleDate: new Date(),
     groupID: 'group3',
@@ -124,9 +125,13 @@ const SavedItems = () => {
       <Header />
       <Box sx={{ height: '100vh' }}>
         <Grid container sx={{ height: '100%' }}>
-          <Grid item xs={12} sm={3}>
-            <SavedSidebar user={user} onSelectCollection={setSelectedCollectionId} />
-          </Grid>
+        <Grid item xs={12} sm={3}>
+          <SavedSidebar 
+            user={user} 
+            onSelectCollection={setSelectedCollectionId} 
+            setUser={setUser}  // Truyền setUser ở đây
+          />
+        </Grid>
           <Grid item xs={12} sm={9}>
             <MainContent
               user={user}

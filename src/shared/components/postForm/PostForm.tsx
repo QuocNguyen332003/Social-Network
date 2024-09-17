@@ -22,7 +22,7 @@ const PostForm = ({ onSubmit }: { onSubmit: (newPost: string, images: File[], vi
   };
 
   return (
-    <Paper sx={{ padding: 2, marginBottom: 2, borderRadius: '8px', width: '96%' }}>
+    <Paper sx={{ padding: 2, marginBottom: 2, borderRadius: '8px'}}>
       {/* Header với Avatar và tên người dùng */}
       <Box display="flex" alignItems="center" mb={2}>
         <Avatar alt="User Avatar" src="https://via.placeholder.com/150" sx={{ width: 48, height: 48, marginRight: 2 }} />

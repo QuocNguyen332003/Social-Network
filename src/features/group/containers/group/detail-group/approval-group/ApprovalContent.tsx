@@ -9,6 +9,7 @@ import {Group} from '../../../../../../interface/interface.ts'
 const mockArticles: Article[] = [
   {
     _id: 'article1',
+    isShare: false,
     idHandler: 'John Doe',
     handleDate: new Date(),
     groupID: 'group1',
@@ -26,6 +27,7 @@ const mockArticles: Article[] = [
   },
   {
     _id: 'article2',
+    isShare: false,
     idHandler: 'Jane Doe',
     handleDate: new Date(),
     groupID: 'group2',
@@ -43,6 +45,7 @@ const mockArticles: Article[] = [
   },
   {
     _id: 'article3',
+    isShare: false,
     idHandler: 'John Smith',
     handleDate: new Date(),
     groupID: 'group3',

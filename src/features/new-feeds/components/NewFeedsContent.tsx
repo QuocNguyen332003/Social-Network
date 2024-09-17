@@ -9,6 +9,7 @@ const NewFeedsContent = () => {
   const [posts, setPosts] = useState<Article[]>([
     {
       _id: '1',
+      isShare: false,
       idHandler: 'Panda Media',
       handleDate: null,
       groupID: null,
@@ -61,6 +62,7 @@ const NewFeedsContent = () => {
     const newPostEntry: Article = {
       _id: (posts.length + 1).toString(),
       idHandler: 'Panda Media',
+      isShare: false,
       handleDate: null,
       groupID: null,
       content: newPost,

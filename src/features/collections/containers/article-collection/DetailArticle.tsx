@@ -10,6 +10,7 @@ const DetailArticle = () => {
   const [posts, setPosts] = useState<Article[]>([
     {
       _id: '1',
+      isShare: false,
       idHandler: 'Panda Media',
       handleDate: null,
       groupID: null,

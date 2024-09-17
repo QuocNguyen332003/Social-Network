@@ -1,4 +1,3 @@
- 
 // User Interface
 export interface User {
     _id: string;
@@ -10,20 +9,18 @@ export interface User {
     lastName: string;
     displayName: string;
     userName: string;
-    friends: Array<{
-      userId: string;
-      addDate: string;
-    }>;
-    avt: string[];
-    backGround: string[];
-    status: string;
-    createDate: string;
     details?: {
       phoneNumber?: string;
       address?: string;
       gender?: boolean;
       birthDate?: Date;
     };
+    friends: Array<{
+      userId: string;
+      addDate: string;
+    }>;
+    status: string;
+    avt: string[];
     collections: Array<{
       _id: string;
       name: string;
@@ -33,12 +30,11 @@ export interface User {
       _destroy: Date;
     }>;
     groups: string[];
+    backGround: string[];
+    aboutMe: string,
+    createDate: string;
     hobbies: string[];
     listArticle: string[];
-    listArticleShare: Array<{
-      id_article: string;
-      id_tuongtac: string;
-    }>;
     createdAt: Date;
     updatedAt: Date;
     _destroy: Date;
@@ -132,6 +128,7 @@ export interface Emoticon {
     // Article Interface
 export interface Article {
     _id: string;
+    isShare: boolean
     idHandler: string | null;
     handleDate: Date | null;
     groupID: string | null;
