@@ -44,14 +44,14 @@ export const useAllFriend = () => {
     const [data, setData] = useState<FriendProps[]>(friendsData);
     const navigate = useNavigate()
 
-    const deleteFriend = (userID: String | null) => {
+    const deleteFriend = (userID: string | null) => {
         if (userID != null){
             const updatedData = data.filter(friend => friend.userID !== userID);
             setData(updatedData)
         }
     }
 
-    const viewPersonalPage = (userID: String) => {
+    const viewPersonalPage = (userID: string) => {
         navigate(`/profile/${userID}`)
     }
 

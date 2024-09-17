@@ -14,6 +14,7 @@ const ProfilePost = () => {
       groupID: null,
       content: 'This is a sample post content about pandas.',
       listPhoto: ['/static/images/panda1.jpg', '/static/images/panda2.jpg'],
+      hashTag: [],
       scope: 'Public',
       interact: {
         _id: 'interact-1',
@@ -56,6 +57,7 @@ const ProfilePost = () => {
       groupID: null,
       content: newPost,
       listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],
+      hashTag: [],
       scope: 'Public',
       interact: {
         _id: `interact-${posts.length + 1}`,

@@ -9,12 +9,12 @@ function App() {
   const {data, AcceptsFriend, RefuseFriend} = useRequestFriend();
   const {showDialog,message, setShowDialog, SetValueDialog} = useDialogRequestFriend();
 
-  const PressAcceptsFriend = (userID: String, name: string) => {
+  const PressAcceptsFriend = (userID: string, name: string) => {
     AcceptsFriend(userID);
     SetValueDialog(`Bạn và ${name} đã trở thành bạn bè`);
   }
 
-  const PressRefuseFriend = (userID: String, name: string) => {
+  const PressRefuseFriend = (userID: string, name: string) => {
       RefuseFriend(userID);
       SetValueDialog(`Bạn đã từ chối lời mời của ${name}`);
   }

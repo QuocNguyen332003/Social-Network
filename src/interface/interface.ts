@@ -133,6 +133,7 @@ export interface Article {
     handleDate: Date | null;
     groupID: string | null;
     content: string;
+    hashTag: string[];
     listPhoto: string[];
     scope: string;
     interact: Interact;

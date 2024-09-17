@@ -68,6 +68,7 @@ const articles: Article[] = [
     groupID: 'group1',
     content: 'This is the first article content',
     listPhoto: ['/src/assets/images/avt.png'],
+    hashTag: [],
     scope: 'public',
     interact: {
       _id: 'interact1',
@@ -86,6 +87,7 @@ const articles: Article[] = [
     groupID: 'group2',
     content: 'This is the second article content',
     listPhoto: ['/src/assets/images/avt.png'],
+    hashTag: [],
     scope: 'public',
     interact: {
       _id: 'interact2',
@@ -104,6 +106,7 @@ const articles: Article[] = [
     groupID: 'group3',
     content: 'This is the third article content',
     listPhoto: ['/src/assets/images/avt.png'],
+    hashTag: [],
     scope: 'public',
     interact: {
       _id: 'interact3',

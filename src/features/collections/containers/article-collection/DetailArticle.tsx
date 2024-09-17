@@ -18,6 +18,7 @@ const DetailArticle = () => {
         "[Historical Fact] The West first learned of the giant panda on 11 March 1869, when the French missionary Armand David received a skin from a hunter. In 1936, Ruth Harkness became the first Westerner to bring back a live giant panda.",
       scope: 'Public',
       listPhoto: [],
+      hashTag: [],
       interact: {
         _id: '1-interact',
         emoticons: [],

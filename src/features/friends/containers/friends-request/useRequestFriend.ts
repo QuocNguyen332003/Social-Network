@@ -42,12 +42,12 @@ const friendsData: FriendProps[] = [
 export const useRequestFriend = () => {
     const [data, setData] = useState<FriendProps[]>(friendsData);
 
-    const AcceptsFriend = (userID: String) => {
+    const AcceptsFriend = (userID: string) => {
         const updatedData = data.filter(friend => friend.userID !== userID);
         setData(updatedData)
     }
 
-    const RefuseFriend = (userID: String) => {
+    const RefuseFriend = (userID: string) => {
         const updatedData = data.filter(friend => friend.userID !== userID);
         setData(updatedData)
     }

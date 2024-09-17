@@ -141,10 +141,6 @@ export const groups: Group[] = [
 ];
 // Mock dữ liệu bài viết
 
-
-
-
-
 const GroupList: React.FC = () => {
 
   // Tách các nhóm đã tham gia và chưa tham gia dựa trên user.groups

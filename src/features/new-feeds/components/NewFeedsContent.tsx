@@ -16,6 +16,7 @@ const NewFeedsContent = () => {
       content:
         "[Historical Fact] The West first learned of the giant panda on 11 March 1869, when the French missionary Armand David received a skin from a hunter. In 1936, Ruth Harkness became the first Westerner to bring back a live giant panda.",
       scope: 'Public',
+      hashTag: [],
       listPhoto: [],
       interact: {
         _id: '1',
@@ -64,6 +65,7 @@ const NewFeedsContent = () => {
       content:
         "[Historical Fact] The West first learned of the giant panda on 11 March 1869, when the French missionary Armand David received a skin from a hunter. In 1936, Ruth Harkness became the first Westerner to bring back a live giant panda.",
       scope: 'Public',
+      hashTag: [],
       listPhoto: [],
       interact: {
         _id: '1',
@@ -106,7 +108,7 @@ const NewFeedsContent = () => {
   ]);
 
   // Xử lý khi gửi bài viết mới
-  const handlePostSubmit = (newPost: string, images: File[], visibility: string) => {
+  const handlePostSubmit = (newPost: string, images: File[], visibility: string,  hashTags: string[]) => {
     const newPostEntry: Article = {
       _id: (posts.length + 1).toString(),
       idHandler: 'Panda Media',
@@ -114,6 +116,7 @@ const NewFeedsContent = () => {
       handleDate: null,
       groupID: null,
       content: newPost,
+      hashTag: hashTags, // Pass hashtags to the new post
       listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],
       scope: visibility,
       interact: {
