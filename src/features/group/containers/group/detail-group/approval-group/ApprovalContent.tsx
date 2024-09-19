@@ -9,11 +9,13 @@ import {Group} from '../../../../../../interface/interface.ts'
 const mockArticles: Article[] = [
   {
     _id: 'article1',
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'John Doe',
     handleDate: new Date(),
     groupID: 'group1',
     content: 'This is the first article content',
     listPhoto: ['/src/assets/images/avt.png'],
+    hashTag: [],
     scope: 'public',
     interact: {
       _id: 'interact1',
@@ -26,11 +28,13 @@ const mockArticles: Article[] = [
   },
   {
     _id: 'article2',
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'Jane Doe',
     handleDate: new Date(),
     groupID: 'group2',
     content: 'This is the second article content',
     listPhoto: ['/src/assets/images/avt.png'],
+    hashTag: [],
     scope: 'public',
     interact: {
       _id: 'interact2',
@@ -43,11 +47,13 @@ const mockArticles: Article[] = [
   },
   {
     _id: 'article3',
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'John Smith',
     handleDate: new Date(),
     groupID: 'group3',
     content: 'This is the third article content',
     listPhoto: ['/src/assets/images/avt.png'],
+    hashTag: [],
     scope: 'public',
     interact: {
       _id: 'interact3',

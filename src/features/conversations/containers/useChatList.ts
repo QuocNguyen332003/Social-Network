@@ -28,7 +28,7 @@ export const useChatList = () => {
         setData(updatedChatList);
     }
 
-    const sendMessage = (userID: String, message: string) => {
+    const sendMessage = (userID: string, message: string) => {
         const updatedChatList = chatList.map((chat) => {
             if (chat.userID === userID) {
               return {

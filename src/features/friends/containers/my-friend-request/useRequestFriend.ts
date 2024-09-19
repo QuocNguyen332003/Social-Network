@@ -43,7 +43,7 @@ const friendsData: FriendProps[] = [
 export const useRequestFriend = () => {
     const [data, setData] = useState<FriendProps[]>(friendsData);
 
-    const SendAddFriend = (userID: String) => {
+    const SendAddFriend = (userID: string) => {
         const updatedData = data.filter(friend => friend.userID !== userID);
         setData(updatedData)
     }

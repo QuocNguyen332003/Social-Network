@@ -9,12 +9,63 @@ const NewFeedsContent = () => {
   const [posts, setPosts] = useState<Article[]>([
     {
       _id: '1',
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'Panda Media',
       handleDate: null,
       groupID: null,
       content:
         "[Historical Fact] The West first learned of the giant panda on 11 March 1869, when the French missionary Armand David received a skin from a hunter. In 1936, Ruth Harkness became the first Westerner to bring back a live giant panda.",
       scope: 'Public',
+      hashTag: [],
+      listPhoto: [],
+      interact: {
+        _id: '1',
+        emoticons: [],
+        comment: [
+          {
+            _iduser: 'JohnDoe',
+            content: 'Wow, that’s interesting!',
+            img: [],
+            replyComment: [],
+            emoticons: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            _iduser: 'JaneDoe',
+            content: 'I never knew that!',
+            img: [],
+            replyComment: [
+              {
+                _iduser: 'PandaLover',
+                content: 'Yes, it’s a fascinating history!',
+                img: [],
+                replyComment: [],
+                emoticons: [],
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              },
+            ],
+            emoticons: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      _destroy: new Date(),
+    },
+    {
+      _id: '1',
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
+      idHandler: 'Panda Media',
+      handleDate: null,
+      groupID: null,
+      content:
+        "[Historical Fact] The West first learned of the giant panda on 11 March 1869, when the French missionary Armand David received a skin from a hunter. In 1936, Ruth Harkness became the first Westerner to bring back a live giant panda.",
+      scope: 'Public',
+      hashTag: [],
       listPhoto: [],
       interact: {
         _id: '1',
@@ -57,13 +108,15 @@ const NewFeedsContent = () => {
   ]);
 
   // Xử lý khi gửi bài viết mới
-  const handlePostSubmit = (newPost: string, images: File[], visibility: string) => {
+  const handlePostSubmit = (newPost: string, images: File[], visibility: string,  hashTags: string[]) => {
     const newPostEntry: Article = {
       _id: (posts.length + 1).toString(),
       idHandler: 'Panda Media',
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       handleDate: null,
       groupID: null,
       content: newPost,
+      hashTag: hashTags, // Pass hashtags to the new post
       listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],
       scope: visibility,
       interact: {

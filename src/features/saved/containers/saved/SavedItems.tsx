@@ -23,6 +23,7 @@ const initialUserData: User = {
   ],
   avt: ['/static/images/avatar.png'],
   backGround: ['/static/images/background.png'],
+  aboutMe: 'Hello',
   status: 'active',
   createDate: '2022-01-01',
   details: {
@@ -52,9 +53,6 @@ const initialUserData: User = {
   groups: ['group1', 'group2'],
   hobbies: ['Gaming', 'Reading'],
   listArticle: ['article1', 'article2'],
-  listArticleShare: [
-    { id_article: 'article1', id_tuongtac: 'interaction1' },
-  ],
   createdAt: new Date(),
   updatedAt: new Date(),
   _destroy: new Date(),
@@ -64,11 +62,13 @@ const initialUserData: User = {
 const articles: Article[] = [
   {
     _id: 'article1',
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'John Doe',
     handleDate: new Date(),
     groupID: 'group1',
     content: 'This is the first article content',
     listPhoto: ['/src/assets/images/avt.png'],
+    hashTag: [],
     scope: 'public',
     interact: {
       _id: 'interact1',
@@ -81,11 +81,13 @@ const articles: Article[] = [
   },
   {
     _id: 'article2',
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'Jane Doe',
     handleDate: new Date(),
     groupID: 'group2',
     content: 'This is the second article content',
     listPhoto: ['/src/assets/images/avt.png'],
+    hashTag: [],
     scope: 'public',
     interact: {
       _id: 'interact2',
@@ -98,11 +100,13 @@ const articles: Article[] = [
   },
   {
     _id: 'article3',
+    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: 'John Smith',
     handleDate: new Date(),
     groupID: 'group3',
     content: 'This is the third article content',
     listPhoto: ['/src/assets/images/avt.png'],
+    hashTag: [],
     scope: 'public',
     interact: {
       _id: 'interact3',
@@ -124,9 +128,13 @@ const SavedItems = () => {
       <Header />
       <Box sx={{ height: '100vh' }}>
         <Grid container sx={{ height: '100%' }}>
-          <Grid item xs={12} sm={3}>
-            <SavedSidebar user={user} onSelectCollection={setSelectedCollectionId} />
-          </Grid>
+        <Grid item xs={12} sm={3}>
+          <SavedSidebar 
+            user={user} 
+            onSelectCollection={setSelectedCollectionId} 
+            setUser={setUser}  // Truyền setUser ở đây
+          />
+        </Grid>
           <Grid item xs={12} sm={9}>
             <MainContent
               user={user}

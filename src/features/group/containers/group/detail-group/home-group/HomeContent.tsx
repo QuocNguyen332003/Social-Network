@@ -10,8 +10,63 @@ const DetailContent = () => {
   const { group, setGroup } = useOutletContext<{ group: Group, setGroup: (group: Group) => void }>();
   
   const mockArticles: Article[] = [
-    // Mock data for approved articles
-    // Example articles (mock data)
+    {
+      _id: 'article1',
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
+      idHandler: 'John Doe',
+      handleDate: new Date(),
+      groupID: 'group1',
+      content: 'This is the first article content',
+      listPhoto: ['/src/assets/images/avt.png'],
+      hashTag: [],
+      scope: 'public',
+      interact: {
+        _id: 'interact1',
+        emoticons: [],
+        comment: [],
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      _destroy: new Date(),
+    },
+    {
+      _id: 'article2',
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
+      idHandler: 'Jane Doe',
+      handleDate: new Date(),
+      groupID: 'group2',
+      content: 'This is the second article content',
+      listPhoto: ['/src/assets/images/avt.png'],
+      hashTag: [],
+      scope: 'public',
+      interact: {
+        _id: 'interact2',
+        emoticons: [],
+        comment: [],
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      _destroy: new Date(),
+    },
+    {
+      _id: 'article3',
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
+      idHandler: 'John Smith',
+      handleDate: new Date(),
+      groupID: 'group3',
+      content: 'This is the third article content',
+      listPhoto: ['/src/assets/images/avt.png'],
+      hashTag: [],
+      scope: 'public',
+      interact: {
+        _id: 'interact3',
+        emoticons: [],
+        comment: [],
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      _destroy: new Date(),
+    },
   ];
 
   // Lọc những bài viết có trạng thái "approved"
@@ -22,16 +77,19 @@ const DetailContent = () => {
 
   const [posts, setPosts] = useState<Article[]>([]);
 
+  
   // Xử lý khi gửi bài viết mới
   const handlePostSubmit = (newPost: string, images: File[], visibility: string) => {
     const newPostId = (posts.length + 1).toString(); // Tạo ID cho bài viết mới
     const newPostEntry: Article = {
       _id: newPostId,
+      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'Panda Media',
       handleDate: null,
       groupID: group._id,
       content: newPost,
       listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],
+      hashTag: [],
       scope: visibility,
       interact: {
         _id: `interact-${newPostId}`,

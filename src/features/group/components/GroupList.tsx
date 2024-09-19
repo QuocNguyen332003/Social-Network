@@ -20,6 +20,7 @@ export const user: User = {
   ],
   avt: ['/src/assets/images/avt.png'],
   backGround: ['/src/assets/images/avt.png'],
+  aboutMe: 'Hello Viet Nam',
   status: 'active',
   createDate: '2022-01-01',
   details: {
@@ -41,9 +42,6 @@ export const user: User = {
   groups: ['group123', 'group456'],
   hobbies: ['Reading', 'Gaming'],
   listArticle: ['article1', 'article2'],
-  listArticleShare: [
-    { id_article: 'article1', id_tuongtac: 'interaction1' },
-  ],
   createdAt: new Date(),
   updatedAt: new Date(),
   _destroy: new Date(),
@@ -142,10 +140,6 @@ export const groups: Group[] = [
   },
 ];
 // Mock dữ liệu bài viết
-
-
-
-
 
 const GroupList: React.FC = () => {
 
