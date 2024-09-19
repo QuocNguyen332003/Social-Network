@@ -15,6 +15,12 @@ const DetailContent = () => {
       sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'John Doe',
       handleDate: new Date(),
+      reports: [{
+        _idReporter: '2',
+        reason: 'Violating community rules',
+        reportDate: new Date('19/09/2024'),
+        status: 'pending' // Trạng thái của báo 
+      }],
       groupID: 'group1',
       content: 'This is the first article content',
       listPhoto: ['/src/assets/images/avt.png'],
@@ -34,6 +40,12 @@ const DetailContent = () => {
       sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'Jane Doe',
       handleDate: new Date(),
+      reports: [{
+        _idReporter: '2',
+        reason: 'Violating community rules',
+        reportDate: new Date('19/09/2024'),
+        status: 'pending' // Trạng thái của báo 
+      }],
       groupID: 'group2',
       content: 'This is the second article content',
       listPhoto: ['/src/assets/images/avt.png'],
@@ -53,6 +65,12 @@ const DetailContent = () => {
       sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'John Smith',
       handleDate: new Date(),
+      reports: [{
+        _idReporter: '2',
+        reason: 'Violating community rules',
+        reportDate: new Date('19/09/2024'),
+        status: 'pending' // Trạng thái của báo 
+      }],
       groupID: 'group3',
       content: 'This is the third article content',
       listPhoto: ['/src/assets/images/avt.png'],
@@ -86,6 +104,7 @@ const DetailContent = () => {
       sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'Panda Media',
       handleDate: null,
+      reports: [],
       groupID: group._id,
       content: newPost,
       listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],

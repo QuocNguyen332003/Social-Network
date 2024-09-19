@@ -58,6 +58,7 @@ export const useProfile = () => {
         const updateUser = {
           ...myUser,
           account: {
+            warningLevel: myUser.account.warningLevel,
             email: dataInput[0],
             password: myUser.account.password
           },
@@ -71,6 +72,7 @@ export const useProfile = () => {
         const updateUser = {
           ...myUser,
           account: {
+            warningLevel: myUser.account.warningLevel,
             email: myUser.account.email,
             password: dataInput[2]
           },
@@ -94,6 +96,7 @@ const user: User[] = [
   {
     _id: "u123",
     account: {
+      warningLevel: 0,
       email: "user123@example.com",
       password: "hashed_password"
     },
@@ -142,6 +145,7 @@ const user: User[] = [
   {
     _id: "user001",
     account: {
+      warningLevel: 0,
       email: "user123@example.com",
       password: "hashed_password"
     },
@@ -190,6 +194,7 @@ const user: User[] = [
   {
     _id: "user002",
     account: {
+      warningLevel: 0,
       email: "user123@example.com",
       password: "hashed_password"
     },
@@ -238,6 +243,7 @@ const user: User[] = [
   {
     _id: "user003",
     account: {
+      warningLevel: 0,
       email: "user123@example.com",
       password: "hashed_password"
     },
@@ -286,6 +292,7 @@ const user: User[] = [
   {
     _id: "user004",
     account: {
+      warningLevel: 0,
       email: "user123@example.com",
       password: "hashed_password"
     },
@@ -334,6 +341,7 @@ const user: User[] = [
   {
     _id: "user005",
     account: {
+      warningLevel: 0,
       email: "user123@example.com",
       password: "hashed_password"
     },

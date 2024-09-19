@@ -11,6 +11,12 @@ const ProfilePost = () => {
       sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'Panda Media',
       handleDate: new Date(),
+      reports: [{
+        _idReporter: '2',
+        reason: 'Violating community rules',
+        reportDate: new Date('19/09/2024'),
+        status: 'pending' // Trạng thái của báo 
+      }],
       groupID: null,
       content: 'This is a sample post content about pandas.',
       listPhoto: ['/static/images/panda1.jpg', '/static/images/panda2.jpg'],
@@ -54,6 +60,7 @@ const ProfilePost = () => {
       sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
       idHandler: 'Panda Media',
       handleDate: new Date(),
+      reports: [],
       groupID: null,
       content: newPost,
       listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],

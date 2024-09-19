@@ -2,6 +2,7 @@
 export interface User {
     _id: string;
     account: {
+      warningLevel: 0 | 1 | 2 | 3;
       email: string;
       password: string;
     };
@@ -131,6 +132,12 @@ export interface Article {
     sharedPostId: string | null; // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: string | null;
     handleDate: Date | null;
+    reports: Array<{
+      _idReporter: string;
+      reason: string;
+      reportDate: Date;
+      status: string // Trạng thái của báo cáo (đang chờ xử lý, đã xử lý, bị từ chối) = pending, processed, rejected
+    }>;
     groupID: string | null;
     content: string;
     hashTag: string[];

@@ -7,6 +7,7 @@ import {Group, User} from '../../../interface/interface'
 export const user: User = {
   _id: 'user123',
   account: {
+    warningLevel: 0,
     email: 'user@example.com',
     password: 'password123',
   },
