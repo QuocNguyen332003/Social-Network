@@ -168,7 +168,7 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   };
 
   return (
-    <Paper sx={{ padding: 3, marginBottom: 3, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
+    <Paper sx={{ padding: 2, marginBottom: 2, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)'}}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
         <Box display="flex" alignItems="center">
           <Avatar alt={post.idHandler ?? 'Anonymous'} src="/static/images/avatar/1.jpg" sx={{ width: 48, height: 48 }} />
