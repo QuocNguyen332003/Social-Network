@@ -53,6 +53,7 @@ export const user: User = {
 export const groups: Group[] = [
   {
     _id: 'group123',
+    warningLevel: 0 ,
     groupName: 'Tech Enthusiasts',
     type: 'public',
     idAdmin: 'admin123',
@@ -85,6 +86,7 @@ export const groups: Group[] = [
   },
   {
     _id: 'group456',
+    warningLevel: 0 ,
     groupName: 'Book Lovers',
     type: 'private',
     idAdmin: 'admin456',
@@ -114,6 +116,7 @@ export const groups: Group[] = [
   },
   {
     _id: 'group789',
+    warningLevel: 0 ,
     groupName: 'Fitness Fanatics',
     type: 'public',
     idAdmin: 'admin789',

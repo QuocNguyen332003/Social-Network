@@ -197,7 +197,7 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
               {post.idHandler ?? 'Anonymous'}
             </Typography>
             <Typography variant="caption" color="textSecondary">
-              {formatDistanceToNow(new Date(post.createdAt))} - {post.scope}
+              {formatDistanceToNow(new Date(post.createdAt))} - {post.scope} 
             </Typography>
           </Box>
         </Box>

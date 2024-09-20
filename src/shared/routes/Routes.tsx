@@ -27,7 +27,10 @@ import DetailArticle from '../../features/collections/containers/article-collect
 import DetailArticles from '../../features/new-feeds/containers/detail-article/DetailArticles';
 import NewFeedsContent from '../../features/new-feeds/components/NewFeedsContent'
 import MyFriendsRequest from '../../features/friends/containers/my-friend-request/MyFriendsRequest';
-
+import NewGroup from '../../features/new-group/containers/new-group/NewGroup';
+import ExploreGroups from '../../features/new-group/containers/new-group/explore-groups/ExploreGroups';
+import YourGroups from '../../features/new-group/containers/new-group/your-groups/YourGroups';
+import NewFeedGroup from '../../features/new-group/containers/new-group/new-feed-group/NewFeedGroup';
 
 const Routes = () => {
   const router = createBrowserRouter([
@@ -65,6 +68,25 @@ const Routes = () => {
       path: '/groups',
       element: <Group />,
     },
+    {
+      path: '/new-group/',
+      element: <NewGroup />, // Default to the main content of the group (Trang chủ)
+      children: [
+        {
+          path: 'your-feed',
+          element: <NewFeedGroup />, // Default to the main content of the group (Trang chủ)
+        },
+        {
+          path: 'your-groups',
+          element: <YourGroups />, // Default to the main content of the group (Trang chủ)
+        },
+        {
+          path: 'explore-groups',
+          element: <ExploreGroups />, // Default to the main content of the group (Trang chủ)
+        },
+      ],
+    },
+    
     {
       path: '/saved', 
       element: <SavedItems/> // Protect this route
