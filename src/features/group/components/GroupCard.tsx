@@ -1,12 +1,15 @@
 import React from 'react';
-import { Card, CardContent, CardMedia, Typography, Button, Box } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Button, Box, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import {Group} from '../../../interface/interface'
+import MoreVertIcon from '@mui/icons-material/MoreVert'; // Icon ba dấu chấm
+import CloseIcon from '@mui/icons-material/Close'; // Icon đóng
+import { Group } from '../../../interface/interface';
 
 interface GroupCardProps {
   group: Group;
   userGroups: string[];
 }
+
 const GroupCard: React.FC<GroupCardProps> = ({ group, userGroups }) => {
   const navigate = useNavigate();
 
@@ -15,37 +18,63 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, userGroups }) => {
 
   // Hàm xử lý khi nhấn vào thẻ nhóm
   const handleClick = () => {
-    // Sử dụng navigate để truyền toàn bộ dữ liệu nhóm
     navigate(`/groups/${group._id}`, { state: { group } });
   };
 
   return (
     <Box display="flex" justifyContent="center" sx={{ width: '100%' }}>
-      <Card onClick={handleClick} sx={{ display: 'flex', width: '96%', marginBottom: 2, cursor: 'pointer', borderRadius: '8px' }}>
+      {/* Card chung cho cả hai giao diện */}
+      <Card sx={{ display: 'flex', width: '96%', marginBottom: 2, cursor: 'pointer', borderRadius: '8px', boxShadow: 3 }}>
+        {/* Hiển thị hình ảnh nhóm */}
         <CardMedia
           component="img"
-          sx={{ width: 151 }}
+          sx={{ width: isJoined ? 120 : '100%', borderRadius: isJoined ? '8px 0 0 8px' : '8px' }}
           image={group.avt}
           alt={group.groupName}
         />
-        <CardContent sx={{ flex: '1 0 auto' }}>
-          <Typography component="div" variant="h5">
-            {group.groupName}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary" component="div">
-            {group.introduction}
-          </Typography>
 
-          {isJoined ? (
-            <Button variant="contained" color="secondary" sx={{ marginTop: 2 }}>
-              Đã tham gia
+        {isJoined ? (
+          // Giao diện nhóm đã tham gia
+          <CardContent sx={{ flex: '1 0 auto', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Typography component="div" variant="h6">
+              {group.groupName}
+            </Typography>
+            <Typography variant="subtitle2" color="text.secondary">
+              Lần truy cập gần đây: 36 phút trước {/* Bạn có thể cập nhật thời gian động */}
+            </Typography>
+
+            <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+              <Button variant="outlined" color="primary" onClick={handleClick}>
+                Xem nhóm
+              </Button>
+              <IconButton>
+                <MoreVertIcon />
+              </IconButton>
+            </Box>
+          </CardContent>
+        ) : (
+          // Giao diện nhóm chưa tham gia
+          <CardContent sx={{ position: 'relative', paddingBottom: '16px' }}>
+            <Typography component="div" variant="h6">
+              {group.groupName}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {group.members.count} thành viên • {group.article.count}+ bài viết mỗi ngày
+            </Typography>
+
+            <Button variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }} onClick={handleClick}>
+              Tham gia nhóm
             </Button>
-          ) : (
-            <Button variant="contained" color="primary" sx={{ marginTop: 2 }}>
-              Tham gia
-            </Button>
-          )}
-        </CardContent>
+
+            {/* Icon đóng */}
+            <IconButton
+              sx={{ position: 'absolute', top: '8px', right: '8px' }}
+              onClick={() => console.log('Close action triggered')}
+            >
+              <CloseIcon />
+            </IconButton>
+          </CardContent>
+        )}
       </Card>
     </Box>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
-import Post from '../../../../../shared/components/post/Post';
+import Post from '../../../../../shared/components/post/Post.tsx';
 import { Group, Article, Comment } from '../../../../../interface/interface.ts';
 import { groups, users, articles } from '../../../components/GroupListData.tsx'; // Import mock data
 
@@ -86,6 +86,10 @@ const NewFeedGroup: React.FC = () => {
       })
     );
   };
+  const handleDeletePost = (postId: string) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+    currentUser.listArticle = currentUser.listArticle.filter((id) => id !== postId); // Cập nhật danh sách bài viết
+  };
 
   return (
     <Box
@@ -117,7 +121,14 @@ const NewFeedGroup: React.FC = () => {
         {/* Kiểm tra và hiển thị các bài viết */}
         {posts.length > 0 ? (
           posts.map((post, index) => (
-            <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} />
+            <Post
+            key={index}
+            post={post}
+            onAddComment={handleAddComment}
+            onAddReply={handleAddReply}
+            onDeletePost={handleDeletePost}
+            currentUserId={currentUser._id}
+          />
           ))
         ) : (
           <Box sx={{ textAlign: 'center', mt: 4 }}>

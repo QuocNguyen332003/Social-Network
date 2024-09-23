@@ -4,7 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 import {Group} from '../../../../../../interface/interface.ts'
 
 
-const MemberContent: React.FC = () => {
+const MemberGroupContent: React.FC = () => {
   const { group } = useOutletContext<{ group: Group }>();
 
   console.log('Group data in MemberContent: ', group); // Debug
@@ -48,4 +48,4 @@ const MemberContent: React.FC = () => {
 };
 
 
-export default MemberContent;
+export default MemberGroupContent;

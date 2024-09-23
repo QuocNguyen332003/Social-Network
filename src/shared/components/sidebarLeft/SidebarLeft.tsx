@@ -21,7 +21,7 @@ const SidebarLeft = () => {
           </ListItemIcon>
           <ListItemText primary="Bạn bè" />
         </ListItem>
-        <ListItem button onClick={() => navigate('/groups')}>
+        <ListItem button onClick={() => navigate('/group')}>
           <ListItemIcon>
             <GroupIcon sx={{ color: '#8b9dc3' }} />
           </ListItemIcon>

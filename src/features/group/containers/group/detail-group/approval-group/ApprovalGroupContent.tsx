@@ -1,102 +1,42 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, Divider, IconButton, Grid } from '@mui/material';
 import { MoreHoriz } from '@mui/icons-material';
-import { Article } from '../../../../../../interface/interface';
 import { useOutletContext } from 'react-router-dom';
-import {Group} from '../../../../../../interface/interface.ts'
+import { Group, Article } from '../../../../../../interface/interface.ts';
+import { articles } from '../../../../components/GroupListData.tsx'; // Importing data
 
-// Mock dữ liệu bài viết
-const mockArticles: Article[] = [
-  {
-    _id: 'article1',
-    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
-    idHandler: 'John Doe',
-    handleDate: new Date(),
-    reports: [],
-    groupID: 'group1',
-    content: 'This is the first article content',
-    listPhoto: ['/src/assets/images/avt.png'],
-    hashTag: [],
-    scope: 'public',
-    interact: {
-      _id: 'interact1',
-      emoticons: [],
-      comment: [], // Nếu không có bình luận
-    },
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    _destroy: new Date(),
-  },
-  {
-    _id: 'article2',
-    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
-    idHandler: 'Jane Doe',
-    handleDate: new Date(),
-    reports: [],
-    groupID: 'group2',
-    content: 'This is the second article content',
-    listPhoto: ['/src/assets/images/avt.png'],
-    hashTag: [],
-    scope: 'public',
-    interact: {
-      _id: 'interact2',
-      emoticons: [],
-      comment: [], // Nếu không có bình luận
-    },
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    _destroy: new Date(),
-  },
-  {
-    _id: 'article3',
-    sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
-    idHandler: 'John Smith',
-    handleDate: new Date(),
-    reports: [],
-    groupID: 'group3',
-    content: 'This is the third article content',
-    listPhoto: ['/src/assets/images/avt.png'],
-    hashTag: [],
-    scope: 'public',
-    interact: {
-      _id: 'interact3',
-      emoticons: [],
-      comment: [], // Nếu không có bình luận
-    },
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    _destroy: new Date(),
-  },
-];
-
-const ApprovalContent: React.FC = () => {
+const ApprovaGroupContent: React.FC = () => {
   const { group } = useOutletContext<{ group: Group }>();
   
   const [approvedPosts, setApprovedPosts] = useState<string[]>([]);
   const [rejectedPosts, setRejectedPosts] = useState<string[]>([]);
 
-  // Lọc những bài viết có trạng thái "pending"
+  // Lọc những bài viết có trạng thái "pending" trong nhóm hiện tại
   const pendingPosts = group.article.listArticle
     .filter(article => article.state === 'pending')
-    .map(article => mockArticles.find(a => a._id === article.idArticle))
+    .map(article => articles.find(a => a._id === article.idArticle)) // Sử dụng articles từ GroupListData.tsx
     .filter(Boolean) as Article[];
 
   // Hàm duyệt bài viết
   const handleApproval = (postId: string) => {
-    setApprovedPosts([...approvedPosts, postId]);
+    setApprovedPosts((prevApproved) => [...prevApproved, postId]);
+    setRejectedPosts((prevRejected) => prevRejected.filter(id => id !== postId)); // Remove from rejected if present
   };
 
   // Hàm từ chối bài viết
   const handleRejection = (postId: string) => {
-    setRejectedPosts([...rejectedPosts, postId]);
+    setRejectedPosts((prevRejected) => [...prevRejected, postId]);
+    setApprovedPosts((prevApproved) => prevApproved.filter(id => id !== postId)); // Remove from approved if present
   };
 
   return (
     <Box
       sx={{
-        padding: 2,
+        padding: 3, // Increased padding
         backgroundColor: '#e9e9e9',
-        height: '60vh',
+        height: '70vh', // Adjusted height
+        maxWidth: '900px', // Set max width to control the size of the content
+        margin: '0 auto', // Center the content horizontally
         overflowY: 'auto',
         scrollbarWidth: 'none',
         '&::-webkit-scrollbar': {
@@ -104,25 +44,25 @@ const ApprovalContent: React.FC = () => {
         },
       }}
     >
-      <Typography variant="h6" sx={{ marginBottom: 3 }}>
-        Chờ phê duyệt
-      </Typography>
       <List>
         {pendingPosts.map((post, index) => (
           <Box
             key={index}
             sx={{
-              padding: 3,
+              padding: 3, // Increased padding inside each post box
               borderRadius: 2,
               border: '1px solid #e0e0e0',
-              boxShadow: '0 3px 6px rgba(0,0,0,0.1)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Softer shadow
               backgroundColor: '#f9f9f9',
-              marginBottom: 3,
+              marginBottom: 4, // More margin between posts
+              maxWidth: '600px', // Limit the post box width
+              margin: '0 auto', // Center each post
             }}
           >
             <ListItem sx={{ paddingLeft: 0 }}>
               <ListItemAvatar>
-                <Avatar src={'/static/images/avatar/1.jpg'} sx={{ width: 56, height: 56 }} />
+                {/* You can dynamically assign avatar based on userId or index */}
+                <Avatar src={`/static/images/avatar/${index + 1}.jpg`} sx={{ width: 50, height: 50 }} /> {/* Slightly larger avatar */}
               </ListItemAvatar>
               <ListItemText
                 primary={
@@ -149,16 +89,16 @@ const ApprovalContent: React.FC = () => {
               </IconButton>
             </ListItem>
             <Box sx={{ marginTop: 2 }}>
-              <Typography sx={{ marginBottom: 2, color: '#555' }}>{post.content}</Typography>
+              <Typography sx={{ marginBottom: 2, color: '#555' }}>{post.content}</Typography> {/* Increased margin */}
               <Grid container spacing={1}>
                 {post.listPhoto.map((image, imgIndex) => (
-                  <Grid item xs={12 / Math.min(post.listPhoto.length, 3)} key={imgIndex}>
+                  <Grid item xs={12} key={imgIndex}>
                     <img
                       src={image}
                       alt={`post image ${imgIndex}`}
                       style={{
                         width: '100%',
-                        height: '200px',
+                        height: '200px', // Increase height for the images
                         objectFit: 'cover',
                         borderRadius: 8,
                       }}
@@ -176,14 +116,14 @@ const ApprovalContent: React.FC = () => {
                 </Typography>
               ) : (
                 <>
-                  <Divider sx={{ marginY: 2 }} />
+                  <Divider sx={{ marginY: 2 }} /> {/* Increased margin */}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
                     <Button
                       variant="contained"
                       sx={{
                         backgroundColor: '#1976d2',
                         width: '48%',
-                        padding: '12px 0',
+                        padding: '12px 0', // Increased padding on buttons
                         '&:hover': {
                           backgroundColor: '#1565c0',
                         },
@@ -198,7 +138,7 @@ const ApprovalContent: React.FC = () => {
                         borderColor: '#d32f2f',
                         color: '#d32f2f',
                         width: '48%',
-                        padding: '12px 0',
+                        padding: '12px 0', // Increased padding on buttons
                         '&:hover': {
                           backgroundColor: '#f9f9f9',
                         },
@@ -218,4 +158,4 @@ const ApprovalContent: React.FC = () => {
   );
 };
 
-export default ApprovalContent;
+export default ApprovaGroupContent;

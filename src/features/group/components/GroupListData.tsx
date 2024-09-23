@@ -286,6 +286,7 @@ export const groups: Group[] = [
       count: 1,
       listArticle: [
         { idArticle: 'article3', state: 'approved' },
+        { idArticle: 'article4', state: 'pending' },
       ],
     },
     rule: ['Be polite', 'No offensive content'],

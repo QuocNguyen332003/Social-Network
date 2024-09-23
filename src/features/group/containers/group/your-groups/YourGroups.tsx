@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, Grid, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert'; // Icon ba dấu chấm
-import { groups, users } from '../../../components/GroupListData.tsx'; // Import dữ liệu từ file chứa mock data
+import { groups, users } from '../../../components/GroupListData'; // Import dữ liệu từ file chứa mock data
 import { useNavigate } from 'react-router-dom'; // Dùng để điều hướng
 
 const YourGroups: React.FC = () => {
@@ -28,8 +28,8 @@ const YourGroups: React.FC = () => {
   };
 
   // Hàm xử lý điều hướng khi nhấn "Xem nhóm"
-  const handleViewGroup = (groupId: string) => {
-    navigate(`/groups/${groupId}`);
+  const handleViewGroup = (group: typeof groups[0]) => {
+    navigate(`/group/${group._id}`, { state: { group } }); // Pass the selected group data via state
   };
 
   // Hàm xử lý sắp xếp theo tên nhóm
@@ -135,7 +135,7 @@ const YourGroups: React.FC = () => {
                       backgroundColor: '#1565c0',
                     },
                   }}
-                  onClick={() => handleViewGroup(group._id)}
+                  onClick={() => handleViewGroup(group)}
                 >
                   Xem nhóm
                 </Button>

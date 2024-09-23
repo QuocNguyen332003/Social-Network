@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import { Box, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Post from "../../../../shared/components/post/Post";
-import { Interact, Article, Comment } from '../../../../interface/interface';
+import { Article, Comment } from '../../../../interface/interface';
 
 const DetailArticles = () => {
   const navigate = useNavigate();
@@ -64,6 +64,11 @@ const DetailArticles = () => {
     );
   };
 
+  // Xử lý xóa bài viết
+  const handleDeletePost = (postId: string) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+  };
+
   return (
     <Box sx={{
       backgroundColor: '#e9e9e9',
@@ -76,7 +81,14 @@ const DetailArticles = () => {
         Quay lại
       </Button>
       {posts.map((post, index) => (
-        <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} />
+        <Post
+          key={index}
+          post={post}
+          onAddComment={handleAddComment}
+          onAddReply={handleAddReply}
+          onDeletePost={handleDeletePost} // Add onDeletePost prop here
+          currentUserId="current-user-id" // Replace with actual user ID
+        />
       ))}
     </Box>
   );
