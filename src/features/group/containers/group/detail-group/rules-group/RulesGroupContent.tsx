@@ -3,7 +3,7 @@ import { Box, Typography, Paper, Button, Divider } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import {Group} from '../../../../../../interface/interface.ts'
 
-const RulesContent: React.FC = () => {
+const RulesGroupContent: React.FC = () => {
   const context = useOutletContext<{ group: Group }>(); // Lấy dữ liệu từ Outlet context
 
   console.log("Context in RulesContent: ", context); // Kiểm tra xem context có dữ liệu hay không
@@ -41,4 +41,4 @@ const RulesContent: React.FC = () => {
   );
 };
 
-export default RulesContent;
+export default RulesGroupContent;

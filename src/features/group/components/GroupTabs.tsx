@@ -22,7 +22,7 @@ const GroupTabs: React.FC<GroupTabsProps> = ({ groupId }) => {
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     const pathMap = ['', 'members', 'rules', 'admins', 'pending'];
-    navigate(`/groups/${groupId}/${pathMap[newValue]}`);
+    navigate(`/group/${groupId}/${pathMap[newValue]}`);
   };
 
   return (

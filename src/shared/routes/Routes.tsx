@@ -3,13 +3,6 @@ import Login from '../../features/user-authentication/containers/login/Login';
 import Register from '../../features/user-authentication/containers/register/Register';
 import Forgot from '../../features/user-authentication/containers/forgot/Forgot';
 import NewFeeds from '../../features/new-feeds/containers/new-feeds/NewFeeds';
-import Group from '../../features/group/containers/group/Group';
-import MemberContent from '../../features/group/containers/group/detail-group/member-group/MemberContent';
-import HomeContent from '../../features/group/containers/group/detail-group/home-group/HomeContent';
-import RulesContent from '../../features/group/containers/group/detail-group/rules-group/RulesContent';
-import ApprovalContent from '../../features/group/containers/group/detail-group/approval-group/ApprovalContent';
-import AdminContent from '../../features/group/containers/group/detail-group/admin-group/AdminContent';
-import MainContent from '../../features/group/containers/group/detail-group/MainContent';
 import Messages from '../../features/conversations/containers/Messages'
 import AllFriends from '../../features/friends/containers/friends/AllFriends';
 import FriendsRequest from '../../features/friends/containers/friends-request/FriendsRequest';
@@ -27,7 +20,16 @@ import DetailArticle from '../../features/collections/containers/article-collect
 import DetailArticles from '../../features/new-feeds/containers/detail-article/DetailArticles';
 import NewFeedsContent from '../../features/new-feeds/components/NewFeedsContent'
 import MyFriendsRequest from '../../features/friends/containers/my-friend-request/MyFriendsRequest';
-
+import NewGroup from '../../features/group/containers/group/NewGroup';
+import ExploreGroups from '../../features/group/containers/group/explore-groups/ExploreGroups';
+import YourGroups from '../../features/group/containers/group/your-groups/YourGroups';
+import NewFeedGroup from '../../features/group/containers/group/new-feed-group/NewFeedGroup';
+import DetailGroupContent from '../../features/group/containers/group/detail-group/DetailGroupContent'
+import HomeGroupContent from '../../features/group/containers/group/detail-group/home-group/HomeGroupContent'
+import RulesGroupContent from '../../features/group/containers/group/detail-group/rules-group/RulesGroupContent'
+import MemberGroupContent from '../../features/group/containers/group/detail-group/member-group/MemberGroupContent'
+import ApprovalGroupContent from '../../features/group/containers/group/detail-group/approval-group/ApprovalGroupContent'
+import AdminGroupContent from '../../features/group/containers/group/detail-group/admin-group/AdminGroupContent'
 
 const Routes = () => {
   const router = createBrowserRouter([
@@ -62,9 +64,50 @@ const Routes = () => {
       ],
     },
     {
-      path: '/groups',
-      element: <Group />,
+      path: '/group/',
+      element: <NewGroup />, // Default to the main content of the group (Trang chủ)
+      children: [
+        {
+          path: 'your-feed',
+          element: <NewFeedGroup />, // Default to the main content of the group (Trang chủ)
+        },
+        {
+          path: 'your-groups',
+          element: <YourGroups />, // Default to the main content of the group (Trang chủ)
+        },
+        {
+          path: 'explore-groups',
+          element: <ExploreGroups />, // Default to the main content of the group (Trang chủ)
+        },
+        {
+          path: ':id',
+          element: <DetailGroupContent />,
+          children: [
+            {
+              path: '',
+              element: < HomeGroupContent/>, 
+            },
+            {
+              path: 'members',
+              element: <MemberGroupContent />,
+            },
+            {
+              path: 'rules',
+              element: <RulesGroupContent />,
+            },
+            {
+              path: 'admins',
+              element: <AdminGroupContent />,
+            },
+            {
+              path: 'pending',
+              element: <ApprovalGroupContent />,
+            },
+          ], // Default to the main content of the group (Trang chủ)
+        },
+      ],
     },
+    
     {
       path: '/saved', 
       element: <SavedItems/> // Protect this route
@@ -76,33 +119,6 @@ const Routes = () => {
     {
       path: '/notifications', 
       element: <NotificationPage/> // Protect this route
-    },
-    {
-      path: '/groups/:groupId',
-      element: <MainContent />,
-      children: [
-        {
-          path: '',
-          element: <HomeContent />, // Default to the main content of the group (Trang chủ)
-        },
-        {
-          path: 'members',
-          element: <MemberContent />, // Component for "Thành viên"
-        },
-        {
-          path: 'rules',
-          element: <RulesContent />, // Component for "Quy định của nhóm"
-        },
-        {
-          path: 'admins',
-          element: <AdminContent />, // Component for "Duyệt Admin"
-        },
-        {
-          path: 'pending',
-          element: <ApprovalContent />, // Component for "Duyệt bài viết"
-        },
-        // Define other routes here for rules, admins, pending, etc.
-      ],
     },
     {
       path: '/friends',

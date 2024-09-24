@@ -1,17 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import React, { useState } from 'react';
 import { Box, Typography, Avatar, Paper, Button, IconButton, Collapse, TextField, Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogTitle, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import { MoreHoriz, Favorite, Comment, Share, CardGiftcard, ThumbUpAlt, Reply, Report } from '@mui/icons-material';
+import { MoreHoriz, Favorite, Comment, Share, CardGiftcard, ThumbUpAlt, Reply, Report, Delete, Bookmark } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
-import { Comment as CommentType, Article, Emoticon } from '../../../interface/interface';
+import { Comment as CommentType, Article } from '../../../interface/interface';
 
 interface PostComponentProps {
   post: Article;
   onAddComment: (postId: string, newComment: CommentType) => void;
   onAddReply: (postId: string, commentId: string, newReply: CommentType) => void;
+  onDeletePost: (postId: string) => void; // Thêm hàm để xử lý xóa bài viết
+  currentUserId: string; // ID của người dùng hiện tại
 }
 
-const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
+const Post = ({ post, onAddComment, onAddReply, onDeletePost, currentUserId }: PostComponentProps) => {
   const [showComments, setShowComments] = useState(false);
   const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const [likedComments, setLikedComments] = useState<{ [key: string]: boolean }>({});
@@ -19,7 +21,6 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   const [replyTexts, setReplyTexts] = useState<{ [key: string]: string }>({});
   const [newComment, setNewComment] = useState('');
   
-  // State cho báo cáo
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
@@ -47,9 +48,9 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
         const isLiked = likedComments[commentId];
 
         if (isLiked) {
-          comment.emoticons = comment.emoticons.filter((emoticon) => emoticon._iduser !== 'CurrentUser');
+          comment.emoticons = comment.emoticons.filter((emoticon) => emoticon._iduser !== currentUserId);
         } else {
-          comment.emoticons.push({ typeEmoticons: 'like', _iduser: 'CurrentUser' });
+          comment.emoticons.push({ typeEmoticons: 'like', _iduser: currentUserId });
         }
       }
       return comment;
@@ -64,9 +65,9 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
             const isLiked = likedComments[replyId];
 
             if (isLiked) {
-              reply.emoticons = reply.emoticons.filter((emoticon) => emoticon._iduser !== 'CurrentUser');
+              reply.emoticons = reply.emoticons.filter((emoticon) => emoticon._iduser !== currentUserId);
             } else {
-              reply.emoticons.push({ typeEmoticons: 'like', _iduser: 'CurrentUser' });
+              reply.emoticons.push({ typeEmoticons: 'like', _iduser: currentUserId });
             }
           }
           return reply;
@@ -84,10 +85,10 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   const handleLikePost = (postId: string) => {
     if (likedPosts.includes(postId)) {
       setLikedPosts(likedPosts.filter((id) => id !== postId));
-      post.interact.emoticons = post.interact.emoticons.filter(emoticon => emoticon._iduser !== 'CurrentUser');
+      post.interact.emoticons = post.interact.emoticons.filter(emoticon => emoticon._iduser !== currentUserId);
     } else {
       setLikedPosts([...likedPosts, postId]);
-      post.interact.emoticons.push({ typeEmoticons: 'like', _iduser: 'CurrentUser' });
+      post.interact.emoticons.push({ typeEmoticons: 'like', _iduser: currentUserId });
     }
   };
 
@@ -109,7 +110,7 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
     const replyText = replyTexts[commentId];
     if (replyText.trim()) {
       const reply: CommentType = {
-        _iduser: 'CurrentUser',
+        _iduser: currentUserId,
         content: replyText,
         img: [],
         replyComment: [],
@@ -136,7 +137,7 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
   const handleSubmitNewComment = () => {
     if (newComment.trim()) {
       const comment: CommentType = {
-        _iduser: 'CurrentUser',
+        _iduser: currentUserId,
         content: newComment,
         img: [],
         replyComment: [],
@@ -157,12 +158,16 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
     setAnchorEl(null);
   };
 
+  const handleDeletePost = () => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa bài viết này không?')) {
+      onDeletePost(post._id);
+    }
+  };
+
   const handleSavePost = () => {
-    console.log('Post saved');
     handleMenuClose();
   };
 
-  // Xử lý mở hộp thoại báo cáo
   const handleOpenReportDialog = (postId: string, commentId?: string) => {
     setReportTarget({ postId, commentId });
     setReportDialogOpen(true);
@@ -173,16 +178,13 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
     setSelectedReportReason('');
   };
 
-  // Xử lý khi người dùng chọn lý do báo cáo
   const handleReportReasonChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedReportReason(event.target.value);
   };
 
-  // Xử lý báo cáo bài viết/bình luận
   const handleSubmitReport = () => {
     if (reportTarget) {
-      console.log(`Report submitted for ${reportTarget.commentId ? 'comment' : 'post'}: ${selectedReportReason}`);
-      // Xử lý báo cáo, chẳng hạn như gửi đến API
+      // Submit the report logic here
       handleCloseReportDialog();
     }
   };
@@ -201,10 +203,12 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
             </Typography>
           </Box>
         </Box>
-        <IconButton onClick={handleMenuOpen}>
-          <MoreHoriz sx={{ color: '#757575' }} />
-        </IconButton>
-
+        <Box>
+          {/* Chỉ hiển thị nút xóa nếu người dùng là chủ sở hữu bài viết */}
+          <IconButton onClick={handleMenuOpen}>
+            <MoreHoriz sx={{ color: '#757575' }} />
+          </IconButton>
+        </Box>
         <Menu
           anchorEl={anchorEl}
           open={open}
@@ -217,17 +221,71 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
             vertical: 'top',
             horizontal: 'right',
           }}
+          PaperProps={{
+            sx: {
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)', // Bóng mờ mềm mại
+              borderRadius: 2, // Đường bo tròn đẹp
+              minWidth: 200, // Đảm bảo chiều rộng của menu
+              fontFamily: '"Roboto", sans-serif', // Font chữ tùy chỉnh cho toàn bộ menu
+            }
+          }}
         >
-          <MenuItem onClick={handleSavePost}>Lưu bài viết</MenuItem>
-          <MenuItem onClick={() => handleOpenReportDialog(post._id)}>Báo cáo bài viết</MenuItem>
+          {/* Mục lưu bài viết */}
+          <MenuItem
+            onClick={handleSavePost}
+            sx={{
+              fontSize: '14px', // Kích thước font chữ
+              fontWeight: 500, // Trọng lượng chữ (bold nhẹ)
+              '&:hover': {
+                backgroundColor: '#f0f0f0', // Đổi màu nền khi di chuột qua
+              },
+            }}
+          >
+            <Bookmark fontSize="small" sx={{ marginRight: 1, color: '#1E90FF' }} /> {/* Biểu tượng Bookmark */}
+            Lưu bài viết
+          </MenuItem>
+
+          {/* Mục báo cáo bài viết */}
+          <MenuItem
+            onClick={() => handleOpenReportDialog(post._id)}
+            sx={{
+              fontSize: '14px',
+              fontWeight: 500,
+              '&:hover': {
+                backgroundColor: '#f0f0f0',
+              },
+            }}
+          >
+            <Report fontSize="small" sx={{ marginRight: 1, color: '#f39c12' }} /> {/* Biểu tượng Report */}
+            Báo cáo bài viết
+          </MenuItem>
+
+          {/* Mục xóa bài viết chỉ hiển thị khi người dùng là chủ sở hữu */}
+          {post.idHandler === currentUserId && (
+            <MenuItem
+              onClick={handleDeletePost}
+              sx={{
+                fontSize: '14px',
+                fontWeight: 500,
+                '&:hover': {
+                  backgroundColor: '#fdecea', // Màu nền đỏ nhẹ khi di chuột qua
+                },
+                color: '#d32f2f', // Màu chữ đỏ cho xóa
+              }}
+            >
+              <Delete fontSize="small" sx={{ marginRight: 1, color: '#d32f2f' }} /> {/* Biểu tượng Delete */}
+              Xoá bài viết
+            </MenuItem>
+          )}
         </Menu>
+
+
       </Box>
 
       <Typography variant="body1" sx={{ color: '#424242', marginBottom: 2 }}>
         {post.content}
       </Typography>
 
-      {/* Hiển thị hashtags */}
       <Box display="flex" flexWrap="wrap" gap={1} sx={{ marginBottom: 2 }}>
         {post.hashTag.map((hashtag, index) => (
           <Button
@@ -419,7 +477,6 @@ const Post = ({ post, onAddComment, onAddReply }: PostComponentProps) => {
         </Box>
       </Collapse>
 
-      {/* Hộp thoại báo cáo */}
       <Dialog open={reportDialogOpen} onClose={handleCloseReportDialog}>
         <DialogTitle>Báo cáo</DialogTitle>
         <DialogContent>
