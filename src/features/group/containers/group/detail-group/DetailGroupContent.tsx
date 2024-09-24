@@ -7,12 +7,13 @@ import { Group } from '../../../../../interface/interface';
 const DetailGroupContent: React.FC = () => {
   const location = useLocation();
 
-  // Tạo state cho group và setGroup
+  // State for group and setGroup
   const [group, setGroup] = useState<Group | undefined>(() => {
     const storedGroup = localStorage.getItem('groupData');
     return storedGroup ? JSON.parse(storedGroup) : undefined;
   });
 
+  // Update the group state when new group data is passed in the route state
   useEffect(() => {
     if (location.state?.group) {
       setGroup(location.state.group);
@@ -20,15 +21,22 @@ const DetailGroupContent: React.FC = () => {
     }
   }, [location.state?.group]);
 
+  // Callback for updating the group information
+  const handleUpdateGroup = (updatedGroup: Group) => {
+    setGroup(updatedGroup);
+    localStorage.setItem('groupData', JSON.stringify(updatedGroup)); // Update local storage with new group data
+  };
+
   if (!group) {
     return <div>Không tìm thấy dữ liệu nhóm.</div>;
   }
 
   return (
     <>
-      <GroupHeader group={group} />
+      {/* Pass handleUpdateGroup to GroupHeader */}
+      <GroupHeader group={group} onUpdateGroup={handleUpdateGroup} />
       <GroupTabs groupId={group._id} />
-      {/* Truyền group và setGroup thông qua Outlet */}
+      {/* Pass group and setGroup via Outlet context */}
       <Outlet context={{ group, setGroup }} />
     </>
   );
