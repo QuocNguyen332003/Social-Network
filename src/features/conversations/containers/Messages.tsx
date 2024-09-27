@@ -3,7 +3,11 @@ import  Header  from '../../../shared/components/header/Header';
 import  SidebarLeft  from '../../../shared/components/sidebarLeft/SidebarLeft';
 import MainContent from './MainContent';
 
-const Messages = () => {
+export interface MessageProps {
+  userIDStart: string;
+}
+
+const Messages = ({userIDStart}: MessageProps) => {
   return (
     <>
       <Header />
@@ -12,7 +16,7 @@ const Messages = () => {
           <SidebarLeft />
         </Grid>
         <Grid item xs={9.5} >
-          <MainContent />
+          <MainContent userIDStart={userIDStart}/>
         </Grid>
       </Grid>
     </>

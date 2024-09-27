@@ -3,7 +3,7 @@ import { Box, Button } from "@mui/material";
 import { useState } from "react";
 import Post from "../../../../shared/components/post/Post";
 import { useNavigate } from "react-router-dom";
-import { Interact, Article, Comment } from '../../../../interface/interface';
+import {  Article, Comment } from '../../../../interface/interface';
 
 const DetailArticle = () => {
   const navigate = useNavigate();
@@ -122,7 +122,9 @@ const DetailArticle = () => {
         Quay lại
       </Button>
       {posts.map((post, index) => (
-        <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} />
+        <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} onDeletePost={function (postId: string): void {
+          throw new Error("Function not implemented.");
+        } } currentUserId={""} />
       ))}
     </Box>
   );
