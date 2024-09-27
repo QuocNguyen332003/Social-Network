@@ -5,17 +5,18 @@ import Post from "../../../../shared/components/post/Post";
 import { Article, Comment } from '../../../../interface/interface';
 
 const ProfilePost = () => {
+  const currentUserId = 'currentUserId'; // You should set this to the actual current user ID from your authentication logic
   const [posts, setPosts] = useState<Article[]>([
     {
       _id: '1',
-      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
+      sharedPostId: null,
       idHandler: 'Panda Media',
       handleDate: new Date(),
       reports: [{
         _idReporter: '2',
         reason: 'Violating community rules',
         reportDate: new Date('19/09/2024'),
-        status: 'pending' // Trạng thái của báo 
+        status: 'pending',
       }],
       groupID: null,
       content: 'This is a sample post content about pandas.',
@@ -53,11 +54,10 @@ const ProfilePost = () => {
     },
   ]);
 
-
   const handlePostSubmit = (newPost: string, images: File[]) => {
     const newPostEntry: Article = {
       _id: (posts.length + 1).toString(),
-      sharedPostId: null, // Mã bài viết gốc được chia sẻ (nếu có)
+      sharedPostId: null,
       idHandler: 'Panda Media',
       handleDate: new Date(),
       reports: [],
@@ -88,7 +88,6 @@ const ProfilePost = () => {
     );
   };
 
-
   const handleAddReply = (postId: string, commentId: string, newReply: Comment) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) => {
@@ -106,13 +105,22 @@ const ProfilePost = () => {
     );
   };
 
+  const handleDeletePost = (postId: string) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+  };
+
   return (
     <Box sx={{ backgroundColor: '#e9e9e9', padding: '20px 0' }}>
       <PostForm onSubmit={handlePostSubmit} />
       {posts.map((post, index) => (
-        <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} onDeletePost={function (postId: string): void {
-          throw new Error("Function not implemented.");
-        } } currentUserId={""} />
+        <Post
+          key={index}
+          post={post}
+          onAddComment={handleAddComment}
+          onAddReply={handleAddReply}
+          onDeletePost={handleDeletePost}
+          currentUserId={currentUserId} // Pass current user ID to Post component
+        />
       ))}
     </Box>
   );
