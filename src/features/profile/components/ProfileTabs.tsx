@@ -12,15 +12,14 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ userID }) => {
 
   const tabMap: { [key: string]: number } = {
     '': 0,
-    'image': 1,
-    'video': 2,
+    'user-collection': 1,
   };
 
   const currentTab = tabMap[location.pathname.split('/').pop() || ''] || 0; 
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
 
-    const pathMap = ['', 'image', 'video'];
+    const pathMap = ['', 'personal-collection'];
     navigate(`/profile/${userID}/${pathMap[newValue]}`);
   };
 
@@ -28,8 +27,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ userID }) => {
     <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: '#fff' }}>
       <Tabs value={currentTab} onChange={handleTabChange} aria-label="group tabs">
         <Tab label="Bài đăng" />
-        <Tab label="Ảnh" />
-        <Tab label="Video" />
+        <Tab label="Bộ sưu tập" />
       </Tabs>
     </Box>
   );

@@ -4,16 +4,25 @@ import Conversations from "./conversations/Conversations";
 import { useConversations } from "./useConversations";
 import { useChatList } from "./useChatList";
 import { useMessage } from "./useMessage";
+import { useEffect } from "react";
+import { MessageProps } from "./Messages";
 
-function App() {  
+const App = ({userIDStart}: MessageProps) => {  
   const myAvt = "src/assets/images/avt.png";
   const {dataConversation, chooseFriendChat, addNewMessage} = useConversations();
   const {data, readMessage} = useChatList();
-  const {userChat} = useMessage(data);
+  const {userChat, changeUserChat} = useMessage(data);
+
+  useEffect(()=> {
+    if (userIDStart != ""){
+      changeChat(userIDStart);
+    }
+  }, []);
 
   const changeChat = (userID: string) => {
     readMessage(userID);
     chooseFriendChat(userID);
+    changeUserChat(userID);
   }
 
   const sendMessage = (type: string, data: string, userID: string) => {

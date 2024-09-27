@@ -1,5 +1,4 @@
 import {useState } from "react"
-
 export interface DataMessageProps {
     userID: string;
     avt: string;
@@ -184,7 +183,7 @@ export const useConversations = () => {
     return {
         dataConversation,
         chooseFriendChat,
-        addNewMessage
+        addNewMessage,
     }
 }
   

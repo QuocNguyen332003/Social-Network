@@ -1,4 +1,4 @@
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter, useSearchParams } from 'react-router-dom';
 import Login from '../../features/user-authentication/containers/login/Login';
 import Register from '../../features/user-authentication/containers/register/Register';
 import Forgot from '../../features/user-authentication/containers/forgot/Forgot';
@@ -8,8 +8,6 @@ import AllFriends from '../../features/friends/containers/friends/AllFriends';
 import FriendsRequest from '../../features/friends/containers/friends-request/FriendsRequest';
 import FriendsSuggest from '../../features/friends/containers/friends-suggest/FriendsSuggest';
 import ProfilePost from '../../features/profile/containers/personal-page/ProfilePost';
-import ProfileImage from '../../features/profile/containers/personal-image/ProfileImage';
-import ProfileVideo from '../../features/profile/containers/personal-video/ProfileVideo';
 import Profile from '../../features/profile/containers/Profile';
 import ProfileEdit from '../../features/profile/containers/edit-profile/ProfileEdit';
 import SavedItems from '../../features/saved/containers/saved/SavedItems';
@@ -30,8 +28,17 @@ import RulesGroupContent from '../../features/group/containers/group/detail-grou
 import MemberGroupContent from '../../features/group/containers/group/detail-group/member-group/MemberGroupContent'
 import ApprovalGroupContent from '../../features/group/containers/group/detail-group/approval-group/ApprovalGroupContent'
 import AdminGroupContent from '../../features/group/containers/group/detail-group/admin-group/AdminGroupContent'
+import Hobby from '../../features/user-authentication/containers/register/Hobby';
+import ProfileCollection from '../../features/profile/containers/personal-collection/ProfileCollection';
 
 const Routes = () => {
+
+  function MessagesWrapper() {
+    const [searchParams] = useSearchParams();
+    const userIDStart = searchParams.get('userIDStart');
+    return <Messages userIDStart={userIDStart || ""} />;
+  }
+  
   const router = createBrowserRouter([
     {
       path: '/',
@@ -44,6 +51,10 @@ const Routes = () => {
     {
       path: '/register',
       element: <Register />,
+    },
+    {
+      path: '/choose-interest',
+      element: <Hobby />,
     },
     {
       path: '/forgot',
@@ -113,8 +124,8 @@ const Routes = () => {
       element: <SavedItems/> // Protect this route
     },
     {
-      path: '/messages', 
-      element: <Messages/> // Protect this route
+      path: '/messages',
+      element: <MessagesWrapper/>,
     },
     {
       path: '/notifications', 
@@ -150,14 +161,9 @@ const Routes = () => {
           element: <ProfilePost />,
         },
         {
-          path: 'image',
-          element: <ProfileImage />, 
+          path: 'personal-collection',
+          element: <ProfileCollection />, 
         },
-        {
-          path: 'video',
-          element: <ProfileVideo />,
-        },
-    
       ],
     },
     {

@@ -110,7 +110,9 @@ const ProfilePost = () => {
     <Box sx={{ backgroundColor: '#e9e9e9', padding: '20px 0' }}>
       <PostForm onSubmit={handlePostSubmit} />
       {posts.map((post, index) => (
-        <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} />
+        <Post key={index} post={post} onAddComment={handleAddComment} onAddReply={handleAddReply} onDeletePost={function (postId: string): void {
+          throw new Error("Function not implemented.");
+        } } currentUserId={""} />
       ))}
     </Box>
   );
