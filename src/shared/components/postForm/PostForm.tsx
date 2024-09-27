@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Paper, IconButton, Button, InputBase, Avatar, MenuItem, Select, FormControl, Typography, Input, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { InsertPhoto, LocalOffer, EmojiEmotions } from '@mui/icons-material';
 
+
 const PostForm = ({ onSubmit }: { onSubmit: (newPost: string, images: File[], visibility: string, hashTags: string[]) => void }) => {
   const [newPost, setNewPost] = useState(''); // Post content input state
   const [selectedImages, setSelectedImages] = useState<File[]>([]); // Image upload handling
@@ -13,7 +14,6 @@ const PostForm = ({ onSubmit }: { onSubmit: (newPost: string, images: File[], vi
 const handleAddHashTag = () => {
   const newHashTag = prompt('Nhập hashtag bạn muốn thêm:');
   if (newHashTag) {
-    // Add '#' if it doesn't already have it
     const formattedHashTag = newHashTag.startsWith('#') ? newHashTag : `#${newHashTag}`;
     if (!hashTags.includes(formattedHashTag)) {
       setHashTags([...hashTags, formattedHashTag]);
@@ -21,25 +21,18 @@ const handleAddHashTag = () => {
   }
 };
 
-
-  // Function to add emoji to the post content
   const handleAddEmoji = (emoji: string) => {
-    setNewPost(newPost + emoji); // Add selected emoji to post content
-    setEmojiDialogOpen(false); // Close emoji dialog
+    setNewPost(newPost + emoji); 
+    setEmojiDialogOpen(false); 
   };
 
-  // Function to submit the post content and images
   const handlePostSubmit = () => {
     if (newPost.trim() || selectedImages.length > 0) {
-      console.log("Post Content:", newPost);
-      console.log("Selected Images:", selectedImages);
-      console.log("Visibility:", visibility);
-      console.log("Tags:", hashTags);
       
-      onSubmit(newPost, selectedImages, visibility, hashTags); // Submit new post
-      setNewPost(''); // Clear input field
-      setSelectedImages([]); // Clear selected images
-      setHashTags([]); // Clear selected tags
+      onSubmit(newPost, selectedImages, visibility, hashTags); 
+      setNewPost(''); 
+      setSelectedImages([]); 
+      setHashTags([]); 
     }
   };
 
