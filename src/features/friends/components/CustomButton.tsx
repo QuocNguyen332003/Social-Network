@@ -11,7 +11,7 @@ function CustomButton({title, clickButton}: ButtonProps){
             sx={{
                 width: '170px', height: '35px', 
                 fontWeight: '400', fontSize: 14, textTransform: 'none',
-                backgroundColor: '#5858fa',  
+                backgroundColor: '#1976d2',  
               }}
             >{title}
         </Button>

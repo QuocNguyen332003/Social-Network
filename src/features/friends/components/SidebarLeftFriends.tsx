@@ -31,34 +31,34 @@ const SidebarLeftFriends = () => {
         <ListItem button onClick={() => {navigate('/friends'); setCurrTab(0)}} 
           sx={currTab == 0? {backgroundColor: '#e9e9e9'}: {}}>
           <ListItemIcon >
-            <Diversity3Icon sx={{ color: '#8b9dc3' }}/>  
+            <Diversity3Icon sx={{ color: '#1976d2' }}/>  
           </ListItemIcon>
           <ListItemText primary="Tất cả bạn bè" />
         </ListItem>
         <ListItem button onClick={() => {navigate('/friends/friends-suggest'); setCurrTab(1)}} 
           sx={currTab == 1? {backgroundColor: '#e9e9e9'}: {}}>
           <ListItemIcon>
-            <GroupIcon sx={{ color: '#8b9dc3' }} />
+            <GroupIcon sx={{ color: '#1976d2' }} />
           </ListItemIcon>
           <ListItemText primary="Gợi ý" />
         </ListItem>
         <ListItem button onClick={() => {navigate('/friends/friends-request'); setCurrTab(2)}} 
           sx={currTab == 2? {backgroundColor: '#e9e9e9'}: {}}>
           <ListItemIcon>
-            <GroupAddIcon sx={{ color: '#8b9dc3' }} />
+            <GroupAddIcon sx={{ color: '#1976d2' }} />
           </ListItemIcon>
           <ListItemText primary="Lời mời kết bạn" />
         </ListItem>
         <ListItem button onClick={() => {navigate('/friends/my-friends-request'); setCurrTab(3)}} 
           sx={currTab == 3? {backgroundColor: '#e9e9e9'}: {}}>
           <ListItemIcon>
-            <PersonAddIcon sx={{ color: '#8b9dc3' }} />
+            <PersonAddIcon sx={{ color: '#1976d2' }} />
           </ListItemIcon>
           <ListItemText primary="Lời mời kết bạn của tôi" />
         </ListItem>
         <ListItem button onClick={() => navigate('/new-feeds')}>
           <ListItemIcon>
-            <ArrowCircleLeftIcon sx={{ color: '#8b9dc3' }} />
+            <ArrowCircleLeftIcon sx={{ color: '#1976d2' }} />
           </ListItemIcon>
           <ListItemText primary="Quay lại" />
         </ListItem>

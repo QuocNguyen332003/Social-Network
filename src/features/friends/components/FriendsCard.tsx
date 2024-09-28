@@ -17,7 +17,7 @@ function FriendsCard({ avt, name, message, children }: FriendsCardProps) {
         height: '200px',
         justifyContent: 'space-between',
         backgroundColor: '#f9f9f9',
-        border: '1px solid #ccc'
+        border: '1px solid #ccc',
       }}
     >
       <Box 
@@ -42,7 +42,7 @@ function FriendsCard({ avt, name, message, children }: FriendsCardProps) {
             marginBottom: '40px',
           }}>
             <Typography variant="h6" component="h2"
-            sx={{color: '#150aa1', fontWeight: 'bold'}}>
+            sx={{color: 'fffffff', fontWeight: 'bold'}}>
                 {name}
             </Typography>
             {children}

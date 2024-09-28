@@ -14,8 +14,6 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import GoogleIcon from '@mui/icons-material/Google';
-import AppleIcon from '@mui/icons-material/Apple';
-import FacebookIcon from '@mui/icons-material/Facebook';
 
 const theme = createTheme();
 
@@ -72,12 +70,12 @@ const Login: React.FC = () => {
               <img 
                 src="./src/assets/images/logoSocialNetwork.png" 
                 alt="Logo" 
-                style={{ marginBottom: 16, maxWidth: '100%' }} 
+                style={{ marginBottom: 8, maxWidth: '100%' }} 
               /> {/* Đảm bảo logo có thể thu nhỏ */}
               <Typography
                 component="h1"
                 variant="h5"
-                sx={{ fontWeight: 600 }}
+                sx={{ fontWeight: 800, fontSize: 40 }}
               >
                 Đăng nhập
               </Typography>
@@ -153,20 +151,6 @@ const Login: React.FC = () => {
                     sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }} // Đảm bảo mỗi button có tối thiểu 100px, và có khoảng cách dưới khi xuống dòng
                   >
                     Google
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<AppleIcon />}
-                    sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }}
-                  >
-                    Apple
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<FacebookIcon />}
-                    sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }}
-                  >
-                    Facebook
                   </Button>
                 </Box>
                 

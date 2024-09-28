@@ -61,7 +61,7 @@ const Forgot: React.FC = () => {
               <Typography
                 component="h1"
                 variant="h5"
-                sx={{ fontWeight: 600 }}
+                sx={{ fontWeight: 800, fontSize: 40 }}
               >
                 Quên mật khẩu
               </Typography>

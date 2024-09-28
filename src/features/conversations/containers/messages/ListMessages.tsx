@@ -24,7 +24,7 @@ const ListMesssages = ({data, changeChat} : ListMessagesProps) => {
           justifyContent='space-around'
           alignItems='flex-end'
         >
-            <Typography variant="h6" component="h2" fontWeight='bold' color='#150aa1'>
+            <Typography variant="h6" component="h2" fontWeight='bold' color='#1976d2'>
                 Message
             </Typography>
             <Box 

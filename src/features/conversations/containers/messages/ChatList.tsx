@@ -4,9 +4,9 @@ import { ListMessagesProps } from "./ListMessages";
 
 
 const BorderButton = styled(Button)<ButtonProps>(() => ({
-    color: '#333',
-    backgroundColor: '#c7c7f9',
-    borderRadius: 30,
+    color: '#ffffff',
+    backgroundColor: '#1976d2',
+    borderRadius: 25,
     padding: '5px 40px',
     fontSize: 12,
   }));

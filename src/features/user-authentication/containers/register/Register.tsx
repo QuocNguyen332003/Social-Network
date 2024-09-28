@@ -63,7 +63,7 @@ const Register: React.FC = () => {
               <Typography
                 component="h1"
                 variant="h5"
-                sx={{ fontWeight: 600 }}
+                sx={{ fontWeight: 800, fontSize: 40 }}
               >
                 Đăng ký
               </Typography>
