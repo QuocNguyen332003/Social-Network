@@ -1,10 +1,13 @@
-import { Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, Typography } from "@mui/material";
+import { Box, Button, CardMedia, Dialog, DialogContent, Grid, IconButton, Typography } from "@mui/material";
 import { useState } from "react";
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import VideoCard from "../video-card/VideoCard";
 import CloseIcon from '@mui/icons-material/Close';
 import { MyPhoto } from "../../../interface/interface";
+import { useCollectionCard } from "./useCollectionCard";
+import ShareIcon from '@mui/icons-material/Share';
+import ReplyIcon from '@mui/icons-material/Reply';
 interface CollectionCardProps{
     id: string;
     title: string;
@@ -16,23 +19,7 @@ const CollectionCard = ({id, title,type, data}: CollectionCardProps) => {
     
     const tabs = ["Ảnh của bạn"];
     const [currTab, setCurrTab] = useState(0);
-    const [open, setOpen] = useState(false);
-    const [selectedImage, setSelectedImage] = useState("");  
-
-    const handleClickOpen = (typeLink: string, link: string) => {
-      if (typeLink == "img"){
-        handleClickOpenImg(link);
-      }
-    }
-    const handleClickOpenImg = (imageUrl: string) => {
-      setSelectedImage(imageUrl); 
-      setOpen(true);
-    };
-  
-    const handleClose = () => {
-      setOpen(false);
-      setSelectedImage("");
-    };
+    const {openPhoto, open, CloseDialogCollectionCard, photo } = useCollectionCard();
     const [showAll, setShowAll] = useState(false);
     const displayedItems = showAll ? data : type === "img"? data.slice(0, 11): data.slice(0, 7);
   return (
@@ -71,7 +58,7 @@ const CollectionCard = ({id, title,type, data}: CollectionCardProps) => {
         <Grid item xs={type === "img"? 2: 3} key={index}>
           <IconButton
             sx={{ width: '100%', height: '100%', borderRadius: 0 }}
-            onClick={() => handleClickOpen(type, item.link)}
+            onClick={() => openPhoto(item)}
           >
             {type === "img"?(
                 <img
@@ -101,21 +88,72 @@ const CollectionCard = ({id, title,type, data}: CollectionCardProps) => {
         </Grid>
       )}
       </Grid>
-      <Dialog open={open} onClose={handleClose} maxWidth="md"
+      <Dialog open={open} onClose={CloseDialogCollectionCard} maxWidth="md"
         fullScreen  
-        sx={{padding: '0px'}}
+        sx={{padding: '0px',
+          '& .MuiDialog-paper': {
+            backgroundColor: '#ccc',
+          },
+        }}
       >
-        <DialogTitle>
-          <Button onClick={handleClose} sx={{ position: 'absolute', right: 16, top: 16 }}>
-            <CloseIcon />
-          </Button>
-        </DialogTitle>
         <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <img
-            src={selectedImage}
-            alt="Ảnh đại diện lớn"
-            style={{ width: '80%', height: '80%', objectFit: 'contain' }}  // Adjust size and fit
-          />
+          <Grid container sx={{ width: '100vw', height: '90vh', 
+             borderRadius: 10, backgroundColor: '#fff'}}>
+            <Grid item xs={0.5}/>
+            <Grid xs={8}>
+              {/* Hiển thị ảnh hoặc video */}
+              {type === "img" ? (
+                <CardMedia
+                  sx={{ width: '100%', height: '80vh', objectFit: 'contain', margin: '5vh 0px' }}
+                  component="img"
+                  image={photo?photo.link:""}
+                  alt={photo?photo.name:""}
+                />
+              ) : (
+                <CardMedia
+                sx={{ width: '100%', height: '80vh', margin: '5vh 0px' }}
+                  component="video"
+                  src={photo?photo.link:""}
+                  controls
+                />
+              )}
+            </Grid>
+            <Grid item xs={0.5}/>
+            {/* Thông tin ảnh */}
+            <Grid item xs={2.5} sx={{height: '80vh',  margin: '5vh 0px', backgroundColor: '#e9e9e9', borderRadius: 10 }}>
+            <Box sx={{ height: '100%' }}>
+            <Typography variant="h5" color="black" fontWeight= "bold"
+                sx={{margin: '20px', color:  '#1976d2', fontSize: 30}}>
+                Thông tin {photo?(photo.type === 'img'? "ảnh":"video"):""}
+              </Typography>
+              <Typography variant="body1"  color="text.secondary" sx={{ fontWeight: '500', fontSize: 15, margin: '5vh 3vw' }}>
+                Tên ảnh: {photo?photo.name: ""}
+              </Typography>
+              <Typography variant="body1"  color="text.secondary"sx={{ fontWeight: '500', fontSize: 15, margin: '5vh 3vw' }}>
+                Tác giả: {photo ? photo.idAuthor : ""}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: '500', fontSize: 15, margin: '5vh 3vw' }}>
+                Created: {photo ? new Date(photo.createdAt).toLocaleDateString() : ""}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: '500', fontSize: 15, margin: '5vh 3vw' }}>
+                Updated: {photo ? new Date(photo.updatedAt).toLocaleDateString() : ""}
+              </Typography>
+              <Button variant="contained" endIcon={<ShareIcon />}
+              sx={{margin: '2vh 3vw'}}>
+                Chia sẻ
+              </Button>
+              <Button variant="outlined" endIcon={<ReplyIcon />}
+              sx={{backgroundColor: '#fff', margin: '2vh 3vw'}}>
+                Xem bài viết gốc
+              </Button>
+            </Box>
+            </Grid>
+            <Grid item xs={0.5}>
+              <Button onClick={CloseDialogCollectionCard} sx={{marginTop: '10px'}}>
+                <CloseIcon />
+              </Button>
+            </Grid>
+          </Grid>
         </DialogContent>
       </Dialog>
     </Box>

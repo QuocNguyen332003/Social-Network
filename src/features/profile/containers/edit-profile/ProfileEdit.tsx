@@ -5,9 +5,12 @@ import SidebarRight from '../../../../shared/components/sidebarRight/SidebarRigh
 import ProfileHeaderEdit from '../../components/ProfileHeaderEdit';
 import EditProfileCard from '../../components/EditProfileCard';
 import { useProfile } from '../useProfile';
+import EditCardDate from '../../components/EditCardDate';
 
 const ProfileEdit = () => {
-  const {myUser, changeAvt, changeBackground, changeName, changeUserName, changeEmail, changePassword} = useProfile();
+  const {myUser, changeAvt, changeBackground, 
+    changeName, changeUserName, changeEmail, changePassword,
+    changePhoneNumber, changeAboutMe, changeAddress, changeBirthday} = useProfile();
 
   if (myUser == null) return <></>
   return (
@@ -31,9 +34,14 @@ const ProfileEdit = () => {
         >
           <ProfileHeaderEdit myUser={myUser} changeAvt={changeAvt} changeBackground={changeBackground}/>
           <Grid container sx={{backgroundColor: '#fff', paddingBottom: '100px', marginBottom: '20px'}}>
+          <Grid item xs={12}>
+                <EditProfileCard label={'Giới thiệu về bản thân'} 
+                    textInput={[myUser.aboutMe]} 
+                    saveData={changeAboutMe}/>
+            </Grid>
             <Grid item xs={6}>
                 <EditProfileCard label={'Thay đổi tên hiển thị'} 
-                    textInput={[myUser.firstName, myUser.lastName]} 
+                    textInput={[myUser.displayName]} 
                     saveData={changeName}/>
             </Grid>
             <Grid item xs={6}>
@@ -42,9 +50,29 @@ const ProfileEdit = () => {
                     saveData={changeUserName}/>
             </Grid>
             <Grid item xs={6}>
+                <EditProfileCard label={'Thay đổi tên người dùng'} 
+                    textInput={[myUser.firstName, myUser.lastName]} 
+                    saveData={changeName}/>
+            </Grid>
+            <Grid item xs={6}>
                 <EditProfileCard label={'Thay đổi Email'} 
                     textInput={[myUser.account.email]}
                     saveData={changeEmail}/>
+            </Grid>
+            <Grid item xs={6}>
+                <EditProfileCard label={'Thay đổi Số điện thoại'} 
+                    textInput={[myUser.details? myUser.details.phoneNumber? myUser.details.phoneNumber : "" : ""]}
+                    saveData={changePhoneNumber}/>
+            </Grid>
+            <Grid item xs={6}>
+                <EditProfileCard label={'Thay đổi địa chỉ'} 
+                    textInput={[myUser.details? myUser.details.address? myUser.details.address : "" : ""]}
+                    saveData={changeAddress}/>
+            </Grid>
+            <Grid item xs={6}>
+                <EditCardDate label={'Thay đổi ngày sinh'} 
+                    textInput={myUser.details? myUser.details.birthDate? myUser.details.birthDate : new Date() : new Date()}
+                    saveData={changeBirthday}/>
             </Grid>
             <Grid item xs={6}>
              <EditProfileCard label={'Thay đổi mật khẩu'} 
