@@ -109,14 +109,15 @@ export interface Emoticon {
   }
   
   export interface Comment {
+    _id: string;
     _iduser: string;
     content: string;
     img: string[];
     replyComment: Array<Comment>; // Đệ quy: bình luận có thể có các bình luận con
     emoticons: Array<Emoticon>;
     createdAt: Date;
-    updatedAt: Date;
-    _destroy?: Date;
+    updatedAt:Date | null;
+    _destroy?: Date | null;
   }
   
   export interface Interact {
@@ -129,6 +130,7 @@ export interface Emoticon {
     // Article Interface
 export interface Article {
     _id: string;
+    createdBy: string, // Mã người tạo bài viết
     sharedPostId: string | null; // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: string | null;
     handleDate: Date | null;
@@ -146,7 +148,7 @@ export interface Article {
     interact: Interact;
     createdAt: Date;
     updatedAt: Date;
-    _destroy: Date;
+    _destroy: Date | null;
 }
   // Group Interface
   export interface Group {

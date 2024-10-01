@@ -1,87 +1,113 @@
-import React, { useState } from 'react';
-import { Box, Paper, IconButton, Button, InputBase, Avatar, MenuItem, Select, FormControl, Typography, Input, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import { InsertPhoto, LocalOffer, EmojiEmotions } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
+import { Box, Paper, IconButton, Button, InputBase, Avatar, MenuItem, Select, FormControl, Typography, Input, Dialog, DialogActions, DialogContent, DialogTitle, SelectChangeEvent } from '@mui/material';
+import { InsertPhoto, LocalOffer, EmojiEmotions, Close } from '@mui/icons-material';
 
-const PostForm = ({ onSubmit }: { onSubmit: (newPost: string, images: File[], visibility: string, hashTags: string[]) => void }) => {
-  const [newPost, setNewPost] = useState(''); // Post content input state
-  const [selectedImages, setSelectedImages] = useState<File[]>([]); // Image upload handling
-  const [visibility, setVisibility] = useState('public'); // Post visibility options
-  const [hashTags, setHashTags] = useState<string[]>([]);
-  const [emojiDialogOpen, setEmojiDialogOpen] = useState(false); // Emoji dialog open state
+interface PostFormProps {
+  onSubmit: (newPost: string, images: File[], visibility: string, hashTags: string[]) => void;
+}
 
-// Function to add a new hashtag
-const handleAddHashTag = () => {
-  const newHashTag = prompt('Nhập hashtag bạn muốn thêm:');
-  if (newHashTag) {
-    // Add '#' if it doesn't already have it
-    const formattedHashTag = newHashTag.startsWith('#') ? newHashTag : `#${newHashTag}`;
-    if (!hashTags.includes(formattedHashTag)) {
-      setHashTags([...hashTags, formattedHashTag]);
+const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
+  const [newPost, setNewPost] = useState(''); // Nội dung bài viết
+  const [selectedImages, setSelectedImages] = useState<File[]>([]); // Hình ảnh được chọn
+  const [visibility, setVisibility] = useState('public'); // Phạm vi hiển thị bài viết
+  const [hashTags, setHashTags] = useState<string[]>([]); // Hashtag đã chọn
+  const [emojiDialogOpen, setEmojiDialogOpen] = useState(false); // Hộp thoại emoji
+  const [displayName, setDisplayName] = useState(''); // Tên hiển thị người dùng
+
+  // Cập nhật tên hiển thị người dùng từ localStorage
+  useEffect(() => {
+    const userDisplayName = localStorage.getItem('displayName');
+    if (userDisplayName) {
+      setDisplayName(userDisplayName);
     }
-  }
-};
+  }, []);
 
+  // Hàm thêm hashtag mới
+  const handleAddHashTag = () => {
+    const newHashTag = prompt('Nhập hashtag bạn muốn thêm:');
+    if (newHashTag) {
+      const formattedHashTag = newHashTag.startsWith('#') ? newHashTag : `#${newHashTag}`;
+      if (!hashTags.includes(formattedHashTag)) {
+        setHashTags([...hashTags, formattedHashTag]);
+      }
+    }
+  };
 
-  // Function to add emoji to the post content
+  // Hàm xóa hashtag
+  const handleRemoveHashTag = (hashTag: string) => {
+    setHashTags(hashTags.filter((tag) => tag !== hashTag));
+  };
+
+  // Hàm thêm emoji vào nội dung bài viết
   const handleAddEmoji = (emoji: string) => {
-    setNewPost(newPost + emoji); // Add selected emoji to post content
-    setEmojiDialogOpen(false); // Close emoji dialog
+    setNewPost(newPost + emoji);
+    setEmojiDialogOpen(false);
   };
 
-  // Function to submit the post content and images
+  // Sử dụng `SelectChangeEvent` cho hàm `handleVisibilityChange`
+  const handleVisibilityChange = (event: SelectChangeEvent<string>) => {
+    console.log('Thay đổi visibility:', event.target.value); // Log kiểm tra
+    setVisibility(event.target.value as string);
+  };
+
+  // Hàm xử lý khi người dùng nhấn nút Đăng bài
   const handlePostSubmit = () => {
+    console.log('Giá trị visibility hiện tại khi nhấn nút Đăng:', visibility); // Kiểm tra giá trị visibility khi đăng bài
+    console.log('Dữ liệu bài viết đang gửi:', { newPost, selectedImages, visibility, hashTags });
     if (newPost.trim() || selectedImages.length > 0) {
-      console.log("Post Content:", newPost);
-      console.log("Selected Images:", selectedImages);
-      console.log("Visibility:", visibility);
-      console.log("Tags:", hashTags);
-      
-      onSubmit(newPost, selectedImages, visibility, hashTags); // Submit new post
-      setNewPost(''); // Clear input field
-      setSelectedImages([]); // Clear selected images
-      setHashTags([]); // Clear selected tags
+      onSubmit(newPost, selectedImages, visibility, hashTags);
+      setNewPost('');
+      setSelectedImages([]);
+      setHashTags([]);
     }
   };
 
-  // Function to handle image uploads
+  // Hàm xử lý khi người dùng chọn ảnh để đăng
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setSelectedImages([...selectedImages, ...Array.from(e.target.files)]); // Add selected images
+      setSelectedImages([...selectedImages, ...Array.from(e.target.files)]);
     }
+  };
+
+  // Hàm xóa ảnh đã chọn
+  const handleRemoveImage = (index: number) => {
+    const updatedImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(updatedImages);
   };
 
   return (
     <Paper sx={{ padding: 2, marginBottom: 2, borderRadius: '8px' }}>
-      {/* Header với Avatar và tên người dùng */}
       <Box display="flex" alignItems="center" mb={2}>
         <Avatar alt="User Avatar" src="https://via.placeholder.com/150" sx={{ width: 48, height: 48, marginRight: 2 }} />
         <Box>
-          <Typography variant="subtitle1" fontWeight="bold">Bảo Quốc</Typography>
-          {/* Post visibility selector */}
+          <Typography variant="subtitle1" fontWeight="bold">{displayName}</Typography>
           <FormControl sx={{ minWidth: 120 }}>
-            <Select
+          <Select
               value={visibility}
-              onChange={(e) => setVisibility(e.target.value as string)} // Change visibility option
+              onChange={(event) => {
+                console.log('Sự kiện onChange đã kích hoạt:', event.target.value); // Log kiểm tra sự kiện có được kích hoạt
+                handleVisibilityChange(event as SelectChangeEvent<string>);
+              }} // Sử dụng `SelectChangeEvent` thay vì `ChangeEvent`
               displayEmpty
               inputProps={{ 'aria-label': 'Phạm vi bài viết' }}
               sx={{ fontSize: '14px' }}
             >
-              <MenuItem value="public">Công khai</MenuItem> {/* Public visibility */}
-              <MenuItem value="friends">Bạn bè</MenuItem> {/* Friends only visibility */}
-              <MenuItem value="private">Riêng tư</MenuItem> {/* Private visibility */}
+              <MenuItem value="public">Công khai</MenuItem>
+              <MenuItem value="friends">Bạn bè</MenuItem>
+              <MenuItem value="private">Riêng tư</MenuItem>
             </Select>
           </FormControl>
         </Box>
       </Box>
 
-      {/* Input for writing post */}
+      {/* Input để nhập nội dung bài viết */}
       <InputBase
         placeholder="Quốc ơi, bạn đang nghĩ gì thế?"
         fullWidth
         multiline
         rows={2}
-        value={newPost} // Post content state
-        onChange={(e) => setNewPost(e.target.value)} // Update post content
+        value={newPost}
+        onChange={(e) => setNewPost(e.target.value)}
         sx={{
           fontSize: '16px',
           padding: '8px 16px',
@@ -91,86 +117,97 @@ const handleAddHashTag = () => {
         }}
       />
 
-      {/* Display selected images */}
+      {/* Hiển thị các hình ảnh đã chọn */}
       {selectedImages.length > 0 && (
         <Box sx={{ marginBottom: 2, display: 'flex', flexWrap: 'wrap' }}>
           {selectedImages.map((image, index) => (
-            <img
-              key={index}
-              src={URL.createObjectURL(image)}
-              alt={`selected-${index}`}
-              style={{ maxWidth: '100px', maxHeight: '100px', marginRight: '10px', borderRadius: '8px' }}
-            />
+            <Box key={index} sx={{ position: 'relative', display: 'inline-block', margin: '4px' }}>
+              <img
+                src={URL.createObjectURL(image)}
+                alt={`selected-${index}`}
+                style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '8px' }}
+              />
+              {/* Nút xóa ảnh */}
+              <IconButton
+                sx={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'white' }}
+                onClick={() => handleRemoveImage(index)}
+              >
+                <Close fontSize="small" />
+              </IconButton>
+            </Box>
           ))}
         </Box>
       )}
 
-      {/* Display added tags */}
+      {/* Hiển thị các hashtag đã thêm */}
       {hashTags.length > 0 && (
         <Box sx={{ marginBottom: 2 }}>
-          {hashTags.map((hashTags, index) => (
-            <Typography key={index} variant="body2" sx={{ display: 'inline-block', marginRight: 1, color: 'blue' }}>
-              {hashTags}
-            </Typography>
+          {hashTags.map((hashTag, index) => (
+            <Box key={index} sx={{ display: 'inline-block', marginRight: 1 }}>
+              <Typography
+                variant="body2"
+                sx={{ display: 'inline-block', color: 'blue', cursor: 'pointer' }}
+                onClick={() => handleRemoveHashTag(hashTag)}
+              >
+                {hashTag}
+              </Typography>
+            </Box>
           ))}
         </Box>
       )}
 
-      {/* Function bar with buttons */}
+      {/* Thanh công cụ */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box display="flex" gap={2}>
           <label htmlFor="upload-photo">
             <Input
               id="upload-photo"
               type="file"
-              inputProps={{ multiple: true }} // Allow multiple file uploads
+              inputProps={{ multiple: true }}
               sx={{ display: 'none' }}
-              onChange={handleImageChange} // Handle image uploads
+              onChange={handleImageChange}
             />
-            <IconButton component="span" sx={{ color: '#43A047', display: 'flex', alignItems: 'center' }}> {/* Horizontal layout */}
-              <InsertPhoto sx={{ fontSize: 24, marginRight: '4px' }} /> {/* Custom size for photo icon */}
-              <Typography variant="caption" sx={{ fontWeight: 'bold'}}>Ảnh/Video</Typography> {/* Bold text */}
+            <IconButton component="span" sx={{ color: '#43A047' }}>
+              <InsertPhoto sx={{ fontSize: 24, marginRight: '4px' }} />
+              <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Ảnh/Video</Typography>
             </IconButton>
           </label>
 
-          {/* Tag adding button */}
-          <IconButton onClick={handleAddHashTag} sx={{ color: '#FB8C00', display: 'flex', alignItems: 'center' }}> {/* Horizontal layout */}
-            <LocalOffer sx={{ fontSize: 24, marginRight: '4px' }} /> {/* Custom size for tag icon */}
-            <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Thẻ</Typography> {/* Bold text */}
+          <IconButton onClick={handleAddHashTag} sx={{ color: '#FB8C00' }}>
+            <LocalOffer sx={{ fontSize: 24, marginRight: '4px' }} />
+            <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Thẻ</Typography>
           </IconButton>
 
-          {/* Emoji dialog button */}
-          <IconButton onClick={() => setEmojiDialogOpen(true)} sx={{ color: '#FDD835', display: 'flex', alignItems: 'center' }}> {/* Horizontal layout */}
-            <EmojiEmotions sx={{ fontSize: 24, marginRight: '4px' }} /> {/* Custom size for emoji icon */}
-            <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Biểu tượng</Typography> {/* Bold text */}
+          <IconButton onClick={() => setEmojiDialogOpen(true)} sx={{ color: '#FDD835' }}>
+            <EmojiEmotions sx={{ fontSize: 24, marginRight: '4px' }} />
+            <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Biểu tượng</Typography>
           </IconButton>
         </Box>
 
-        {/* Post submit button */}
+        {/* Nút đăng bài */}
         <Button
           variant="contained"
           sx={{ bgcolor: '#0D47A1', borderRadius: '16px', padding: '6px 24px' }}
-          onClick={handlePostSubmit} // Trigger post submission
+          onClick={handlePostSubmit}
         >
           Đăng
         </Button>
       </Box>
 
-      {/* Emoji selection dialog */}
+      {/* Hộp thoại chọn emoji */}
       <Dialog open={emojiDialogOpen} onClose={() => setEmojiDialogOpen(false)}>
         <DialogTitle>Chọn biểu tượng cảm xúc</DialogTitle>
         <DialogContent>
-          {/* Extended emoji list */}
           <Box display="grid" gridTemplateColumns="repeat(6, 1fr)" gap={2}>
             {['😀', '😂', '😍', '😎', '😢', '😡', '😱', '👍', '👏', '🙌', '💪', '🙏', '❤️', '💔', '🔥', '💯'].map((emoji, index) => (
-              <Button key={index} onClick={() => handleAddEmoji(emoji)}> {/* Emoji buttons */}
+              <Button key={index} onClick={() => handleAddEmoji(emoji)}>
                 {emoji}
               </Button>
             ))}
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEmojiDialogOpen(false)}>Đóng</Button> {/* Close emoji dialog */}
+          <Button onClick={() => setEmojiDialogOpen(false)}>Đóng</Button>
         </DialogActions>
       </Dialog>
     </Paper>
