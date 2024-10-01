@@ -103,7 +103,7 @@ const SidebarRightCollections = ({setCurrCollection}: CollectionContextType) => 
       </List>
 
       {/* Create new collection button */}
-      <Button
+      {/* <Button
         variant="contained"
         sx={{
           width: '100%',
@@ -117,7 +117,7 @@ const SidebarRightCollections = ({setCurrCollection}: CollectionContextType) => 
         startIcon={<Add />}
       >
         Tạo bộ sưu tập mới
-      </Button>
+      </Button> */}
     </Box>
     )
 }
