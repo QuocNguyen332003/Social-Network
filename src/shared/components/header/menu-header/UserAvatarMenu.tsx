@@ -63,7 +63,7 @@ const UserAvatarMenu = () => {
       >
         <MenuItem onClick={() => handleMenuClick(`/profile/${userID}`)}>Trang Cá Nhân</MenuItem>
         <MenuItem onClick={() => handleMenuClick('/settings')}>Cài đặt</MenuItem>
-        <MenuItem onClick={() => handleMenuClick('/logout')}>Log out</MenuItem>
+        <MenuItem onClick={() => handleMenuClick('/login')}>Log out</MenuItem>
       </Menu>
     </>
   );
