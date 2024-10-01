@@ -230,12 +230,7 @@ const NewFeedsContent = () => {
             return post;
           })
         );
-  
-        // Cập nhật trạng thái liked của reply
-        setLikedComments((prev) => ({
-          ...prev,
-          [replyId]: !prev[replyId] // Chuyển đổi trạng thái liked
-        }));
+
       }
     } catch (error) {
       console.error('Lỗi khi like reply comment:', error);
