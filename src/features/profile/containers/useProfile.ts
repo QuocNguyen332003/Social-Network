@@ -81,6 +81,64 @@ export const useProfile = () => {
       }
     }
 
+    const changeAboutMe = (dataInput: string[]) => {
+      if (myUser != null){
+        const updateUser = {
+          ...myUser,
+          aboutMe: dataInput[0]
+        };
+        setMyUser(updateUser);
+      }
+    }
+    const changePhoneNumber = (dataInput: string[]) => {
+      if (myUser != null){
+        const updateUser = {
+          ...myUser,
+          details: {
+            ...myUser,
+            phoneNumber: dataInput[0],
+          }
+        };
+        setMyUser(updateUser);
+      }
+    }
+    const changeAddress= (dataInput: string[]) => {
+      if (myUser != null){
+        const updateUser = {
+          ...myUser,
+          details: {
+            ...myUser,
+            address: dataInput[0],
+          }
+        };
+        setMyUser(updateUser);
+      }
+    }
+
+    const changeBirthday= (dataInput: Date) => {
+      if (myUser != null){
+        const updateUser = {
+          ...myUser,
+          details: {
+            ...myUser,
+            birthDate: dataInput,
+          }
+        };
+        setMyUser(updateUser);
+      }
+    }
+    const changeGender= (dataInput: boolean) => {
+      if (myUser != null){
+        const updateUser = {
+          ...myUser,
+          details: {
+            ...myUser,
+            gender: dataInput,
+          }
+        };
+        setMyUser(updateUser);
+      }
+    }
     return {
         myUser,
         changeAvt,
@@ -89,6 +147,12 @@ export const useProfile = () => {
         changeUserName,
         changeEmail,
         changePassword,
+        changeAboutMe,
+        changePhoneNumber,
+        changeAddress,
+        changeBirthday,
+        changeGender,
+
     }
 }
 
