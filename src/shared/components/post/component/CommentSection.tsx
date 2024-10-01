@@ -55,7 +55,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                   sx={{ color: isCommentLiked ? '#2e7d32' : '#757575', textTransform: 'none' }}
                   onClick={() => onLikeComment(comment._id)}
                 >
-                  {isCommentLiked ? 'Thích' : 'Bỏ Thích'} ({commentLikes})
+                  {isCommentLiked ? 'Bỏ thích' : 'Thích'} ({commentLikes})
                 </Button>
                 <Button
                   size="small"

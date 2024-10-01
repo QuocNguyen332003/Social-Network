@@ -10,7 +10,7 @@ import { useProfile } from './useProfile';
 
 const Profile = () => {
   const {myUser} = useProfile();
-
+  
   if (myUser == null) {
     return <></>;
   }
