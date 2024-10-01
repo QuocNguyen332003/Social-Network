@@ -1,12 +1,13 @@
 import React from 'react';
 import { Menu, MenuItem } from '@mui/material';
-import { Bookmark, Report, Delete } from '@mui/icons-material';
+import { Bookmark, Report, Delete, Edit } from '@mui/icons-material';
 
 interface PostMenuProps {
   anchorEl: null | HTMLElement;
   open: boolean;
   handleClose: () => void;
   handleSavePost: () => void;
+  handleOpenEditDialog: () => void;
   handleOpenReportDialog: () => void;
   handleDeletePost: () => void;
   isOwner: boolean; // Kiểm tra người dùng hiện tại có phải chủ sở hữu bài viết không
@@ -17,6 +18,7 @@ const PostMenu: React.FC<PostMenuProps> = ({
   open,
   handleClose,
   handleSavePost,
+  handleOpenEditDialog,
   handleOpenReportDialog,
   handleDeletePost,
   isOwner,
@@ -73,22 +75,31 @@ const PostMenu: React.FC<PostMenuProps> = ({
         Báo cáo bài viết
       </MenuItem>
 
-      {/* Mục xóa bài viết chỉ hiển thị khi người dùng là chủ sở hữu */}
       {isOwner && (
-        <MenuItem
-          onClick={handleDeletePost}
+        <>
+          <MenuItem onClick={handleOpenEditDialog} 
           sx={{
-            fontSize: '14px',
-            fontWeight: 500,
-            '&:hover': {
-              backgroundColor: '#fdecea', // Màu nền đỏ nhẹ khi di chuột qua
-            },
-            color: '#d32f2f', // Màu chữ đỏ cho xóa
-          }}
-        >
-          <Delete fontSize="small" sx={{ marginRight: 1, color: '#d32f2f' }} /> {/* Biểu tượng Delete */}
-          Xoá bài viết
-        </MenuItem>
+          fontSize: '14px',
+          fontWeight: 500,
+          '&:hover': {
+            backgroundColor: '#f0f0f0',
+          },
+        }}>
+            <Edit fontSize="small" sx={{ marginRight: 1, color: '#3498db' }} />
+            Chỉnh sửa bài viết
+          </MenuItem>
+          <MenuItem onClick={handleDeletePost} 
+          sx={{
+          fontSize: '14px',
+          fontWeight: 500,
+          '&:hover': {
+            backgroundColor: '#f0f0f0',
+          },
+        }}>
+            <Delete fontSize="small" sx={{ marginRight: 1, color: '#d32f2f'  }} />
+            Xóa bài viết
+          </MenuItem>
+        </>
       )}
     </Menu>
   );

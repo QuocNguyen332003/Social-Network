@@ -1,85 +1,71 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
+ 
 import { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import axios from 'axios';
 import PostForm from '../../../shared/components/postForm/PostForm';
 import Post from '../../../shared/components/post/Post';
-import { Article, Comment } from '../../../interface/interface'; // Chỉ giữ lại các interface cần thiết
+import { Article, Comment } from '../../../interface/interface';
 
 const NewFeedsContent = () => {
-  // State lưu trữ danh sách bài viết
-  const [posts, setPosts] = useState<Article[]>([]); 
-  const currentUserId = localStorage.getItem('userId') || ''; 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
+  const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
+  const [error, setError] = useState<string | null>(null); // State cho lỗi
+  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
 
-  // Lấy danh sách bài viết từ API khi component render lần đầu
+  // Gọi API lấy danh sách bài viết khi component render lần đầu
   useEffect(() => {
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      setError(null);  // Reset lỗi trước khi gọi API
-    
-      try {
-        const response = await axios.get('http://localhost:3000/v1/article');
-        setPosts(response.data);
-      } catch (error) {
-        console.error('Lỗi khi lấy bài viết:', error);
-        setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
-      } finally {
-        setIsLoading(false);  // Hoàn tất loading bất kể thành công hay thất bại
-      }
-    };
-    
-
-    fetchPosts(); // Thực hiện gọi API ngay khi component được render
+    fetchPosts();
   }, []);
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    setError(null); // Reset lỗi trước khi gọi API
+    try {
+      const response = await axios.get(`http://localhost:3000/v1/article?userId=${currentUserId}`);
+      setPosts(response.data);
+    } catch (error) {
+      console.error('Lỗi khi lấy bài viết:', error);
+      setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
+    } finally {
+      setIsLoading(false); 
+    }
+  };
 
   // Xử lý khi gửi bài viết mới
   const handlePostSubmit = async (newPost: string, images: File[], visibility: string, hashTags: string[]) => {
     const formData = new FormData();
     formData.append('content', newPost);
-    formData.append('visibility', visibility);
-
-    hashTags.forEach(tag => formData.append('hashTag[]', tag));
-
+    formData.append('scope', visibility);
+    formData.append('userId', currentUserId);
+    hashTags.forEach(tag => {
+      formData.append('hashTag[]', tag);
+    });
     images.forEach((image) => {
       formData.append('images', image);
     });
-    formData.append('userId', currentUserId)
+  
     try {
       const response = await axios.post('http://localhost:3000/v1/article', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       console.log('Bài viết đã được tạo thành công:', response.data);
-      setPosts((prevPosts) => [response.data.post, ...prevPosts]);
+      setPosts((prevPosts) => [response.data.post, ...prevPosts]); 
     } catch (error) {
       console.error('Lỗi khi gửi bài viết:', error);
     }
   };
+  
 
   const handleLikePost = async (postId: string) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/like`, {
-        userId: currentUserId,
-      });
-  
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/like`, { userId: currentUserId });
       if (response.status === 200) {
         setPosts((prevPosts) =>
           prevPosts.map((post) => {
             if (post._id === postId) {
-              // Kiểm tra người dùng đã like chưa
-              const isLiked = post.interact.emoticons.some(
-                (emoticon) => emoticon._iduser === currentUserId && emoticon.typeEmoticons === 'like'
-              );
-  
-              // Cập nhật trạng thái like/unlike cho bài viết
+              const isLiked = post.interact.emoticons.some((emoticon) => emoticon._iduser === currentUserId && emoticon.typeEmoticons === 'like');
               const updatedEmoticons = isLiked
                 ? post.interact.emoticons.filter((emoticon) => emoticon._iduser !== currentUserId)
                 : [...post.interact.emoticons, { typeEmoticons: 'like', _iduser: currentUserId }];
-  
               return { ...post, interact: { ...post.interact, emoticons: updatedEmoticons } };
             }
             return post;
@@ -90,80 +76,219 @@ const NewFeedsContent = () => {
       console.error('Lỗi khi like bài viết:', error);
     }
   };
-  
 
-
-const handleAddComment = async (postId: string, newComment: Comment) => {
-  try {
-    const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments`, newComment);
-    
-    // Cập nhật state với comment mới
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post._id === postId
-          ? { ...post, interact: { ...post.interact, comment: [...post.interact.comment, response.data] } }
-          : post
-      )
-    );
-  } catch (error) {
-    console.error('Lỗi khi thêm comment:', error);
-  }
-};
-
-
-const handleAddReply = async (postId: string, commentId: string, newReply: Comment) => {
-  try {
-    const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply`, newReply);
-
-    setPosts((prevPosts) =>
-      prevPosts.map((post) => {
-        if (post._id === postId) {
-          const updatedComments = post.interact.comment.map((comment) => {
-            if (comment._id === commentId) { 
-              return {
-                ...comment,
-                replyComment: [...comment.replyComment, response.data], 
-              };
-            }
-            return comment;
-          });
-          return { ...post, interact: { ...post.interact, comment: updatedComments } };
-        }
-        return post;
-      })
-    );
-  } catch (error) {
-    console.error('Error adding reply:', error);
-  }
-};
-
-
-
-  
-
-  const handleDeletePost = (postId: string) => {
-    setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId)); 
+  const handleAddComment = async (postId: string, newComment: Comment) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments`, newComment);
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postId
+            ? { ...post, interact: { ...post.interact, comment: [...post.interact.comment, response.data] }, totalComments: post.totalComments + 1 }
+            : post
+        )
+      );
+    } catch (error) {
+      console.error('Lỗi khi thêm comment:', error);
+    }
   };
 
+  const handleAddReply = async (postId: string, commentId: string, newReply: Comment) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply`, newReply);
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => {
+          if (post._id === postId) {
+            const updatedComments = post.interact.comment.map((comment) => {
+              if (comment._id === commentId) {
+                return { ...comment, replyComment: [...comment.replyComment, response.data] };
+              }
+              return comment;
+            });
+            return { ...post, interact: { ...post.interact, comment: updatedComments }, totalComments: post.totalComments + 1 };
+          }
+          return post;
+        })
+      );
+    } catch (error) {
+      console.error('Error adding reply:', error);
+    }
+  };
+
+  const handleReportPost = async (postId: string, reason: string) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/report`, { userId: currentUserId, reason });
+      console.log('Báo cáo thành công:', response.data);
+    } catch (error) {
+      console.error('Lỗi khi báo cáo bài viết:', error);
+    }
+  };
+
+  const handleSavePost = async (postId: string) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/save`, {
+        userId: currentUserId,
+      });
+      if (response.status === 200) {
+        alert('Lưu bài viết thành công!');
+      }
+    } catch (error) {
+      console.error('Lỗi khi lưu bài viết:', error);
+      alert('Đã xảy ra lỗi khi lưu bài viết!');
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/v1/article/${postId}`);
+      if (response.status === 200) {
+        setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId)); // Loại bỏ bài viết đã xóa ra khỏi danh sách bài viết hiện tại
+        alert('Xóa bài viết thành công!');
+      }
+    } catch (error) {
+      console.error('Lỗi khi xóa bài viết:', error);
+      alert('Đã xảy ra lỗi khi xóa bài viết!');
+    }
+  };
+  const handleEditPost = async (postId: string, updatedContent: string, updatedScope: string) => {
+    try {
+      const response = await axios.put(`http://localhost:3000/v1/article/${postId}/edit`, {
+        content: updatedContent,
+        scope: updatedScope
+      });
+      if (response.status === 200) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId ? { ...post, content: updatedContent, scope: updatedScope } : post
+          )
+        );
+        alert('Chỉnh sửa bài viết thành công!');
+      }
+    } catch (error) {
+      console.error('Lỗi khi chỉnh sửa bài viết:', error);
+      alert('Đã xảy ra lỗi khi chỉnh sửa bài viết!');
+    }
+  };
+  
+  const handleLikeComment = async (postId: string, commentId: string) => {
+    try {
+      
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/like`, { userId: currentUserId });
+      if (response.status === 200) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) => {
+            if (post._id === postId) {
+              const updatedComments = post.interact.comment.map((comment) => {
+                if (comment._id === commentId) {
+                  const isLiked = comment.emoticons.some((emoticon) => emoticon._iduser === currentUserId);
+                  const updatedEmoticons = isLiked
+                    ? comment.emoticons.filter((emoticon) => emoticon._iduser !== currentUserId)
+                    : [...comment.emoticons, { typeEmoticons: 'like', _iduser: currentUserId }];
+                  return { ...comment, emoticons: updatedEmoticons };
+                }
+                return comment;
+              });
+              return { ...post, interact: { ...post.interact, comment: updatedComments } };
+            }
+            return post;
+          })
+        );
+      }
+    } catch (error) {
+      console.error('Lỗi khi like bình luận:', error);
+    }
+  };
+
+  const handleLikeReplyComment = async (postId: string, commentId: string, replyId: string) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply/${replyId}/like`,
+        { userId: currentUserId }
+      );
+  
+      if (response.status === 200) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) => {
+            if (post._id === postId) {
+              return {
+                ...post,
+                interact: {
+                  ...post.interact,
+                  comment: post.interact.comment.map((comment) => {
+                    if (comment._id === commentId) {
+                      return {
+                        ...comment,
+                        replyComment: comment.replyComment.map((reply) =>
+                          reply._id === replyId ? response.data.reply : reply
+                        )
+                      };
+                    }
+                    return comment;
+                  })
+                }
+              };
+            }
+            return post;
+          })
+        );
+  
+        // Cập nhật trạng thái liked của reply
+        setLikedComments((prev) => ({
+          ...prev,
+          [replyId]: !prev[replyId] // Chuyển đổi trạng thái liked
+        }));
+      }
+    } catch (error) {
+      console.error('Lỗi khi like reply comment:', error);
+    }
+  };
+
+  const handleSharePost = async (postId: string, shareContent: string, shareScope: string) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/share`, {
+        content: shareContent,
+        scope: shareScope,
+        userId: currentUserId,
+      });
+      console.log('Bài viết đã được chia sẻ thành công:', response.data);
+      // Cập nhật danh sách bài viết sau khi chia sẻ
+      setPosts((prevPosts) => [response.data.post, ...prevPosts]);
+    } catch (error) {
+      console.error('Lỗi khi chia sẻ bài viết:', error);
+    }
+  };
+  
+  
+  
   return (
     <Box sx={{ padding: 2, height: '85vh' }}>
       <PostForm onSubmit={handlePostSubmit} />
-      {posts.length > 0 ? ( // Kiểm tra nếu có bài viết
+      {isLoading ? (
+        <p>Đang tải...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : posts.length > 0 ? (
         posts.map((post, index) => (
           <Post
             key={index}
             post={post}
+            onLikeComment={handleLikeComment}
             onAddComment={handleAddComment}
+            onLikeReplyComment={handleLikeReplyComment}
             onAddReply={handleAddReply}
-            onLikePost={handleLikePost} 
+            onLikePost={handleLikePost}
             onDeletePost={handleDeletePost}
-            currentUserId={currentUserId}   // ID của người dùng hiện tại
+            onReportPost={handleReportPost}
+            onSavePost={handleSavePost} // Truyền hàm `onReportPost` vào Post component
+            onEditPost={handleEditPost}
+            currentUserId={currentUserId}
+            onSharePost={handleSharePost}
           />
         ))
       ) : (
-        <p>Không có bài viết nào.</p> // Hiển thị thông báo nếu không có bài viết
+        <p>Không có bài viết nào.</p>
       )}
     </Box>
   );
 };
+
 export default NewFeedsContent;

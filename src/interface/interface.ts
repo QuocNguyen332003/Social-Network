@@ -148,7 +148,7 @@ export interface Article {
     interact: Interact;
     createdAt: Date;
     updatedAt: Date;
-    _destroy: Date;
+    _destroy: Date | null;
 }
   // Group Interface
   export interface Group {

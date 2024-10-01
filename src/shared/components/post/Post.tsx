@@ -1,22 +1,58 @@
- 
 import React, { useState } from 'react';
-import { Box, Typography, Avatar, Paper, Button, IconButton, Collapse, TextField, Dialog, DialogActions, DialogContent, DialogTitle, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Avatar,
+  Paper,
+  Button,
+  IconButton,
+  Collapse,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Divider,
+} from '@mui/material';
 import { MoreHoriz, Favorite, Comment, Share } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
 import { Comment as CommentType, Article } from '../../../interface/interface';
 import PostMenu from './component/PostMenu.tsx';
 import CommentSection from './component/CommentSection.tsx';
+import ShareItemCard from './component/ShareItemCard'; // Nhập SavedItemCard để hiển thị bài viết được chia sẻ
 
 interface PostComponentProps {
   post: Article;
+  onLikeComment: (postId: string, commentId: string) => void;
   onAddComment: (postId: string, newComment: CommentType) => void;
   onAddReply: (postId: string, commentId: string, newReply: CommentType) => void;
-  onDeletePost: (postId: string) => void; 
+  onLikeReplyComment: (postId: string, commentId: string, replyId: string) => void;
+  onDeletePost: (postId: string) => void;
   onLikePost: (postId: string) => void;
+  onReportPost: (postId: string, reason: string) => void;
+  onSavePost: (postId: string) => void;
+  onEditPost: (postId: string, updatedContent: string, updatedScope: string) => void;
   currentUserId: string;
+  onSharePost: (postId: string, shareContent: string, shareScope: string) => void;
 }
 
-const Post = ({ post, onAddComment, onAddReply, onDeletePost, onLikePost, currentUserId }: PostComponentProps) => {
+const Post = ({
+  post,
+  onLikeComment,
+  onAddComment,
+  onLikeReplyComment,
+  onAddReply,
+  onDeletePost,
+  onLikePost,
+  onReportPost,
+  onSavePost,
+  onEditPost,
+  currentUserId,
+  onSharePost
+}: PostComponentProps) => {
   const [showComments, setShowComments] = useState(false);
   const [likedComments, setLikedComments] = useState<{ [key: string]: boolean }>({});
   const [replyInputs, setReplyInputs] = useState<{ [key: string]: boolean }>({});
@@ -24,9 +60,17 @@ const Post = ({ post, onAddComment, onAddReply, onDeletePost, onLikePost, curren
   const [newComment, setNewComment] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [updatedContent, setUpdatedContent] = useState(post.content);
+  const [updatedScope, setUpdatedScope] = useState(post.scope);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [selectedReportReason, setSelectedReportReason] = useState<string>('');
   const [reportTarget, setReportTarget] = useState<{ postId: string; commentId?: string } | null>(null);
+
+  // New state for share dialog
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareContent, setShareContent] = useState('');
+  const [shareScope, setShareScope] = useState('public');
 
   const isLiked = post.interact.emoticons.some(emoticon => emoticon._iduser === currentUserId && emoticon.typeEmoticons === 'like');
 
@@ -38,65 +82,31 @@ const Post = ({ post, onAddComment, onAddReply, onDeletePost, onLikePost, curren
   };
 
   const handleLikeComment = (commentId: string) => {
-    setLikedComments((prevLikedComments) => ({
+    onLikeComment(post._id, commentId);
+    setLikedComments(prevLikedComments => ({
       ...prevLikedComments,
-      [commentId]: !prevLikedComments[commentId],
+      [commentId]: !prevLikedComments[commentId], // Toggle trạng thái like của comment
     }));
-
-    post.interact.comment = post.interact.comment.map((comment) => {
-      if (comment._iduser === commentId) {
-        const isLiked = likedComments[commentId];
-
-        if (isLiked) {
-          comment.emoticons = comment.emoticons.filter((emoticon) => emoticon._iduser !== currentUserId);
-        } else {
-          comment.emoticons.push({ typeEmoticons: 'like', _iduser: currentUserId });
-        }
-      }
-      return comment;
-    });
   };
 
   const handleLikeReply = (commentId: string, replyId: string) => {
-    post.interact.comment = post.interact.comment.map((comment) => {
-      if (comment._id === commentId) {
-        comment.replyComment = comment.replyComment.map((reply) => {
-          if (reply._iduser === replyId) {
-            const isLiked = likedComments[replyId];
-
-            if (isLiked) {
-              reply.emoticons = reply.emoticons.filter((emoticon) => emoticon._iduser !== currentUserId);
-            } else {
-              reply.emoticons.push({ typeEmoticons: 'like', _iduser: currentUserId });
-            }
-          }
-          return reply;
-        });
-      }
-      return comment;
-    });
-
-    setLikedComments((prevLikedComments) => ({
-      ...prevLikedComments,
-      [replyId]: !prevLikedComments[replyId],
-    }));
+    onLikeReplyComment(post._id, commentId, replyId);
   };
 
-
   const handleReplyToComment = (commentId: string) => {
-    setReplyInputs((prevReplyInputs) => ({
+    setReplyInputs(prevReplyInputs => ({
       ...prevReplyInputs,
       [commentId]: !prevReplyInputs[commentId], // Toggle the reply input visibility for the specific comment
     }));
   };
-  
+
   const handleReplyChange = (commentId: string, text: string) => {
-    setReplyTexts((prevReplyTexts) => ({
+    setReplyTexts(prevReplyTexts => ({
       ...prevReplyTexts,
       [commentId]: text, // Track reply text for each comment
     }));
   };
-  
+
   const handleSubmitReply = (commentId: string) => {
     const replyText = replyTexts[commentId] || ''; // Đảm bảo replyText luôn là một chuỗi rỗng nếu undefined
     if (replyText.trim()) {
@@ -109,20 +119,19 @@ const Post = ({ post, onAddComment, onAddReply, onDeletePost, onLikePost, curren
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      onAddReply(post._id, commentId, reply); // Đảm bảo sử dụng comment._id thay vì comment._iduser
-      
+      onAddReply(post._id, commentId, reply);
+
       // Reset lại trường nhập liệu sau khi gửi
-      setReplyInputs((prevReplyInputs) => ({
+      setReplyInputs(prevReplyInputs => ({
         ...prevReplyInputs,
         [commentId]: false,
       }));
-      setReplyTexts((prevReplyTexts) => ({
+      setReplyTexts(prevReplyTexts => ({
         ...prevReplyTexts,
         [commentId]: '',
       }));
     }
   };
-  
 
   const handleNewCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewComment(event.target.value);
@@ -159,35 +168,73 @@ const Post = ({ post, onAddComment, onAddReply, onDeletePost, onLikePost, curren
   };
 
   const handleSavePost = () => {
+    onSavePost(post._id);
     handleMenuClose();
   };
+
   const handleOpenReportDialog = () => {
     setReportTarget({ postId: post._id });
     setReportDialogOpen(true);
   };
-
 
   const handleCloseReportDialog = () => {
     setReportDialogOpen(false);
     setSelectedReportReason('');
   };
 
+  const handleSubmitReport = () => {
+    if (reportTarget && selectedReportReason) {
+      onReportPost(reportTarget.postId, selectedReportReason);
+      handleCloseReportDialog();
+    }
+  };
+
   const handleReportReasonChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedReportReason(event.target.value);
   };
 
-  const handleSubmitReport = () => {
-    if (reportTarget) {
-      // Submit the report logic here
-      handleCloseReportDialog();
-    }
+  const handleOpenEditDialog = () => {
+    setIsEditDialogOpen(true);
+    handleMenuClose();
+  };
+
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+  };
+
+  const handleEditPost = () => {
+    onEditPost(post._id, updatedContent, updatedScope);
+    setIsEditDialogOpen(false);
+  };
+
+  const handleShareDialogOpen = () => {
+    setShareDialogOpen(true);
+  };
+
+  const handleShareDialogClose = () => {
+    setShareDialogOpen(false);
+    setShareContent('');
+    setShareScope('public');
+  };
+
+  const handleShareContentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShareContent(event.target.value);
+  };
+
+  const handleShareScopeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShareScope(event.target.value);
+  };
+
+  const handleShare = async () => {
+    onSharePost(post._id, shareContent, shareScope); // Gọi hàm từ props
+    handleShareDialogClose();
   };
 
   return (
     <Paper sx={{ padding: 2, marginBottom: 3, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
         <Box display="flex" alignItems="center">
-          <Avatar alt={post.createdBy ?? 'Anonymous'} src={post.createdBy?.avt || '/static/images/avatar/default.jpg'}  sx={{ width: 48, height: 48 }} />
+          <Avatar alt={post.createdBy ?? 'Anonymous'} src={post.createdBy?.avt || '/static/images/avatar/default.jpg'} sx={{ width: 48, height: 48 }} />
           <Box sx={{ marginLeft: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#333' }}>
               {post?.createdBy?.displayName}
@@ -198,26 +245,32 @@ const Post = ({ post, onAddComment, onAddReply, onDeletePost, onLikePost, curren
           </Box>
         </Box>
         <Box>
-          {/* Chỉ hiển thị nút xóa nếu người dùng là chủ sở hữu bài viết */}
           <IconButton onClick={handleMenuOpen}>
             <MoreHoriz sx={{ color: '#757575' }} />
           </IconButton>
         </Box>
- {      /* Tách phần menu ra thành component riêng */}
-         <PostMenu
+        <PostMenu
           anchorEl={anchorEl}
           open={open}
           handleClose={handleMenuClose}
           handleSavePost={handleSavePost}
+          handleOpenEditDialog={handleOpenEditDialog}
           handleOpenReportDialog={handleOpenReportDialog}
           handleDeletePost={handleDeletePost}
-          isOwner={post.createdBy === currentUserId}
+          isOwner={post.createdBy === currentUserId || post.createdBy?._id === currentUserId}
         />
       </Box>
-
+      <Divider sx={{ marginY: 2 }} />
       <Typography variant="body1" sx={{ color: '#424242', marginBottom: 2 }}>
         {post.content}
       </Typography>
+
+      {/* Hiển thị bài viết chia sẻ nếu có */}
+      {post.sharedPostId && (
+        <ShareItemCard
+          sharedPostId={post.sharedPostId} // Truyền sharedPostId từ bài viết hiện tại
+        />
+      )}
 
       <Box display="flex" flexWrap="wrap" gap={1} sx={{ marginBottom: 2 }}>
         {post.hashTag.map((hashtag, index) => (
@@ -249,31 +302,53 @@ const Post = ({ post, onAddComment, onAddReply, onDeletePost, onLikePost, curren
         </Box>
       )}
 
-      <Box display="flex" alignItems="center" sx={{ marginTop: 2 }}>
-        <Favorite fontSize="small" sx={{ color: '#d32f2f' }} />
-        <Typography variant="body2" sx={{ color: '#757575', marginLeft: 1 }}>
-          {post.interact.emoticons.length} lượt thích - {post?.totalComments} bình luận
-        </Typography>
+      <Divider sx={{ marginY: 2 }} />
+
+
+      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginTop: 2, width: '100%' }}>
+        <Button
+          startIcon={<Favorite />}
+          fullWidth
+          size="small"
+          sx={{ 
+            color: isLiked ? '#d32f2f' : '#1976d2', 
+            marginRight: 1, 
+            '&:hover': { backgroundColor: '#f5f5f5' },
+            flex: 1 // Chiếm 1 phần trong tỷ lệ flex
+          }}
+          onClick={handleLikeClick}
+        >
+          {post.interact.emoticons.length} {isLiked ? 'Bỏ thích' : 'Yêu thích'}
+        </Button>
+        <Button 
+          startIcon={<Comment />} 
+          fullWidth 
+          size="small" 
+          sx={{ 
+            color: '#1976d2', 
+            marginRight: 1, 
+            '&:hover': { backgroundColor: '#f5f5f5' },
+            flex: 1 // Chiếm 1 phần trong tỷ lệ flex
+          }} 
+          onClick={handleToggleComments}
+        >
+          {post?.totalComments} Bình luận
+        </Button>
+        <Button 
+          startIcon={<Share />} 
+          fullWidth 
+          size="small" 
+          sx={{ 
+            color: '#1976d2', 
+            '&:hover': { backgroundColor: '#f5f5f5' },
+            flex: 1 // Chiếm 1 phần trong tỷ lệ flex
+          }} 
+          onClick={handleShareDialogOpen}
+        >
+          Chia sẻ
+        </Button>
       </Box>
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginTop: 2 }}>
-        <Box>
-          <Button
-            startIcon={<Favorite />}
-            size="small"
-            sx={{ color: isLiked ? '#d32f2f' : '#424242', marginRight: 2, '&:hover': { backgroundColor: '#f5f5f5' } }}
-            onClick={handleLikeClick}
-          >
-            {isLiked ? 'Bỏ thích' : 'Yêu thích'}
-          </Button>
-          <Button startIcon={<Comment />} size="small" sx={{ color: '#424242', marginRight: 2, '&:hover': { backgroundColor: '#f5f5f5' } }} onClick={handleToggleComments}>
-            Bình luận
-          </Button>
-          <Button startIcon={<Share />} size="small" sx={{ color: '#424242', marginRight: 2, '&:hover': { backgroundColor: '#f5f5f5' } }}>
-            Chia sẻ
-          </Button>
-        </Box>
-      </Box>
 
       <Collapse in={showComments} timeout="auto" unmountOnExit>
         <Box sx={{ marginTop: 2, backgroundColor: '#f5f5f5', padding: 2, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
@@ -293,18 +368,52 @@ const Post = ({ post, onAddComment, onAddReply, onDeletePost, onLikePost, curren
           </Box>
 
           <CommentSection
-              comments={post.interact.comment}
-              onLikeComment={handleLikeComment}
-              onReplyToComment={handleReplyToComment}
-              handleReplyChange={handleReplyChange}
-              replyTexts={replyTexts}
-              replyInputs={replyInputs}
-              handleSubmitReply={handleSubmitReply}
-              likedComments={likedComments}
-              onLikeReply={handleLikeReply} // Truyền hàm onLikeReply vào CommentSection
-            />
+            comments={post.interact.comment}
+            onLikeComment={handleLikeComment}
+            onReplyToComment={handleReplyToComment}
+            handleReplyChange={handleReplyChange}
+            replyTexts={replyTexts}
+            replyInputs={replyInputs}
+            handleSubmitReply={handleSubmitReply}
+            likedComments={likedComments}
+            onLikeReply={handleLikeReply}
+            currentUserId={currentUserId}
+          />
         </Box>
       </Collapse>
+
+      <Dialog open={shareDialogOpen} onClose={handleShareDialogClose} fullWidth sx={{ '& .MuiDialog-paper': { backgroundColor: '#ffffff', color: '#000' } }}>
+        <DialogTitle sx={{ textAlign: 'center', color: '#1976d2' }}>Chia sẻ</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Hãy nói gì đó về nội dung này (không bắt buộc)"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={shareContent}
+            onChange={handleShareContentChange}
+            sx={{ backgroundColor: '#fff', borderRadius: '4px' }}
+          />
+          <Typography variant="body2" sx={{ marginTop: 2, color: '#1976d2' }}>
+            Chế độ chia sẻ
+          </Typography>
+          <RadioGroup value={shareScope} onChange={handleShareScopeChange}>
+            <FormControlLabel value="public" control={<Radio />} label="Công khai" />
+            <FormControlLabel value="friends" control={<Radio />} label="Bạn bè" />
+            <FormControlLabel value="private" control={<Radio />} label="Riêng tư" />
+          </RadioGroup>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleShareDialogClose} sx={{ color: '#1976d2' }}>
+            Hủy
+          </Button>
+          <Button onClick={handleShare} variant="contained" sx={{ backgroundColor: '#1976d2', color: '#fff' }}>
+            Chia sẻ ngay
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={reportDialogOpen} onClose={handleCloseReportDialog}>
         <DialogTitle>Báo cáo</DialogTitle>
@@ -319,6 +428,43 @@ const Post = ({ post, onAddComment, onAddReply, onDeletePost, onLikePost, curren
         <DialogActions>
           <Button onClick={handleCloseReportDialog}>Hủy</Button>
           <Button onClick={handleSubmitReport} variant="contained" color="primary">Gửi báo cáo</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={isEditDialogOpen} onClose={handleCloseEditDialog}>
+        <DialogTitle>Chỉnh sửa bài viết</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Nội dung"
+            multiline
+            rows={4}
+            value={updatedContent}
+            onChange={(e) => setUpdatedContent(e.target.value)}
+            sx={{ 
+              marginBottom: 2,
+              marginTop: 1,
+            }}
+          />
+          <Typography variant="subtitle2" gutterBottom>
+            Phạm vi bài viết
+          </Typography>
+          <RadioGroup
+            value={updatedScope}
+            onChange={(e) => setUpdatedScope(e.target.value)}
+            row
+          >
+            <FormControlLabel value="public" control={<Radio />} label="Công khai" />
+            <FormControlLabel value="friends" control={<Radio />} label="Bạn bè" />
+            <FormControlLabel value="private" control={<Radio />} label="Riêng tư" />
+          </RadioGroup>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog}>Hủy</Button>
+          <Button onClick={handleEditPost} variant="contained" color="primary">
+            Lưu thay đổi
+          </Button>
         </DialogActions>
       </Dialog>
     </Paper>

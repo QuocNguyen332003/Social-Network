@@ -15,6 +15,7 @@ interface CommentSectionProps {
   handleSubmitReply: (commentId: string) => void;
   likedComments: { [key: string]: boolean };
   onLikeReply: (commentId: string, replyId: string) => void; // Thêm hàm xử lý like reply
+  currentUserId: string;
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({
@@ -27,13 +28,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   handleSubmitReply,
   likedComments,
   onLikeReply,
+  currentUserId
 }) => {
   return (
     <Box sx={{ marginTop: 2 }}>
       {comments.length > 0 ? (
         comments.map((comment, index) => {
           const commentLikes = comment.emoticons.filter((emoticon) => emoticon.typeEmoticons === 'like').length;
-
+          const isCommentLiked = likedComments[comment._id] || false; // Trạng thái like hiện tại
           return (
             <Box key={index} sx={{ marginBottom: 2, padding: 2, borderRadius: 2, backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
               <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
@@ -50,10 +52,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                 <Button
                   size="small"
                   startIcon={<ThumbUpAlt />}
-                  sx={{ color: likedComments[comment._id] ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                  sx={{ color: isCommentLiked ? '#2e7d32' : '#757575', textTransform: 'none' }}
                   onClick={() => onLikeComment(comment._id)}
                 >
-                  {likedComments[comment._id] ? 'Bỏ thích' : 'Thích'} ({commentLikes})
+                  {isCommentLiked ? 'Thích' : 'Bỏ Thích'} ({commentLikes})
                 </Button>
                 <Button
                   size="small"
@@ -85,9 +87,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({
               {/* Sử dụng ReplyComment cho phần hiển thị reply */}
               <ReplyComment
                 replies={comment.replyComment}
-                likedComments={likedComments}
-                onLikeReply={(commentId, replyId) => onLikeReply(comment._id, replyId)}
+                onLikeReply={(replyId) => onLikeReply(comment._id, replyId)}
                 onReplyToComment={onReplyToComment}
+                currentUserId={currentUserId} // Truyền currentUserId
               />
             </Box>
           );

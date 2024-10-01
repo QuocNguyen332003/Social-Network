@@ -6,16 +6,17 @@ import { formatDistanceToNow } from 'date-fns';
 
 interface ReplyCommentProps {
   replies: CommentType[];
-  likedComments: { [key: string]: boolean };
-  onLikeReply: (commentId: string, replyId: string) => void;
+  onLikeReply: (replyId: string) => void;
   onReplyToComment: (commentId: string) => void;
+  currentUserId: string;
 }
 
-const ReplyComment: React.FC<ReplyCommentProps> = ({ replies, likedComments, onLikeReply, onReplyToComment }) => {
+const ReplyComment: React.FC<ReplyCommentProps> = ({ replies, onLikeReply, onReplyToComment, currentUserId }) => {
   return (
     <Box sx={{ marginTop: 2, paddingLeft: 2, borderLeft: '2px solid #bdbdbd' }}>
       {replies.map((reply, replyIndex) => {
         const replyLikes = reply.emoticons.filter((emoticon) => emoticon.typeEmoticons === 'like').length;
+        const isReplyLiked = reply.emoticons.some((emoticon) => emoticon._iduser === currentUserId); // Kiểm tra trạng thái like hiện tại
 
         return (
           <Box key={replyIndex} sx={{ marginTop: 2 }}>
@@ -33,10 +34,10 @@ const ReplyComment: React.FC<ReplyCommentProps> = ({ replies, likedComments, onL
               <Button
                 size="small"
                 startIcon={<ThumbUpAlt />}
-                sx={{ color: likedComments[reply._iduser._id] ? '#2e7d32' : '#757575', textTransform: 'none' }}
-                onClick={() => onLikeReply(reply._iduser, reply._iduser._id)}
+                sx={{ color: isReplyLiked ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                onClick={() => onLikeReply(reply._id)}
               >
-                {likedComments[reply._iduser._id] ? 'Bỏ thích' : 'Thích'} ({replyLikes})
+                {isReplyLiked ? 'Bỏ thích' : 'Thích'} ({replyLikes})
               </Button>
               <Button
                 size="small"
@@ -53,5 +54,6 @@ const ReplyComment: React.FC<ReplyCommentProps> = ({ replies, likedComments, onL
     </Box>
   );
 };
+
 
 export default ReplyComment;
