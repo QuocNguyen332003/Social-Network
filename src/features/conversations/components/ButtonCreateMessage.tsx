@@ -2,9 +2,9 @@ import { Button, ButtonProps, styled } from "@mui/material";
 
 const ColorButton = styled(Button)<ButtonProps>(() => ({
     color: '#fff',
-    backgroundColor: '#150aa1',
+    backgroundColor: '#1976d2',
     '&:hover': {
-      backgroundColor: '#3a2ece',
+      backgroundColor: '#1565c0',
     },
     margin: '20px 0',
   }));

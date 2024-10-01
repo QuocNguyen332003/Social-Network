@@ -10,11 +10,11 @@ export interface User {
     lastName: string;
     displayName: string;
     userName: string;
-    details?: {
-      phoneNumber?: string;
-      address?: string;
-      gender?: boolean;
-      birthDate?: Date;
+    details: {
+      phoneNumber: string;
+      address: string;
+      gender: boolean;
+      birthDate: Date;
     };
     friends: Array<{
       userId: string;

@@ -39,7 +39,7 @@ const SidebarLeft = () => {
           </ListItemIcon>
           <ListItemText primary="Bộ sưu tập" />
         </ListItem>
-        <ListItem button onClick={() => navigate('/messages')}>
+        <ListItem button onClick={() => navigate(`/messages?userIDStart=${''}`)}>
           <ListItemIcon>
             <ChatIcon sx={{ color: '#8b9dc3' }} />
           </ListItemIcon>

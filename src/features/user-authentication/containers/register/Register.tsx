@@ -63,7 +63,7 @@ const Register: React.FC = () => {
               <Typography
                 component="h1"
                 variant="h5"
-                sx={{ fontWeight: 600 }}
+                sx={{ fontWeight: 800, fontSize: 40 }}
               >
                 Đăng ký
               </Typography>
@@ -134,7 +134,7 @@ const Register: React.FC = () => {
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2, bgcolor: '#1976d2', ':hover': { bgcolor: '#1565c0' } }}
-                >
+                  onClick={() => navigate('/choose-interest')}>
                   Đăng ký
                 </Button>
                 <Grid container justifyContent="center">

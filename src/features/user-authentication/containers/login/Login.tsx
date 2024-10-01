@@ -15,9 +15,6 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import GoogleIcon from '@mui/icons-material/Google';
-import AppleIcon from '@mui/icons-material/Apple';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import axios from 'axios';
 
 const theme = createTheme();
 
@@ -172,20 +169,6 @@ const Login: React.FC = () => {
                     sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }} // Đảm bảo mỗi button có tối thiểu 100px, và có khoảng cách dưới khi xuống dòng
                   >
                     Google
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<AppleIcon />}
-                    sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }}
-                  >
-                    Apple
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<FacebookIcon />}
-                    sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }}
-                  >
-                    Facebook
                   </Button>
                 </Box>
 

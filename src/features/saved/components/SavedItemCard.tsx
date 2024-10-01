@@ -126,7 +126,7 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ article, collections, use
         </Button>
         <Button
           variant="contained"
-          color="secondary"
+          color="primary"
           sx={{ 
             padding: '4px 8px',  // Giảm padding của button
             fontSize: '0.75rem'   // Giảm kích thước chữ

@@ -86,7 +86,7 @@ const ProfileHeaderEdit = ({myUser, changeAvt, changeBackground}: DataChangeUser
         <Button variant="contained" startIcon={<BorderColorIcon />}
           sx={{ marginRight: '8px', width: '150px',
             backgroundColor: '#e9e9e9',
-            color: '#150aa1',  textTransform: 'none',
+            color: '#1976d2',  textTransform: 'none',
            }} 
           >
           Lưu
@@ -94,7 +94,7 @@ const ProfileHeaderEdit = ({myUser, changeAvt, changeBackground}: DataChangeUser
         <Button variant="contained" startIcon={<ShareIcon/>}
         sx={{ width: '150px',
           backgroundColor: '#e9e9e9',
-          color: '#150aa1',  textTransform: 'none',
+          color: '#1976d2',  textTransform: 'none',
          }} >
           Chia sẻ
         </Button>

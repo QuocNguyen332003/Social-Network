@@ -24,7 +24,7 @@ const EditProfileCard = ({label, textInput, saveData}: EditCardProps) =>{
             position: 'relative', width: '80%', paddingLeft: '10%'
         }}>
           <Typography variant="h5" color="black" fontWeight= "bold"
-          sx={{margin: '10px 0', color:  '#150aa1', fontSize: 17}}>
+          sx={{margin: '10px 0', color:  '#1976d2', fontSize: 17}}>
                 {label}
           </Typography>
           {textInput.map((item, index)=> 
@@ -45,7 +45,7 @@ const EditProfileCard = ({label, textInput, saveData}: EditCardProps) =>{
           sx={{
             textTransform: 'none', position: 'absolute',
             bottom: '20px', right: '10px',
-            backgroundColor:  '#150aa1' , fontSize: 12
+            backgroundColor:  '#1976d2' , fontSize: 12
           }} onClick={() => {saveData(dataInput)}}>
             Lưu
           </Button>

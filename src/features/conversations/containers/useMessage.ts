@@ -10,11 +10,11 @@ export interface UserMessage{
 export const useMessage = (data: DataChatListProps[]) => {
     const [userChat, setUserChat] = useState<DataChatListProps>(data[0]);
 
-    const changeUserChat = (User: UserMessage) => {
-        const newUserChat = data.find((item) => item.userID === User.userID) || {
-            userID: User.userID, 
-            avt: User.avt, 
-            name: User.name, 
+    const changeUserChat = (userID: string) => {
+        const newUserChat = data.find((item) => item.userID === userID) || {
+            userID: userID, 
+            avt: "", 
+            name: "", 
             sendDate: new Date(), 
             isRead: false, 
             lastMessage: {
@@ -22,7 +22,8 @@ export const useMessage = (data: DataChatListProps[]) => {
               message: null 
             }
         };
-        setUserChat(newUserChat);
+        const result = {...newUserChat, isRead: true}
+        setUserChat(result);
     }
     return {
         userChat,
