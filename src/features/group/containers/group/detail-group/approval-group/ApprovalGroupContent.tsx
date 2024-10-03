@@ -1,42 +1,96 @@
-import React, { useState } from 'react';
-import { Box, Button, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, Divider, IconButton, Grid } from '@mui/material';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, Divider, IconButton, Grid, CircularProgress } from '@mui/material';
 import { MoreHoriz } from '@mui/icons-material';
 import { useOutletContext } from 'react-router-dom';
+import axios from 'axios'; // Thêm axios để gọi API
 import { Group, Article } from '../../../../../../interface/interface.ts';
-import { articles } from '../../../../components/GroupListData.tsx'; // Importing data
 
 const ApprovaGroupContent: React.FC = () => {
   const { group } = useOutletContext<{ group: Group }>();
+  const [pendingPosts, setPendingPosts] = useState<Article[]>([]); // State lưu trữ các bài viết pending
+  const [approvedPosts, setApprovedPosts] = useState<string[]>([]); // Lưu trữ các bài viết đã duyệt
+  const [rejectedPosts, setRejectedPosts] = useState<string[]>([]); // Lưu trữ các bài viết bị từ chối
+  const [loading, setLoading] = useState(true); // State loading để hiển thị vòng tròn chờ khi tải dữ liệu
+  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
+  // Gọi API để lấy danh sách bài viết đang chờ duyệt khi component được render lần đầu
+  useEffect(() => {
+    const fetchPendingArticles = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/pending-articles`);
+        setPendingPosts(response.data.articles || []); // Cập nhật danh sách bài viết vào state
+      } catch (error) {
+        console.error('Lỗi khi lấy danh sách bài viết pending:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPendingArticles();
+  }, [group._id]);
+  // Hàm duyệt bài viết và gọi API
+  const handleApproval = async (postId: string) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/v1/group/${group._id}/article/${postId}/processed`,
+        { userId: currentUserId } // Thêm userId vào body của request
+      );
+      
+      if (response.status === 200) {
+        setApprovedPosts((prevApproved) => [...prevApproved, postId]);
+        setRejectedPosts((prevRejected) => prevRejected.filter(id => id !== postId)); // Xóa khỏi danh sách từ chối nếu có
+        alert('✅ Bài viết đã được duyệt thành công!');
+      } else {
+        alert(`❗ Đã xảy ra lỗi: ${response.data.message || 'Không thể duyệt bài viết'}`);
+      }
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data.message || error.message;
+        alert(`❗ Lỗi khi duyệt bài viết: ${errorMessage}`);
+      } else {
+        console.error('Lỗi hệ thống:', error);
+        alert('❗ Đã xảy ra lỗi hệ thống khi duyệt bài viết!');
+      }
+    }
+  };
   
-  const [approvedPosts, setApprovedPosts] = useState<string[]>([]);
-  const [rejectedPosts, setRejectedPosts] = useState<string[]>([]);
 
-  // Lọc những bài viết có trạng thái "pending" trong nhóm hiện tại
-  const pendingPosts = group.article.listArticle
-    .filter(article => article.state === 'pending')
-    .map(article => articles.find(a => a._id === article.idArticle)) // Sử dụng articles từ GroupListData.tsx
-    .filter(Boolean) as Article[];
-
-  // Hàm duyệt bài viết
-  const handleApproval = (postId: string) => {
-    setApprovedPosts((prevApproved) => [...prevApproved, postId]);
-    setRejectedPosts((prevRejected) => prevRejected.filter(id => id !== postId)); // Remove from rejected if present
+  // Hàm từ chối bài viết và gọi API
+  const handleRejection = async (postId: string) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/v1/group/${group._id}/article/${postId}/reject`,
+        { userId: currentUserId } // Thêm userId vào body của request
+      );
+  
+      if (response.status === 200) {
+        setRejectedPosts((prevRejected) => [...prevRejected, postId]);
+        setApprovedPosts((prevApproved) => prevApproved.filter((id) => id !== postId)); // Xóa khỏi danh sách đã duyệt nếu có
+        alert('Bài viết đã bị từ chối!');
+      } else {
+        alert(`❗ Đã xảy ra lỗi: ${response.data.message || 'Không thể từ chối bài viết'}`);
+      }
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data.message || error.message;
+        alert(`❗ Lỗi khi từ chối bài viết: ${errorMessage}`);
+      } else {
+        console.error('Lỗi hệ thống:', error);
+        alert('❗ Đã xảy ra lỗi hệ thống khi từ chối bài viết!');
+      }
+    }
   };
-
-  // Hàm từ chối bài viết
-  const handleRejection = (postId: string) => {
-    setRejectedPosts((prevRejected) => [...prevRejected, postId]);
-    setApprovedPosts((prevApproved) => prevApproved.filter(id => id !== postId)); // Remove from approved if present
-  };
+  
 
   return (
     <Box
       sx={{
-        padding: 3, // Increased padding
+        padding: 3,
         backgroundColor: '#e9e9e9',
-        height: '70vh', // Adjusted height
-        maxWidth: '900px', // Set max width to control the size of the content
-        margin: '0 auto', // Center the content horizontally
+        height: '70vh',
+        maxWidth: '900px',
+        margin: '0 auto',
         overflowY: 'auto',
         scrollbarWidth: 'none',
         '&::-webkit-scrollbar': {
@@ -44,116 +98,127 @@ const ApprovaGroupContent: React.FC = () => {
         },
       }}
     >
-      <List>
-        {pendingPosts.map((post, index) => (
-          <Box
-            key={index}
-            sx={{
-              padding: 3, // Increased padding inside each post box
-              borderRadius: 2,
-              border: '1px solid #e0e0e0',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Softer shadow
-              backgroundColor: '#f9f9f9',
-              marginBottom: 4, // More margin between posts
-              maxWidth: '600px', // Limit the post box width
-              margin: '0 auto', // Center each post
-            }}
-          >
-            <ListItem sx={{ paddingLeft: 0 }}>
-              <ListItemAvatar>
-                {/* You can dynamically assign avatar based on userId or index */}
-                <Avatar src={`/static/images/avatar/${index + 1}.jpg`} sx={{ width: 50, height: 50 }} /> {/* Slightly larger avatar */}
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography
-                      variant="body1"
-                      sx={{ fontWeight: 'bold', marginRight: 1, color: '#333' }}
-                    >
-                      {post.idHandler}
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+          <CircularProgress />
+        </Box>
+      ) : (
+        <List>
+          {pendingPosts.length > 0 ? (
+            pendingPosts.map((post, index) => (
+              <Box
+                key={index}
+                sx={{
+                  display: 'block',
+                  padding: 3,
+                  borderRadius: 2,
+                  border: '1px solid #e0e0e0',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  backgroundColor: '#f9f9f9',
+                  marginBottom: '24px',
+                  maxWidth: '600px',
+                  margin: '24px auto',
+                }}
+              >
+                <ListItem sx={{ paddingLeft: 0 }}>
+                  <ListItemAvatar>
+                    <Avatar src={`/static/images/avatar/${index + 1}.jpg`} sx={{ width: 50, height: 50 }} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', marginRight: 1, color: '#333' }}>
+                          {post.createdBy?.displayName || 'Người dùng ẩn danh'} - 
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                    }
+                    secondary={
+                      <Typography variant="body2" color="textSecondary">
+                        @{post.createdBy?.displayName || 'anonymous'}
+                      </Typography>
+                    }
+                  />
+                  <IconButton>
+                    <MoreHoriz />
+                  </IconButton>
+                </ListItem>
+                <Box sx={{ marginTop: 2 }}>
+                  <Typography sx={{ marginBottom: 2, color: '#555' }}>{post.content}</Typography>
+                  {post.listPhoto && post.listPhoto.length > 0 && (
+                    <Grid container spacing={1}>
+                      {post.listPhoto.map((image, imgIndex) => (
+                        <Grid item xs={12} key={imgIndex}>
+                          <img
+                            src={image}
+                            alt={`post image ${imgIndex}`}
+                            style={{
+                              width: '100%',
+                              height: '200px',
+                              objectFit: 'cover',
+                              borderRadius: 8,
+                            }}
+                          />
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
+                  {approvedPosts.includes(post._id) ? (
+                    <Typography sx={{ marginTop: 2, color: '#4caf50', fontWeight: 'bold' }}>
+                      Đã duyệt
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      @{post.idHandler}
+                  ) : rejectedPosts.includes(post._id) ? (
+                    <Typography sx={{ marginTop: 2, color: '#d32f2f', fontWeight: 'bold' }}>
+                      Đã từ chối
                     </Typography>
-                  </Box>
-                }
-                secondary={
-                  <Typography variant="body2" color="textSecondary">
-                    {post.handleDate?.toLocaleDateString()}
-                  </Typography>
-                }
-              />
-              <IconButton>
-                <MoreHoriz />
-              </IconButton>
-            </ListItem>
-            <Box sx={{ marginTop: 2 }}>
-              <Typography sx={{ marginBottom: 2, color: '#555' }}>{post.content}</Typography> {/* Increased margin */}
-              <Grid container spacing={1}>
-                {post.listPhoto.map((image, imgIndex) => (
-                  <Grid item xs={12} key={imgIndex}>
-                    <img
-                      src={image}
-                      alt={`post image ${imgIndex}`}
-                      style={{
-                        width: '100%',
-                        height: '200px', // Increase height for the images
-                        objectFit: 'cover',
-                        borderRadius: 8,
-                      }}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-              {approvedPosts.includes(post._id) ? (
-                <Typography sx={{ marginTop: 2, color: '#4caf50', fontWeight: 'bold' }}>
-                  Đã duyệt
-                </Typography>
-              ) : rejectedPosts.includes(post._id) ? (
-                <Typography sx={{ marginTop: 2, color: '#d32f2f', fontWeight: 'bold' }}>
-                  Đã từ chối
-                </Typography>
-              ) : (
-                <>
-                  <Divider sx={{ marginY: 2 }} /> {/* Increased margin */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-                    <Button
-                      variant="contained"
-                      sx={{
-                        backgroundColor: '#1976d2',
-                        width: '48%',
-                        padding: '12px 0', // Increased padding on buttons
-                        '&:hover': {
-                          backgroundColor: '#1565c0',
-                        },
-                      }}
-                      onClick={() => handleApproval(post._id)}
-                    >
-                      Chấp nhận
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        borderColor: '#d32f2f',
-                        color: '#d32f2f',
-                        width: '48%',
-                        padding: '12px 0', // Increased padding on buttons
-                        '&:hover': {
-                          backgroundColor: '#f9f9f9',
-                        },
-                      }}
-                      onClick={() => handleRejection(post._id)}
-                    >
-                      Từ chối
-                    </Button>
-                  </Box>
-                </>
-              )}
-            </Box>
-          </Box>
-        ))}
-      </List>
+                  ) : (
+                    <>
+                      <Divider sx={{ marginY: 2 }} />
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
+                        <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: '#1976d2',
+                            width: '48%',
+                            padding: '12px 0',
+                            '&:hover': {
+                              backgroundColor: '#1565c0',
+                            },
+                          }}
+                          onClick={() => handleApproval(post._id)}
+                        >
+                          Chấp nhận
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          sx={{
+                            borderColor: '#d32f2f',
+                            color: '#d32f2f',
+                            width: '48%',
+                            padding: '12px 0',
+                            '&:hover': {
+                              backgroundColor: '#f9f9f9',
+                            },
+                          }}
+                          onClick={() => handleRejection(post._id)}
+                        >
+                          Từ chối
+                        </Button>
+                      </Box>
+                    </>
+                  )}
+                </Box>
+              </Box>
+            ))
+          ) : (
+            <Typography textAlign="center" color="textSecondary">
+              Không có bài viết nào đang chờ duyệt.
+            </Typography>
+          )}
+        </List>
+      )}
     </Box>
   );
 };

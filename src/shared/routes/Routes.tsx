@@ -79,6 +79,10 @@ const Routes = () => {
       element: <NewGroup />, // Default to the main content of the group (Trang chủ)
       children: [
         {
+          path: '',
+          element: <NewFeedGroup />, // Default to the main content of the group (Trang chủ)
+        },
+        {
           path: 'your-feed',
           element: <NewFeedGroup />, // Default to the main content of the group (Trang chủ)
         },

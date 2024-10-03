@@ -1,150 +1,314 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from 'react';
+ 
+import { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import PostForm from '../../../../../../shared/components/postForm/PostForm';
 import Post from '../../../../../../shared/components/post/Post';
-import { Interact, Article, Group, Comment } from '../../../../../../interface/interface';
+import { Article, Group, Comment } from '../../../../../../interface/interface';
 import { useOutletContext } from 'react-router-dom';
-import { groups, users, articles } from '../../../../components/GroupListData.tsx';// Import the shared mock data
+import axios from 'axios';
 
 const HomeGroupContent = () => {
   // Get the group and setGroup function from OutletContext (passed from parent)
-  const { group, setGroup } = useOutletContext<{ group: Group, setGroup: (group: Group) => void }>();
-
-  const [posts, setPosts] = useState<Article[]>([]);
-
-  // Initialize posts with approved articles from the mock data
-  const approvedPosts = group.article.listArticle
-    .filter(article => article.state === 'approved')
-    .map(article => articles.find(a => a._id === article.idArticle))
-    .filter(Boolean) as Article[];
-
-  // Update posts on component mount or whenever approvedPosts change
+  const { group } = useOutletContext<{ group: Group, setGroup: (group: Group) => void }>();
+  const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
+  const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
+  const [error, setError] = useState<string | null>(null); // State cho lỗi
+  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
   useEffect(() => {
-    setPosts(approvedPosts);
-  }, [approvedPosts]);
-
-  // Handle new post submission
-  const handlePostSubmit = (newPost: string, images: File[], visibility: string) => {
-    const newPostId = `article${posts.length + 1}`; // Generate a new ID for the post
-    const newPostEntry: Article = {
-      _id: newPostId,
-      sharedPostId: null,
-      idHandler: 'Panda Media',
-      handleDate: null,
-      reports: [],
-      groupID: group._id,
-      content: newPost,
-      listPhoto: images.length > 0 ? images.map(image => URL.createObjectURL(image)) : [],
-      hashTag: [],
-      scope: visibility,
-      interact: {
-        _id: `interact-${newPostId}`,
-        emoticons: [],
-        comment: []
-      },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      _destroy: new Date(),
-    };
-
-    // Add the new post to the list of posts
-    setPosts([newPostEntry, ...posts]);
-
-    // Update the group’s articles list with the new post (state: 'pending')
-    const updatedGroup = {
-      ...group,
-      article: {
-        ...group.article,
-        listArticle: [
-          ...group.article.listArticle,
-          { idArticle: newPostId, state: 'pending' }
-        ]
+    fetchPosts();
+  }, []);
+  // Gọi API lấy danh sách bài viết khi component render lần đầu
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    setError(null); // Reset lỗi trước khi gọi API
+    try {
+      // Sử dụng `group._id` để lấy bài viết thuộc nhóm cụ thể và trạng thái 'approved'
+      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/articles/processed`);
+      setPosts(response.data);
+    } catch (error) {
+      console.error('Lỗi khi lấy bài viết:', error);
+      setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  
+  const handlePostSubmit = async (
+    newPost: string,
+    images: File[],
+    visibility: string,
+    hashTags: string[]
+  ) => {
+    const formData = new FormData();
+    formData.append('content', newPost); // Thêm nội dung bài viết
+    formData.append('scope', visibility); // Phạm vi của bài viết
+    formData.append('userId', currentUserId); // ID người dùng hiện tại
+    formData.append('groupId', group._id); // ID của nhóm hiện tại
+  
+    // Thêm các hashtag vào formData
+    hashTags.forEach(tag => {
+      formData.append('hashTag[]', tag);
+    });
+  
+    // Kiểm tra nếu `images` là một mảng và có ít nhất một tệp
+    if (images && images.length > 0) {
+      images.forEach((image) => {
+        formData.append('images', image); // Thêm từng tệp hình ảnh vào formData
+      });
+    } else {
+      console.warn('Danh sách hình ảnh rỗng hoặc không hợp lệ.');
+    }
+  
+    try {
+      // Đảm bảo sử dụng đúng `headers` cho `multipart/form-data`
+      const response = await axios.post(
+        `http://localhost:3000/v1/group/${group._id}/article`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      console.log('Bài viết đã được tạo thành công:', response.data);
+    } catch (error: unknown) { // Khai báo kiểu error là unknown
+      if (axios.isAxiosError(error)) {
+        console.error('Lỗi Axios:', error.response?.data || error.message);
+      } else if (error instanceof Error) {
+        console.error('Lỗi hệ thống:', error.message);
+      } else {
+        console.error('Lỗi không xác định:', error);
       }
-    };
-
-    setGroup(updatedGroup);
+    }
   };
 
-  // Handle adding a new comment
-  const handleAddComment = (postId: string, newComment: Comment) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post._id === postId
-          ? {
-              ...post,
-              interact: {
-                ...post.interact,
-                comment: [...post.interact.comment, newComment]
-              }
+  const handleLikePost = async (postId: string) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/like`, { userId: currentUserId });
+      if (response.status === 200) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) => {
+            if (post._id === postId) {
+              const isLiked = post.interact.emoticons.some((emoticon) => emoticon._iduser === currentUserId && emoticon.typeEmoticons === 'like');
+              const updatedEmoticons = isLiked
+                ? post.interact.emoticons.filter((emoticon) => emoticon._iduser !== currentUserId)
+                : [...post.interact.emoticons, { typeEmoticons: 'like', _iduser: currentUserId }];
+              return { ...post, interact: { ...post.interact, emoticons: updatedEmoticons } };
             }
-          : post
-      )
-    );
+            return post;
+          })
+        );
+      }
+    } catch (error) {
+      console.error('Lỗi khi like bài viết:', error);
+    }
   };
 
-  // Handle adding a reply to a comment
-  const handleAddReply = (postId: string, commentId: string, newReply: Comment) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) => {
-        if (post._id === postId) {
-          const updatedComments = post.interact.comment.map((comment) => {
-            if (comment._iduser === commentId) {
+  const handleAddComment = async (postId: string, newComment: Comment) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments`, newComment);
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postId
+            ? { ...post, interact: { ...post.interact, comment: [...post.interact.comment, response.data] }, totalComments: post.totalComments + 1 }
+            : post
+        )
+      );
+    } catch (error) {
+      console.error('Lỗi khi thêm comment:', error);
+    }
+  };
+
+  const handleAddReply = async (postId: string, commentId: string, newReply: Comment) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply`, newReply);
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => {
+          if (post._id === postId) {
+            const updatedComments = post.interact.comment.map((comment) => {
+              if (comment._id === commentId) {
+                return { ...comment, replyComment: [...comment.replyComment, response.data] };
+              }
+              return comment;
+            });
+            return { ...post, interact: { ...post.interact, comment: updatedComments }, totalComments: post.totalComments + 1 };
+          }
+          return post;
+        })
+      );
+    } catch (error) {
+      console.error('Error adding reply:', error);
+    }
+  };
+
+  const handleReportPost = async (postId: string, reason: string) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/report`, { userId: currentUserId, reason });
+      console.log('Báo cáo thành công:', response.data);
+    } catch (error) {
+      console.error('Lỗi khi báo cáo bài viết:', error);
+    }
+  };
+
+  const handleSavePost = async (postId: string) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/save`, {
+        userId: currentUserId,
+      });
+      if (response.status === 200) {
+        alert('Lưu bài viết thành công!');
+      }
+    } catch (error) {
+      console.error('Lỗi khi lưu bài viết:', error);
+      alert('Đã xảy ra lỗi khi lưu bài viết!');
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/v1/article/${postId}`);
+      if (response.status === 200) {
+        setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId)); // Loại bỏ bài viết đã xóa ra khỏi danh sách bài viết hiện tại
+        alert('Xóa bài viết thành công!');
+      }
+    } catch (error) {
+      console.error('Lỗi khi xóa bài viết:', error);
+      alert('Đã xảy ra lỗi khi xóa bài viết!');
+    }
+  };
+
+  const handleEditPost = async (postId: string, updatedContent: string, updatedScope: string) => {
+    try {
+      const response = await axios.put(`http://localhost:3000/v1/article/${postId}/edit`, {
+        content: updatedContent,
+        scope: updatedScope
+      });
+      if (response.status === 200) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId ? { ...post, content: updatedContent, scope: updatedScope } : post
+          )
+        );
+        alert('Chỉnh sửa bài viết thành công!');
+      }
+    } catch (error) {
+      console.error('Lỗi khi chỉnh sửa bài viết:', error);
+      alert('Đã xảy ra lỗi khi chỉnh sửa bài viết!');
+    }
+  };
+  
+  const handleLikeComment = async (postId: string, commentId: string) => {
+    try {
+      
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/like`, { userId: currentUserId });
+      if (response.status === 200) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) => {
+            if (post._id === postId) {
+              const updatedComments = post.interact.comment.map((comment) => {
+                if (comment._id === commentId) {
+                  const isLiked = comment.emoticons.some((emoticon) => emoticon._iduser === currentUserId);
+                  const updatedEmoticons = isLiked
+                    ? comment.emoticons.filter((emoticon) => emoticon._iduser !== currentUserId)
+                    : [...comment.emoticons, { typeEmoticons: 'like', _iduser: currentUserId }];
+                  return { ...comment, emoticons: updatedEmoticons };
+                }
+                return comment;
+              });
+              return { ...post, interact: { ...post.interact, comment: updatedComments } };
+            }
+            return post;
+          })
+        );
+      }
+    } catch (error) {
+      console.error('Lỗi khi like bình luận:', error);
+    }
+  };
+
+  const handleLikeReplyComment = async (postId: string, commentId: string, replyId: string) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply/${replyId}/like`,
+        { userId: currentUserId }
+      );
+  
+      if (response.status === 200) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) => {
+            if (post._id === postId) {
               return {
-                ...comment,
-                replyComment: [...comment.replyComment, newReply]
+                ...post,
+                interact: {
+                  ...post.interact,
+                  comment: post.interact.comment.map((comment) => {
+                    if (comment._id === commentId) {
+                      return {
+                        ...comment,
+                        replyComment: comment.replyComment.map((reply) =>
+                          reply._id === replyId ? response.data.reply : reply
+                        )
+                      };
+                    }
+                    return comment;
+                  })
+                }
               };
             }
-            return comment;
-          });
-          return { ...post, interact: { ...post.interact, comment: updatedComments } };
-        }
-        return post;
-      })
-    );
-  };
+            return post;
+          })
+        );
 
-  // Handle deleting a post
-  const handleDeletePost = (postId: string) => {
-    setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
-
-    const updatedGroup = {
-      ...group,
-      article: {
-        ...group.article,
-        listArticle: group.article.listArticle.filter(article => article.idArticle !== postId)
       }
-    };
-
-    setGroup(updatedGroup);
+    } catch (error) {
+      console.error('Lỗi khi like reply comment:', error);
+    }
   };
 
-  const currentUserId = 'current-user-id'; // Replace with actual user ID logic
-
+  const handleSharePost = async (postId: string, shareContent: string, shareScope: string) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/share`, {
+        content: shareContent,
+        scope: shareScope,
+        userId: currentUserId,
+      });
+      console.log('Bài viết đã được chia sẻ thành công:', response.data);
+      // Cập nhật danh sách bài viết sau khi chia sẻ
+      setPosts((prevPosts) => [response.data.post, ...prevPosts]);
+    } catch (error) {
+      console.error('Lỗi khi chia sẻ bài viết:', error);
+    }
+  };
+  
   return (
-    <Box
-      sx={{
-        padding: 2,
-        backgroundColor: '#e9e9e9',
-        height: '60vh',
-        overflowY: 'auto',
-        scrollbarWidth: 'none',
-        '&::-webkit-scrollbar': {
-          display: 'none',
-        },
-      }}
-    >
+    <Box sx={{ padding: 2, height: '85vh' }}>
       <PostForm onSubmit={handlePostSubmit} />
-      {posts.map((post) => (
-        <Post
-          key={post._id}
-          post={post}
-          onAddComment={handleAddComment}
-          onAddReply={handleAddReply}
-          onDeletePost={handleDeletePost}
-          currentUserId={currentUserId}
-        />
-      ))}
+      {isLoading ? (
+        <p>Đang tải...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : posts.length > 0 ? (
+        posts.map((post, index) => (
+          <Post
+            key={index}
+            post={post}
+            onLikeComment={handleLikeComment}
+            onAddComment={handleAddComment}
+            onLikeReplyComment={handleLikeReplyComment}
+            onAddReply={handleAddReply}
+            onLikePost={handleLikePost}
+            onDeletePost={handleDeletePost}
+            onReportPost={handleReportPost}
+            onSavePost={handleSavePost} // Truyền hàm `onReportPost` vào Post component
+            onEditPost={handleEditPost}
+            currentUserId={currentUserId}
+            onSharePost={handleSharePost}
+          />
+        ))
+      ) : (
+        <p>Không có bài viết nào.</p>
+      )}
     </Box>
   );
 };

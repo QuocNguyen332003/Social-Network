@@ -23,6 +23,7 @@ import { Comment as CommentType, Article } from '../../../interface/interface';
 import PostMenu from './component/PostMenu.tsx';
 import CommentSection from './component/CommentSection.tsx';
 import ShareItemCard from './component/ShareItemCard'; // Nhập SavedItemCard để hiển thị bài viết được chia sẻ
+import { v4 as uuidv4 } from 'uuid';
 
 interface PostComponentProps {
   post: Article;
@@ -54,7 +55,7 @@ const Post = ({
   onSharePost
 }: PostComponentProps) => {
   const [showComments, setShowComments] = useState(false);
-  const [likedComments, setLikedComments] = useState<{ [key: string]: boolean }>({});
+  const [, setLikedComments] = useState<{ [key: string]: boolean }>({});
   const [replyInputs, setReplyInputs] = useState<{ [key: string]: boolean }>({});
   const [replyTexts, setReplyTexts] = useState<{ [key: string]: string }>({});
   const [newComment, setNewComment] = useState('');
@@ -111,6 +112,7 @@ const Post = ({
     const replyText = replyTexts[commentId] || ''; // Đảm bảo replyText luôn là một chuỗi rỗng nếu undefined
     if (replyText.trim()) {
       const reply: CommentType = {
+        _id: uuidv4(), // Thêm `_id` bằng uuid
         _iduser: currentUserId,
         content: replyText,
         img: [],
@@ -132,6 +134,7 @@ const Post = ({
       }));
     }
   };
+  
 
   const handleNewCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewComment(event.target.value);
@@ -140,6 +143,7 @@ const Post = ({
   const handleSubmitNewComment = () => {
     if (newComment.trim()) {
       const comment: CommentType = {
+        _id: uuidv4(), // Thêm `_id` bằng uuid
         _iduser: currentUserId,
         content: newComment,
         img: [],
@@ -234,7 +238,11 @@ const Post = ({
     <Paper sx={{ padding: 2, marginBottom: 3, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
         <Box display="flex" alignItems="center">
-          <Avatar alt={post.createdBy ?? 'Anonymous'} src={post.createdBy?.avt || '/static/images/avatar/default.jpg'} sx={{ width: 48, height: 48 }} />
+        <Avatar 
+          alt={typeof post.createdBy === 'string' ? post.createdBy : 'Anonymous'} 
+          src={typeof post.createdBy?.avt === 'string' ? post.createdBy.avt : '/static/images/avatar/default.jpg'} 
+          sx={{ width: 48, height: 48 }} 
+        />
           <Box sx={{ marginLeft: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#333' }}>
               {post?.createdBy?.displayName}
@@ -257,7 +265,7 @@ const Post = ({
           handleOpenEditDialog={handleOpenEditDialog}
           handleOpenReportDialog={handleOpenReportDialog}
           handleDeletePost={handleDeletePost}
-          isOwner={post.createdBy === currentUserId || post.createdBy?._id === currentUserId}
+          isOwner={post.createdBy?._id === currentUserId}
         />
       </Box>
       <Divider sx={{ marginY: 2 }} />
@@ -375,7 +383,6 @@ const Post = ({
             replyTexts={replyTexts}
             replyInputs={replyInputs}
             handleSubmitReply={handleSubmitReply}
-            likedComments={likedComments}
             onLikeReply={handleLikeReply}
             currentUserId={currentUserId}
           />
