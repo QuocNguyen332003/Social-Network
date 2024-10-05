@@ -95,7 +95,7 @@ export const useProfile = () => {
         const updateUser = {
           ...myUser,
           details: {
-            ...myUser,
+            ...myUser.details,
             phoneNumber: dataInput[0],
           }
         };
@@ -107,7 +107,7 @@ export const useProfile = () => {
         const updateUser = {
           ...myUser,
           details: {
-            ...myUser,
+            ...myUser.details,
             address: dataInput[0],
           }
         };
@@ -120,7 +120,7 @@ export const useProfile = () => {
         const updateUser = {
           ...myUser,
           details: {
-            ...myUser,
+            ...myUser.details,
             birthDate: dataInput,
           }
         };
@@ -132,7 +132,7 @@ export const useProfile = () => {
         const updateUser = {
           ...myUser,
           details: {
-            ...myUser,
+            ...myUser.details,
             gender: dataInput,
           }
         };
