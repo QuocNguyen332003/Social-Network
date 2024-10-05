@@ -1,17 +1,30 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Button } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Paper,
+  Button,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import CollectionDialog from './CollectionDialog';
 import { Article, User } from '../../../interface/interface';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface SavedItemCardProps {
   article: Article;
   collections: string[];
   user: User;
-  setUser: React.Dispatch<React.SetStateAction<User>>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
-const SavedItemCard: React.FC<SavedItemCardProps> = ({ article, collections, user, setUser }) => {
+const SavedItemCard: React.FC<SavedItemCardProps> = ({
+  article,
+  collections,
+  user,
+  setUser,
+}) => {
   const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
 
@@ -23,44 +36,39 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ article, collections, use
     setOpenDialog(false);
   };
 
-  const handleSelectCollection = (collection: string) => {
-    console.log(`Thêm bài viết: ${article._id} vào bộ sưu tập: ${collection}`);
-
-    // Xoá bài viết khỏi tất cả các bộ sưu tập hiện tại
-    const updatedCollections = user.collections.map((coll) => {
-      if (coll.items.includes(article._id)) {
-        return {
-          ...coll,
-          items: coll.items.filter(itemId => itemId !== article._id), // Xoá bài viết khỏi bộ sưu tập cũ
-        };
-      }
-      return coll;
-    });
-
-    // Thêm bài viết vào bộ sưu tập mới
-    const targetCollection = updatedCollections.find((coll) => coll.name === collection);
-    if (targetCollection) {
-      targetCollection.items.push(article._id);
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/v1/user/${user._id}`);
+      setUser(response.data); // Cập nhật trạng thái người dùng
+    } catch (error) {
+      toast.error('Lỗi khi tải lại dữ liệu người dùng');
     }
-
-    // Cập nhật lại state của user
-    setUser({ ...user, collections: updatedCollections });
   };
 
-  const handleRemoveFromCollection = () => {
-    // Xoá bài viết khỏi tất cả các bộ sưu tập hiện tại
-    const updatedCollections = user.collections.map((coll) => {
-      if (coll.items.includes(article._id)) {
-        return {
-          ...coll,
-          items: coll.items.filter(itemId => itemId !== article._id), // Xoá bài viết khỏi bộ sưu tập
-        };
-      }
-      return coll;
-    });
+  const handleSelectCollection = async (collection: string) => {
+    try {
+      // Add the article to the selected collection
+      await axios.post(`http://localhost:3000/v1/saved/articles/${article._id}/${collection}`, {
+        userId: user._id,
+      });
+      toast.success('Bài viết đã được thêm vào bộ sưu tập!');
+      handleCloseDialog();
+      await fetchUserData(); // Gọi hàm này để tải lại dữ liệu người dùng
+    } catch (error) {
+      toast.error('Lỗi khi thêm bài viết vào bộ sưu tập');
+    }
+  };
 
-    // Cập nhật lại state của user
-    setUser({ ...user, collections: updatedCollections });
+  const handleRemoveFromCollection = async () => {
+    try {
+      await axios.delete(`http://localhost:3000/v1/saved/articles/${article._id}`, {
+        data: { userId: user._id },
+      });
+      toast.success('Bài viết đã được xóa khỏi bộ sưu tập thành công!');
+      await fetchUserData(); // Gọi hàm này để tải lại dữ liệu người dùng
+    } catch (error) {
+      toast.error('Lỗi khi xóa bài viết khỏi bộ sưu tập');
+    }
   };
 
   const handleViewPost = () => {
@@ -69,43 +77,49 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ article, collections, use
 
   return (
     <>
-      <Paper 
-        sx={{ 
-          padding: 1, // Giảm padding tổng thể
-          display: 'flex', 
-          flexDirection: { xs: 'column', sm: 'row' }, 
-          alignItems: 'center', 
-          backgroundColor: '#f5f5f5', 
-          color: '#333', 
+      <Paper
+        sx={{
+          padding: 1,
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: 'center',
+          backgroundColor: '#f5f5f5',
+          color: '#333',
           cursor: 'pointer',
-          minHeight: '120px', // Giới hạn chiều cao tối thiểu
-        }} 
+          minHeight: '120px',
+        }}
         onClick={handleViewPost}
       >
-        <Box 
-          sx={{ 
-            width: { xs: '100%', sm: '15%' }, // Giảm chiều rộng của ảnh
-            mb: { xs: 1, sm: 0 }, // Giảm khoảng cách dưới ở chế độ mobile
-            mr: { sm: 2 }, // Giảm khoảng cách phải ở chế độ desktop
+        <Box
+          sx={{
+            width: { xs: '100%', sm: '15%' },
+            mb: { xs: 1, sm: 0 },
+            mr: { sm: 2 },
           }}
         >
           {article.listPhoto.length > 0 && (
-            <img 
-              src={article.listPhoto[0]} 
-              alt={article.content} 
-              style={{ 
-                width: '100%', 
-                display: 'block', 
+            <img
+              src={article.listPhoto[0]}
+              alt={article.content}
+              style={{
+                width: '100%',
+                display: 'block',
                 borderRadius: '8px',
-                maxHeight: '100px', // Giới hạn chiều cao của ảnh
-                objectFit: 'cover', // Đảm bảo ảnh không bị kéo giãn
-              }} 
+                maxHeight: '100px',
+                objectFit: 'cover',
+              }}
             />
           )}
         </Box>
-        <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' }, padding: '4px' }}> {/* Giảm padding */}
-          <Typography variant="body1" fontWeight="bold" color="#000" sx={{ fontSize: '0.875rem' }}> {/* Giảm font size */}
-            {article.content.length > 80 ? `${article.content.slice(0, 80)}...` : article.content} {/* Giảm số ký tự hiển thị */}
+        <Box
+          sx={{
+            flex: 1,
+            textAlign: { xs: 'center', sm: 'left' },
+            padding: '4px',
+          }}
+        >
+          <Typography variant="body1" fontWeight="bold" color="#000" sx={{ fontSize: '0.875rem' }}>
+            {article.content.length > 80 ? `${article.content.slice(0, 80)}...` : article.content}
           </Typography>
           <Typography variant="caption" color="#666">
             Đã lưu vào {article.scope}
@@ -114,22 +128,25 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ article, collections, use
         <Button
           variant="contained"
           color="primary"
-          sx={{ 
-            mr: 2, 
-            display: { xs: 'none', sm: 'inline-flex' }, 
-            padding: '4px 8px', // Giảm padding của button
-            fontSize: '0.75rem'  // Giảm kích thước chữ
+          sx={{
+            mr: 2,
+            display: { xs: 'none', sm: 'inline-flex' },
+            padding: '4px 8px',
+            fontSize: '0.75rem',
           }}
-          onClick={(e) => { e.stopPropagation(); handleAddToCollection(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAddToCollection();
+          }}
         >
           Thêm vào bộ sưu tập
         </Button>
         <Button
           variant="contained"
           color="primary"
-          sx={{ 
-            padding: '4px 8px',  // Giảm padding của button
-            fontSize: '0.75rem'   // Giảm kích thước chữ
+          sx={{
+            padding: '4px 8px',
+            fontSize: '0.75rem',
           }}
           onClick={(e) => {
             e.stopPropagation();
@@ -140,7 +157,12 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({ article, collections, use
         </Button>
       </Paper>
 
-      <CollectionDialog open={openDialog} onClose={handleCloseDialog} collections={collections} onSelectCollection={handleSelectCollection} />
+      <CollectionDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        collections={collections.filter(collection => !user.collections.find(col => col.name === collection && col._destroy))} 
+        onSelectCollection={handleSelectCollection}
+      />
     </>
   );
 };

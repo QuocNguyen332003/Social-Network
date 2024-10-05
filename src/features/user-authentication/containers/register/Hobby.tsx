@@ -74,7 +74,7 @@ const Hobby: React.FC = () => {
                 alignItems: 'center',
               }}
             >
-              <img src="./src/assets/images/logoSocialNetwork.png" alt="Logo" style={{ marginBottom: 16 }} /> {/* Thêm logo */}
+              <img src="./src/assets/images/logoSocialNetwork.png" alt="Logo" style={{ marginBottom: 16, maxWidth: '90%' }} /> {/* Thêm logo */}
               <Typography
                 component="h1"
                 variant="h5"

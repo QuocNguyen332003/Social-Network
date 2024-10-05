@@ -33,7 +33,6 @@ export interface User {
     groups: string[];
     backGround: string[];
     aboutMe: string,
-    createDate: string;
     hobbies: string[];
     listArticle: string[];
     createdAt: Date;
@@ -167,6 +166,7 @@ export interface Article {
       count: number;
       listUsers: Array<{
         idUser: string;
+        state: 'accepted' | 'pending' | 'rejected';
         joinDate: string;
       }>;
     };
@@ -180,6 +180,7 @@ export interface Article {
     rule: string[];
     Administrators: Array<{
       idUser: string;
+      state: 'accepted' | 'pending' | 'rejected';
       joinDate: string;
     }>;
     hobbies: string[];

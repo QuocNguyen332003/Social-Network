@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
  
 import { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
@@ -24,7 +25,7 @@ const HomeGroupContent = () => {
     try {
       // Sử dụng `group._id` để lấy bài viết thuộc nhóm cụ thể và trạng thái 'approved'
       const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/articles/processed`);
-      setPosts(response.data);
+      setPosts(response.data.articles);
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);
       setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');

@@ -30,6 +30,8 @@ import ApprovalGroupContent from '../../features/group/containers/group/detail-g
 import AdminGroupContent from '../../features/group/containers/group/detail-group/admin-group/AdminGroupContent'
 import Hobby from '../../features/user-authentication/containers/register/Hobby';
 import ProfileCollection from '../../features/profile/containers/personal-collection/ProfileCollection';
+import InviteGroupContent from '../../features/group/containers/group/detail-group/invite-group/InviteGroupContent'
+import PendingAdminGroupContent from '../../features/group/containers/group/detail-group/pending-admin-group/PendingAdminGroupContent'
 
 const Routes = () => {
 
@@ -107,6 +109,10 @@ const Routes = () => {
               element: <MemberGroupContent />,
             },
             {
+              path: 'invite-members',
+              element: <InviteGroupContent />,
+            },
+            {
               path: 'rules',
               element: <RulesGroupContent />,
             },
@@ -117,6 +123,10 @@ const Routes = () => {
             {
               path: 'pending',
               element: <ApprovalGroupContent />,
+            },
+            {
+              path: 'pending-admin-group',
+              element: <PendingAdminGroupContent />,
             },
           ], // Default to the main content of the group (Trang chủ)
         },
