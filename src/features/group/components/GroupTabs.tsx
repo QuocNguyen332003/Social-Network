@@ -16,6 +16,8 @@ const GroupTabs: React.FC<GroupTabsProps> = ({ groupId }) => {
     'rules': 2,
     'admins': 3,
     'pending': 4,
+    'invite-members': 5,
+    'pending-admin-group': 6,
   };
 
   const currentTab = tabMap[location.pathname.split('/').pop() || ''] || 0;

@@ -19,29 +19,37 @@ import {
 import { Add, MoreHoriz } from '@mui/icons-material';
 import { User } from '../../../interface/interface';
 import axios from 'axios';
-import { toast } from 'react-toastify'; // Import react-toastify
+import { toast } from 'react-toastify';
 
 interface SavedSidebarProps {
-  user: User | null; // Thay đổi kiểu của user thành User | null
+  user: User | null;
   onSelectCollection: (collectionId: string | null) => void;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>; // Thay đổi kiểu của setUser
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, setUser }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // State for menu anchor
-  const [editingCollection, setEditingCollection] = useState<string | null>(null); // State to track editing collection
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [editingCollection, setEditingCollection] = useState<string | null>(null);
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (collectionId: string | null = null) => {
+    if (collectionId) {
+      const collection = user?.collections.find(col => col._id === collectionId);
+      if (collection) {
+        setNewCollectionName(collection.name); // Set tên bộ sưu tập đang được chỉnh sửa
+        setEditingCollection(collectionId); // Cập nhật bộ sưu tập đang chỉnh sửa
+      }
+    } else {
+      setNewCollectionName(''); // Reset tên cho bộ sưu tập mới
+      setEditingCollection(null); // Reset trạng thái chỉnh sửa
+    }
     setOpenDialog(true);
-    setNewCollectionName(''); // Reset the collection name when opening the dialog
-    setEditingCollection(null); // Reset editingCollection to null for new collection creation
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setNewCollectionName(''); // Clear the input when dialog is closed
+    setNewCollectionName('');
   };
 
   const handleCreateCollection = async () => {
@@ -52,65 +60,22 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
           name: newCollectionName
         });
 
-        const { collection } = response.data; // Lấy dữ liệu phản hồi từ API
+        const { collection } = response.data;
         setUser((prevUser) =>
           prevUser ? { ...prevUser, collections: [...prevUser.collections, collection] } : prevUser
-        ); // Cập nhật state với bộ sưu tập mới
+        );
         handleCloseDialog();
-        toast.success('Bộ sưu tập đã được tạo thành công!'); // Hiển thị thông báo thành công
+        toast.success('Bộ sưu tập đã được tạo thành công!');
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
-          toast.error(`Error while calling API: ${error.message}`); // Hiển thị thông báo lỗi
+          toast.error(`Error while calling API: ${error.message}`);
         } else {
-          toast.error('Unknown error occurred!'); // Hiển thị thông báo lỗi không xác định
+          toast.error('Unknown error occurred!');
         }
       }
     }
   };
 
-  // Mở menu
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, collectionId: string) => {
-    setAnchorEl(event.currentTarget);
-    setEditingCollection(collectionId); // Set bộ sưu tập đang được chọn
-  };
-
-  // Đóng menu
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setEditingCollection(null);
-  };
-
-  // Xử lý việc xóa bộ sưu tập
-  const handleDeleteCollection = async () => {
-    if (editingCollection && user) {
-      try {
-        await axios.patch(`http://localhost:3000/v1/saved/${editingCollection}/delete`, {
-          userId: user._id
-        });
-
-        // Cập nhật trạng thái bộ sưu tập
-        const updatedCollections = user.collections.map(col => {
-          if (col._id === editingCollection) {
-            return { ...col, _destroy: new Date() }; // Đánh dấu bộ sưu tập là đã xóa
-          }
-          return col;
-        });
-
-        setUser({ ...user, collections: updatedCollections });
-        onSelectCollection(null); // Xoá xong thì trở về hiển thị tất cả các bài viết
-        handleMenuClose();
-        toast.success('Bộ sưu tập đã được xóa thành công!'); // Hiển thị thông báo thành công
-      } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
-          toast.error(`${error.message}`); // Hiển thị thông báo lỗi
-        } else {
-          toast.error('Lỗi không xác định'); // Hiển thị thông báo lỗi không xác định
-        }
-      }
-    }
-  };
-
-  // Chỉnh sửa tên bộ sưu tập
   const handleEditCollection = async () => {
     if (editingCollection && newCollectionName.trim() && user) {
       try {
@@ -127,12 +92,50 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
         });
         setUser({ ...user, collections: updatedCollections });
         handleCloseDialog();
-        toast.success('Bộ sưu tập đã được chỉnh sửa thành công!'); // Hiển thị thông báo thành công
+        toast.success('Bộ sưu tập đã được chỉnh sửa thành công!');
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
-          toast.error(`Error while editing collection: ${error.message}`); // Hiển thị thông báo lỗi
+          toast.error(`Error while editing collection: ${error.message}`);
         } else {
-          toast.error('Unknown error occurred!'); // Hiển thị thông báo lỗi không xác định
+          toast.error('Unknown error occurred!');
+        }
+      }
+    }
+  };
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, collectionId: string) => {
+    setAnchorEl(event.currentTarget);
+    setEditingCollection(collectionId);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setEditingCollection(null);
+  };
+
+  const handleDeleteCollection = async () => {
+    if (editingCollection && user) {
+      try {
+        await axios.patch(`http://localhost:3000/v1/saved/${editingCollection}/delete`, {
+          userId: user._id
+        });
+
+        const updatedCollections = user.collections.map(col => {
+          if (col._id === editingCollection) {
+            return { ...col, _destroy: new Date() }; // Đánh dấu bộ sưu tập là đã xóa
+          }
+          return col;
+        });
+
+        setUser({ ...user, collections: updatedCollections });
+        onSelectCollection(null);
+        handleMenuClose();
+        toast.success('Bộ sưu tập đã được xóa thành công!');
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          toast.error(`${error.message}`);
+        } else {
+          toast.error('Lỗi không xác định');
         }
       }
     }
@@ -145,7 +148,7 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
       </Typography>
 
       <List sx={{ gap: 1, display: 'flex', flexDirection: 'column' }}>
-        {user?.collections.filter(col => !col._destroy).map((collection, index) => ( // Exclude deleted collections
+        {user?.collections.filter(col => !col._destroy).map((collection, index) => (
           <ListItem
             button
             key={index}
@@ -172,7 +175,7 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
                 fontWeight: '500' 
               }} 
             />
-            {collection.name !== 'Tất cả mục đã lưu' && ( // Không hiển thị dấu ba chấm cho bộ sưu tập mặc định
+            {collection.name !== 'Tất cả mục đã lưu' && (
               <IconButton onClick={(e) => { e.stopPropagation(); handleMenuClick(e, collection._id); }}>
                 <MoreHoriz />
               </IconButton>
@@ -181,11 +184,10 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
         ))}
       </List>
 
-      <Button variant="contained" sx={{ width: '100%', padding: { xs: 1, sm: 1.5 }, borderRadius: 3, backgroundColor: '#1e88e5', fontSize: { xs: '0.9rem', sm: '1rem' }, ':hover': { backgroundColor: '#1565c0' } }} startIcon={<Add />} onClick={handleOpenDialog}>
+      <Button variant="contained" sx={{ width: '100%', padding: { xs: 1, sm: 1.5 }, borderRadius: 3, backgroundColor: '#1e88e5', fontSize: { xs: '0.9rem', sm: '1rem' }, ':hover': { backgroundColor: '#1565c0' } }} startIcon={<Add />} onClick={() => handleOpenDialog()}>
         Tạo Bộ Sưu Tập Mới
       </Button>
 
-      {/* Dialog tạo bộ sưu tập mới */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>{editingCollection ? 'Chỉnh Sửa Bộ Sưu Tập' : 'Tạo Bộ Sưu Tập Mới'}</DialogTitle>
         <DialogContent>
@@ -199,9 +201,8 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
         </DialogActions>
       </Dialog>
 
-      {/* Menu hiển thị khi bấm dấu ba chấm */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem onClick={handleOpenDialog}>Chỉnh Sửa</MenuItem>
+        <MenuItem onClick={() => { handleOpenDialog(editingCollection); }}>Chỉnh Sửa</MenuItem>
         <MenuItem onClick={handleDeleteCollection} style={{ color: 'red' }}>Xóa</MenuItem>
       </Menu>
     </Box>

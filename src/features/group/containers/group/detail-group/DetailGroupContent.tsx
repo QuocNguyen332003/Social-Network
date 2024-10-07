@@ -9,7 +9,6 @@ const DetailGroupContent: React.FC = () => {
 
   // State lưu trữ dữ liệu nhóm
   const [group, setGroup] = useState<Group | undefined>(() => {
-    // Kiểm tra dữ liệu nhóm trong localStorage nếu có
     const storedGroup = localStorage.getItem('groupData');
     return storedGroup ? JSON.parse(storedGroup) : undefined;
   });
@@ -18,7 +17,6 @@ const DetailGroupContent: React.FC = () => {
   useEffect(() => {
     if (location.state?.group) {
       setGroup(location.state.group);
-      // Lưu trữ dữ liệu nhóm vào localStorage để sử dụng sau này
       localStorage.setItem('groupData', JSON.stringify(location.state.group));
     }
   }, [location.state?.group]);
@@ -26,8 +24,19 @@ const DetailGroupContent: React.FC = () => {
   // Hàm xử lý cập nhật thông tin nhóm khi có thay đổi từ các component con
   const handleUpdateGroup = (updatedGroup: Group) => {
     setGroup(updatedGroup);
-    // Cập nhật lại localStorage với dữ liệu nhóm mới
     localStorage.setItem('groupData', JSON.stringify(updatedGroup));
+  };
+
+  // Hàm xử lý cập nhật quy định và dữ liệu nhóm
+  const handleUpdateRules = (updatedRules: string[]) => {
+    setGroup(prevGroup => {
+      if (prevGroup) {
+        const updatedGroup = { ...prevGroup, rule: updatedRules }; // Cập nhật quy định
+        localStorage.setItem('groupData', JSON.stringify(updatedGroup));
+        return updatedGroup; // Trả về nhóm đã cập nhật
+      }
+      return prevGroup;
+    });
   };
 
   if (!group) {
@@ -36,14 +45,9 @@ const DetailGroupContent: React.FC = () => {
 
   return (
     <>
-      {/* Component Header của nhóm, truyền vào nhóm và hàm cập nhật */}
       <GroupHeader group={group} onUpdateGroup={handleUpdateGroup} />
-      
-      {/* Tabs điều hướng các nội dung trong nhóm */}
       <GroupTabs groupId={group._id} />
-      
-      {/* Outlet để hiển thị các component con */}
-      <Outlet context={{ group, setGroup }} />
+      <Outlet context={{ group, setGroup, handleUpdateRules }} />
     </>
   );
 };

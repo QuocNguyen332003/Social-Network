@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import {
@@ -5,115 +6,75 @@ import {
 } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import { Group, User } from '../../../../../../interface/interface.ts';
-
-// Tạo dữ liệu giả lập cho người dùng gửi yêu cầu tham gia nhóm
-const mockRequestUsers: User[] = [
-  {
-    _id: 'user456',
-    account: {
-      warningLevel: 0,
-      email: 'jane.doe@example.com',
-      password: 'password123'
-    },
-    firstName: 'Jane',
-    lastName: 'Doe',
-    displayName: 'Jane Doe',
-    userName: 'janedoe',
-    details: {
-      phoneNumber: '0987654321',
-      address: '456 Oak Street, Cityville',
-      gender: false,
-      birthDate: new Date('1997-04-15')
-    },
-    friends: [],
-    status: 'pending',
-    avt: ['https://randomuser.me/api/portraits/women/2.jpg'],
-    collections: [],
-    groups: [],
-    backGround: [],
-    aboutMe: 'A software engineer who loves reading and exploring nature.',
-    createDate: new Date().toISOString(),
-    hobbies: ['Cooking', 'Reading'],
-    listArticle: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    _destroy: new Date('2024-01-01')
-  },
-  {
-    _id: 'user789',
-    account: {
-      warningLevel: 0,
-      email: 'mike.smith@example.com',
-      password: 'password456'
-    },
-    firstName: 'Mike',
-    lastName: 'Smith',
-    displayName: 'Mike Smith',
-    userName: 'mikesmith',
-    details: {
-      phoneNumber: '0112233445',
-      address: '789 Pine Street, Cityville',
-      gender: true,
-      birthDate: new Date('1995-09-12')
-    },
-    friends: [],
-    status: 'pending',
-    avt: ['https://randomuser.me/api/portraits/men/3.jpg'],
-    collections: [],
-    groups: [],
-    backGround: [],
-    aboutMe: 'A data scientist who enjoys playing video games and hiking.',
-    createDate: new Date().toISOString(),
-    hobbies: ['Gaming', 'Hiking'],
-    listArticle: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    _destroy: new Date('2024-01-01')
-  }
-];
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const InviteGroupContent: React.FC = () => {
   const { group } = useOutletContext<{ group: Group }>(); // Nhận group từ Outlet context
-  const [users, setUsers] = useState<User[]>(mockRequestUsers); // Sử dụng mảng chứa mockRequestUsers
-  const [searchTerm, setSearchTerm] = useState<string>(''); // Lưu trữ từ khóa tìm kiếm
-  const [sortCriteria, setSortCriteria] = useState<string>('name'); // Lưu tiêu chí sắp xếp
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(mockRequestUsers); // Lưu trữ danh sách người dùng đã lọc
-  const [processedRequests, setProcessedRequests] = useState<{ [key: string]: string }>({}); // Lưu trạng thái đã xử lý của người dùng
+  const [users, setUsers] = useState<User[]>([]); // State chứa danh sách người dùng
+  const [searchTerm, setSearchTerm] = useState<string>(''); // Từ khóa tìm kiếm
+  const [sortCriteria, setSortCriteria] = useState<string>('name'); // Tiêu chí sắp xếp
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]); // Danh sách người dùng đã lọc
+  const [processedRequests, setProcessedRequests] = useState<{ [key: string]: string }>({}); // Trạng thái đã xử lý
+
+  // Gọi API để lấy danh sách yêu cầu tham gia nhóm
+  useEffect(() => {
+    const fetchRequestUsers = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/requests`);
+        setUsers(response.data.requests); // Cập nhật danh sách người dùng từ API
+        setFilteredUsers(response.data.requests); // Cập nhật danh sách đã lọc
+      } catch (error) {
+        console.error('Error fetching request users:', error);
+        toast.error('Có lỗi xảy ra khi lấy danh sách yêu cầu.');
+      }
+    };
+
+    fetchRequestUsers();
+  }, [group._id]);
 
   // Lọc người dùng theo từ khóa tìm kiếm
   useEffect(() => {
     const filtered = users.filter((user) =>
-      user.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.account.email.toLowerCase().includes(searchTerm.toLowerCase())
+      user.idUser.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.idUser.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
 
   // Sắp xếp người dùng theo tiêu chí
-  const handleSort = (criteria: string) => {
+  useEffect(() => {
     const sortedUsers = [...filteredUsers].sort((a, b) => {
-      if (criteria === 'name') return a.displayName.localeCompare(b.displayName);
-      if (criteria === 'email') return a.account.email.localeCompare(b.account.email);
-      if (criteria === 'createdAt') return a.createdAt > b.createdAt ? -1 : 1;
+      if (sortCriteria === 'name') return a.idUser.displayName.localeCompare(b.idUser.displayName);
+      if (sortCriteria === 'email') return a.idUser.email.localeCompare(b.idUser.email);
       return 0;
     });
     setFilteredUsers(sortedUsers);
-  };
-
-  useEffect(() => {
-    handleSort(sortCriteria);
-  }, [sortCriteria]);
+  }, [sortCriteria, filteredUsers]);
 
   // Xử lý chấp nhận yêu cầu
-  const handleAccept = (userId: string) => {
-    setProcessedRequests((prev) => ({ ...prev, [userId]: 'accepted' }));
-    alert(`Đã chấp nhận yêu cầu tham gia nhóm của người dùng ID: ${userId}!`);
-  };
+  const handleAccept = async (userId: string) => {
+    try {
+        const response = await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/accept`, { userId });
+        setProcessedRequests((prev) => ({ ...prev, [userId]: 'accepted' }));
+        toast.success(`Đã chấp nhận yêu cầu tham gia nhóm của người dùng ID: ${userId}!`);
+    } catch (error: any) {
+        console.error('Error accepting invite:', error);
+        toast.error(error.response?.data.message || 'Có lỗi xảy ra khi chấp nhận yêu cầu.');
+    }
+};
+
 
   // Xử lý từ chối yêu cầu
-  const handleReject = (userId: string) => {
-    setProcessedRequests((prev) => ({ ...prev, [userId]: 'rejected' }));
-    alert(`Đã từ chối yêu cầu tham gia nhóm của người dùng ID: ${userId}.`);
+  const handleReject = async (userId: string) => {
+    try {
+      await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/reject`, { userId });
+      setProcessedRequests((prev) => ({ ...prev, [userId]: 'rejected' }));
+      toast.success(`Đã từ chối yêu cầu tham gia nhóm của người dùng ID: ${userId}.`);
+    } catch (error) {
+      console.error('Error rejecting invite:', error);
+      toast.error('Có lỗi xảy ra khi từ chối yêu cầu.');
+    }
   };
 
   return (
@@ -152,7 +113,6 @@ const InviteGroupContent: React.FC = () => {
             >
               <MenuItem value="name">Tên</MenuItem>
               <MenuItem value="email">Email</MenuItem>
-              <MenuItem value="createdAt">Ngày tạo</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -160,45 +120,50 @@ const InviteGroupContent: React.FC = () => {
 
       {/* Danh sách người dùng */}
       <Box sx={{ padding: 2, backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-        <List>
-          {filteredUsers.map((user, index) => (
-            <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
-              <ListItemAvatar>
-                <Avatar src={user.avt[0]} />
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography variant="h6" fontWeight="bold">
-                    {user.displayName}
-                  </Typography>
-                }
-                secondary={`Email: ${user.account.email} | Sở Thích: ${user.hobbies.join(', ')}`}
-              />
-              {processedRequests[user._id] ? (
-                <Typography
-                  variant="body1"
-                  sx={{ color: processedRequests[user._id] === 'accepted' ? '#1976d2' : 'red' }}
-                >
-                  {processedRequests[user._id] === 'accepted' ? 'Đã chấp nhận' : 'Đã từ chối'}
-                </Typography>
-              ) : (
-                <>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{ marginRight: 1 }}
-                    onClick={() => handleAccept(user._id)}
-                  >
-                    Chấp Nhận
-                  </Button>
-                  <Button variant="outlined" color="error" size="small" onClick={() => handleReject(user._id)}>
-                    Từ Chối
-                  </Button>
-                </>
-              )}
-            </ListItem>
+      <List>
+          {filteredUsers.map((request, index) => (
+              <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
+                  <ListItemAvatar>
+                      <Avatar src={request.idUser.avt.length > 0 ? request.idUser.avt[0] : '/path/to/default/avatar.jpg'} />
+                  </ListItemAvatar>
+                  <ListItemText
+                      primary={
+                          <Typography variant="h6" fontWeight="bold">
+                              {request.idUser.displayName}
+                          </Typography>
+                      }
+                      secondary={`Tham gia vào: ${new Date(request.joinDate).toLocaleDateString()} | Trạng thái: ${request.state}`}
+                  />
+                  {processedRequests[request.idUser._id] ? (
+                      <Typography
+                          variant="body1"
+                          sx={{ color: processedRequests[request.idUser._id] === 'accepted' ? '#1976d2' : 'red' }}
+                      >
+                          {processedRequests[request.idUser._id] === 'accepted' ? 'Đã chấp nhận' : 'Đã từ chối'}
+                      </Typography>
+                  ) : (
+                      <>
+                          <Button
+                              variant="contained"
+                              size="small"
+                              sx={{ marginRight: 1 }}
+                              onClick={() => handleAccept(request.idUser._id)} // Pass the userId correctly
+                          >
+                              Chấp Nhận
+                          </Button>
+                          <Button
+                              variant="outlined"
+                              color="error"
+                              size="small"
+                              onClick={() => handleReject(request.idUser._id)}
+                          >
+                              Từ Chối
+                          </Button>
+                      </>
+                  )}
+              </ListItem>
           ))}
-        </List>
+      </List>
       </Box>
     </Box>
   );

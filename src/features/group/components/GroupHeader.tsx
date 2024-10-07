@@ -141,7 +141,6 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, onUpdateGroup }) => {
         <Button variant="contained" sx={{ marginRight: '12px', padding: '10px 20px' }} onClick={handleOpenInviteDialog}>
           Mời thành viên
         </Button>
-        <Button variant="contained" sx={{ padding: '10px 20px' }}>Chia sẻ</Button>
       </Box>
 
       {/* Edit Group Dialog */}

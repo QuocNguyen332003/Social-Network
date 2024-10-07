@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // User Interface
 export interface User {
     _id: string;
@@ -38,6 +39,11 @@ export interface User {
     createdAt: Date;
     updatedAt: Date;
     _destroy: Date;
+
+
+
+    // Thêm để không bị lỗi thôi (Bỏ qua phần này)
+    idUser: any;
 }
   
   
