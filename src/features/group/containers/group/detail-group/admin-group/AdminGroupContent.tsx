@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -14,31 +14,56 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Divider,
 } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
-import { Group } from '../../../../../../interface/interface.ts';
+import { Group, User } from '../../../../../../interface/interface.ts';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-
-interface User {
-  idUser: string;
-  state: 'accepted' | 'pending' | 'rejected';
-  joinDate: Date;
-}
+import { format } from 'date-fns';
 
 const AdminGroupContent: React.FC = () => {
   const { group } = useOutletContext<{ group: Group }>();
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
   const [openPendingDialog, setOpenPendingDialog] = useState(false);
-  const [pendingInvites, setPendingInvites] = useState<User[]>([]); // Khởi tạo là mảng rỗng
+  const [availableMembers, setAvailableMembers] = useState<User[]>([]);
+  const [pendingInvites, setPendingInvites] = useState<User[]>([]);
+  const [acceptedAdmins, setAcceptedAdmins] = useState<User[]>([]);
+  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
 
-  // Lấy danh sách các thành viên có thể mời
-  const availableMembers = group.members.listUsers.filter(
-    (member) =>
-      member.state === 'accepted' &&
-      !group.Administrators.some((admin) => admin.idUser.toString() === member.idUser.toString())
-  );
+  useEffect(() => {
+    fetchAvailableMembers();
+    fetchPendingInvites();
+    fetchAcceptedAdmins();
+  }, [group._id]);
+
+  // Lấy danh sách thành viên có thể mời làm quản trị viên
+ const fetchAvailableMembers = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/available-members`);
+      setAvailableMembers(response.data.availableMembers);
+    } catch (error) {
+      console.error('Error fetching available members:', error);
+    }
+  };
+  
+  const fetchAcceptedAdmins = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/accepted-admins`);
+      setAcceptedAdmins(response.data.acceptedAdministrators);
+    } catch (error) {
+      console.error('Error fetching accepted administrators:', error);
+    }
+  };
+  
+  // Lấy danh sách lời mời đang ở trạng thái "pending"
+  const fetchPendingInvites = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/pending-invites`);
+      setPendingInvites(response.data.pendingInvites);
+    } catch (error) {
+      console.error('Error fetching pending invites:', error);
+    }
+  };
 
   const handleOpenInviteDialog = () => {
     setOpenInviteDialog(true);
@@ -56,31 +81,51 @@ const AdminGroupContent: React.FC = () => {
     setOpenPendingDialog(false);
   };
 
-  const handleCancelInvite = (userId: string) => {
-    setPendingInvites((prev) => prev.filter((invite) => invite.idUser !== userId));
-    alert(`Đã huỷ lời mời cho quản trị viên ID: ${userId}`);
+  // Hủy lời mời quản trị viên
+  const handleCancelInvite = async (userId: string) => {
+    try {
+      await axios.post(`http://localhost:3000/v1/group/${group._id}/cancel-invite`, { userId, currentUserId });
+      setPendingInvites((prev) => prev.filter((invite) => invite.idUser._id !== userId));
+      toast.success('Đã huỷ lời mời cho quản trị viên');
+      fetchAvailableMembers(); // Cập nhật danh sách thành viên
+    } catch (error: any) {
+      toast.error(error.response?.data.message || 'Có lỗi xảy ra khi hủy lời mời.');
+    }
+  };
+  // Xóa quản trị viên khỏi nhóm
+  const handleRemoveAdmin = async (userId: string) => {
+    try {
+      await axios.post(`http://localhost:3000/v1/group/${group._id}/remove-admin`, { userId });
+      setAcceptedAdmins((prev) => prev.filter((admin) => admin.idUser._id !== userId));
+      toast.success('Đã xóa quản trị viên.');
+      fetchAvailableMembers(); // Cập nhật danh sách thành viên
+    } catch (error: any) {
+      toast.error(error.response?.data.message || 'Có lỗi xảy ra khi xóa quản trị viên.');
+    }
   };
 
+  // Thêm quản trị viên với trạng thái "pending"
   const handleAddAdmin = async (userId: string) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/group/${group._id}/add-admin`, {
+      if (!userId || userId.length !== 24) {
+        toast.error('ID không hợp lệ, vui lòng kiểm tra lại.');
+        return;
+      }
+      await axios.post(`http://localhost:3000/v1/group/${group._id}/add-admin`, {
         adminId: userId,
-      });
-
-      const newAdmin: User = {
-        idUser: userId,
-        state: 'pending',
-        joinDate: new Date(),
-      };
-
-      setPendingInvites((prev) => [...prev, newAdmin]); // Cập nhật pendingInvites sau khi mời thành công
-      toast.success(`Đã gửi lời mời cho quản trị viên ID: ${userId}`);
-      handleCloseInviteDialog();
+        currentUserId: currentUserId,
+      }); 
+      toast.success(`Đã gửi lời mời quản trị viên.`);
+      
+      // Gọi lại các hàm để cập nhật danh sách lời mời và thành viên
+      await fetchAvailableMembers();
+      await fetchPendingInvites();
     } catch (error: any) {
       console.error('Error adding admin:', error);
       toast.error(error.response?.data.message || 'Có lỗi xảy ra khi gửi lời mời.');
     }
   };
+  
 
   return (
     <Box
@@ -95,117 +140,68 @@ const AdminGroupContent: React.FC = () => {
         },
       }}
     >
+      {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
         <Typography variant="h5" fontWeight="bold">Quản trị viên</Typography>
         <Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenPendingDialog}
-            sx={{ marginRight: 2 }}
-          >
+          <Button variant="contained" color="primary" onClick={handleOpenPendingDialog} sx={{ marginRight: 2 }}>
             Xem lời mời
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenInviteDialog}
-          >
+          <Button variant="contained" color="primary" onClick={handleOpenInviteDialog}>
             Thêm quản trị viên
           </Button>
         </Box>
       </Box>
 
+      {/* Danh sách quản trị viên */}
       <Box sx={{ padding: 2, backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
         <List>
-          {group.Administrators.filter(admin => admin.state === 'accepted').map((admin, index) => (
-            <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
-              <ListItemAvatar>
-                <Avatar src={`/static/images/avatar/${index + 1}.jpg`} alt={admin.idUser} />
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography variant="h6" fontWeight="bold">
-                    {admin.idUser}
-                  </Typography>
-                }
-                secondary={`Joined on ${new Date(admin.joinDate).toDateString()}`}
-              />
-              <Button variant="outlined" color="error">
-                Xóa quản trị viên
-              </Button>
-            </ListItem>
-          ))}
+          {acceptedAdmins.length > 0 ? (
+            acceptedAdmins.map((admin, index) => (
+              <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
+                <ListItemAvatar>
+                  <Avatar src={admin.idUser.avt?.[0] || '/path/to/default/avatar.jpg'} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Typography variant="h6" fontWeight="bold">
+                      {admin.idUser.displayName}
+                    </Typography>
+                  }
+                  secondary={`Tham gia vào: ${format(new Date(admin.joinDate), 'dd/MM/yyyy')}`}
+                />
+                 <Button variant="outlined" color="error" onClick={() => handleRemoveAdmin(admin.idUser._id)}>
+                  Xóa quản trị viên
+                </Button>
+              </ListItem>
+            ))
+          ) : (
+            <Typography variant="body1" sx={{ textAlign: 'center', marginTop: 2 }}>
+              Không có quản trị viên nào đã chấp nhận.
+            </Typography>
+          )}
         </List>
       </Box>
 
-      <Dialog open={openPendingDialog} onClose={handleClosePendingDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Danh sách lời mời quản trị viên</DialogTitle>
-        <DialogContent>
-          <List>
-            {pendingInvites.length > 0 ? (
-              pendingInvites.map((invite, index) => (
-                <React.Fragment key={index}>
-                  <ListItem sx={{ borderBottom: '1px solid #e0e0e0' }}>
-                    <ListItemAvatar>
-                      <Avatar src={`/static/images/avatar/${index + 1}.jpg`} alt={invite.idUser} />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <Typography variant="h6" fontWeight="bold">
-                          {invite.idUser}
-                        </Typography>
-                      }
-                      secondary={`Được mời vào ngày: ${new Date(invite.joinDate).toDateString()}`}
-                    />
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => handleCancelInvite(invite.idUser)}
-                    >
-                      Huỷ lời mời
-                    </Button>
-                  </ListItem>
-                  {index < pendingInvites.length - 1 && <Divider />}
-                </React.Fragment>
-              ))
-            ) : (
-              <Typography variant="body1" sx={{ textAlign: 'center', marginTop: 2 }}>
-                Không có lời mời nào.
-              </Typography>
-            )}
-          </List>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="contained" color="secondary" onClick={handleClosePendingDialog}>
-            Đóng
-          </Button>
-        </DialogActions>
-      </Dialog>
-
+      {/* Dialog thêm quản trị viên */}
       <Dialog open={openInviteDialog} onClose={handleCloseInviteDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Thêm quản trị viên</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '24px' }}>Thêm quản trị viên</DialogTitle>
         <DialogContent>
           <List>
             {availableMembers.length > 0 ? (
               availableMembers.map((member, index) => (
                 <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
                   <ListItemAvatar>
-                    <Avatar src={`/static/images/avatar/${index + 1}.jpg`} alt={member.idUser} />
+                    <Avatar src={member.idUser?.avt?.[0] || '/path/to/default/avatar.jpg'} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={
                       <Typography variant="h6" fontWeight="bold">
-                        {member.idUser}
+                        {member.displayName}
                       </Typography>
                     }
                   />
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleAddAdmin(member.idUser)}
-                  >
+                  <Button variant="outlined" color="primary" onClick={() => handleAddAdmin(member.idUser)}>
                     Mời
                   </Button>
                 </ListItem>
@@ -218,7 +214,45 @@ const AdminGroupContent: React.FC = () => {
           </List>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" color="secondary" onClick={handleCloseInviteDialog}>
+          <Button variant="contained" sx={{ backgroundColor: '#1976d2' }} onClick={handleCloseInviteDialog}>
+            Đóng
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog xem lời mời */}
+      <Dialog open={openPendingDialog} onClose={handleClosePendingDialog} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '24px' }}>Danh sách lời mời quản trị viên</DialogTitle>
+        <DialogContent>
+          <List>
+            {pendingInvites.length > 0 ? (
+              pendingInvites.map((invite, index) => (
+                <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
+                  <ListItemAvatar>
+                    <Avatar src={invite.idUser?.avt?.[0] || '/path/to/default/avatar.jpg'} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <Typography variant="h6" fontWeight="bold">
+                        {invite.idUser.displayName}
+                      </Typography>
+                    }
+                    secondary={`Được mời vào ngày: ${format(new Date(invite.joinDate), 'dd/MM/yyyy')}`}
+                  />
+                  <Button variant="outlined" color="error" onClick={() => handleCancelInvite(invite.idUser._id)}>
+                    Huỷ lời mời
+                  </Button>
+                </ListItem>
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ textAlign: 'center', marginTop: 2 }}>
+                Không có lời mời nào đang chờ.
+              </Typography>
+            )}
+          </List>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" sx={{ backgroundColor: '#1976d2' }} onClick={handleClosePendingDialog}>
             Đóng
           </Button>
         </DialogActions>

@@ -12,7 +12,6 @@ import { toast } from 'react-toastify';
 const InviteGroupContent: React.FC = () => {
   const { group } = useOutletContext<{ group: Group }>(); // Nhận group từ Outlet context
   const [users, setUsers] = useState<User[]>([]); // State chứa danh sách người dùng
-  const [searchTerm, setSearchTerm] = useState<string>(''); // Từ khóa tìm kiếm
   const [sortCriteria, setSortCriteria] = useState<string>('name'); // Tiêu chí sắp xếp
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]); // Danh sách người dùng đã lọc
   const [processedRequests, setProcessedRequests] = useState<{ [key: string]: string }>({}); // Trạng thái đã xử lý
@@ -33,14 +32,6 @@ const InviteGroupContent: React.FC = () => {
     fetchRequestUsers();
   }, [group._id]);
 
-  // Lọc người dùng theo từ khóa tìm kiếm
-  useEffect(() => {
-    const filtered = users.filter((user) =>
-      user.idUser.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.idUser.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredUsers(filtered);
-  }, [searchTerm, users]);
 
   // Sắp xếp người dùng theo tiêu chí
   useEffect(() => {
@@ -94,14 +85,6 @@ const InviteGroupContent: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
         <Typography variant="h5" fontWeight="bold">Yêu Cầu Tham Gia Nhóm</Typography>
         <Box>
-          <TextField
-            label="Tìm kiếm người dùng"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ marginRight: 1 }}
-          />
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel id="sort-label">Sắp xếp theo</InputLabel>
             <Select

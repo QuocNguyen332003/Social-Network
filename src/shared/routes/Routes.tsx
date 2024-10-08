@@ -31,8 +31,7 @@ import AdminGroupContent from '../../features/group/containers/group/detail-grou
 import Hobby from '../../features/user-authentication/containers/register/Hobby';
 import ProfileCollection from '../../features/profile/containers/personal-collection/ProfileCollection';
 import InviteGroupContent from '../../features/group/containers/group/detail-group/invite-group/InviteGroupContent'
-import PendingAdminGroupContent from '../../features/group/containers/group/detail-group/pending-admin-group/PendingAdminGroupContent'
-
+import PersonalManagementContent from '../../features/group/containers/group/detail-group/personal-management/PersonalManagementContent'
 const Routes = () => {
 
   function MessagesWrapper() {
@@ -125,8 +124,8 @@ const Routes = () => {
               element: <ApprovalGroupContent />,
             },
             {
-              path: 'pending-admin-group',
-              element: <PendingAdminGroupContent />,
+              path: 'personal-management',
+              element: <PersonalManagementContent />,
             },
           ], // Default to the main content of the group (Trang chủ)
         },

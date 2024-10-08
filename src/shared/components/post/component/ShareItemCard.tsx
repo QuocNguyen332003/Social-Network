@@ -40,9 +40,9 @@ const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
     >
       {/* Header thông tin bài viết */}
       <Box display="flex" alignItems="center" sx={{ marginBottom: 2 }}>
-        <Avatar
+      <Avatar
           alt={article.createdBy?.displayName || 'Anonymous'}
-          src={article.createdBy?.avt || './src/assets/images/avt.png'}
+          src={Array.isArray(article.createdBy?.avt) ? article.createdBy.avt[0] : article.createdBy?.avt || './src/assets/images/avt.png'}
           sx={{ width: 48, height: 48 }}
         />
         <Box sx={{ marginLeft: 2, flex: 1 }}>

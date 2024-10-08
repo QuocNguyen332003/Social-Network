@@ -1,65 +1,93 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Grid, Button, IconButton, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close'; // Icon đóng
-import axios from 'axios'; // Thư viện axios để gọi API
+import CloseIcon from '@mui/icons-material/Close';
+import axios from 'axios';
 import { Group } from '../../../../../interface/interface';
 
 const ExploreGroups: React.FC = () => {
-  const [notJoinedGroups, setNotJoinedGroups] = useState<Group[]>([]); // Lưu trữ các nhóm chưa tham gia
-  const [loading, setLoading] = useState(true); // Trạng thái loading
-  const [openDialog, setOpenDialog] = useState(false); // Trạng thái mở Dialog
-  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null); // Nhóm đã chọn để tham gia
+  const [notJoinedGroups, setNotJoinedGroups] = useState<Group[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
-  // Lấy danh sách các nhóm chưa tham gia khi component được render lần đầu
+  // Lấy danh sách các nhóm chưa tham gia và nhóm đã có trạng thái pending
   useEffect(() => {
     const fetchNotJoinedGroups = async () => {
       try {
         setLoading(true);
-        const userId = localStorage.getItem('userId'); // Giả định userId được lưu trữ trong localStorage
+        const userId = localStorage.getItem('userId');
         const response = await axios.get(`http://localhost:3000/v1/group/${userId}/not-joined-groups`);
-        setNotJoinedGroups(response.data.groups); // Lưu danh sách nhóm vào state
+  
+        // Đảm bảo gán đúng giá trị từ dữ liệu trả về
+        const { groups } = response.data;
+  
+        setNotJoinedGroups(groups || []);
       } catch (error) {
         console.error('Lỗi khi lấy danh sách nhóm chưa tham gia:', error);
       } finally {
-        setLoading(false); // Tắt trạng thái loading
+        setLoading(false);
       }
     };
-
+  
     fetchNotJoinedGroups();
   }, []);
 
   // Mở dialog xác nhận tham gia nhóm
   const handleOpenDialog = (group: Group) => {
-    setSelectedGroup(group); // Lưu trữ nhóm đã chọn vào state
-    setOpenDialog(true); // Mở dialog
+    setSelectedGroup(group);
+    setOpenDialog(true);
   };
 
   // Đóng dialog
   const handleCloseDialog = () => {
-    setOpenDialog(false); // Đóng dialog
-    setSelectedGroup(null); // Xóa nhóm đã chọn
+    setOpenDialog(false);
+    setSelectedGroup(null);
   };
 
-  // Hàm xử lý khi nhấn "Tham gia nhóm" trong dialog xác nhận
+  // Xử lý khi nhấn "Tham gia nhóm"
   const handleConfirmJoinGroup = async () => {
     if (!selectedGroup) return;
     try {
       const userId = localStorage.getItem('userId');
-      const response = await axios.post(`http://localhost:3000/v1/group/${selectedGroup._id}/join`, { userId });
+      await axios.post(`http://localhost:3000/v1/group/${selectedGroup._id}/join`, { userId });
       alert(`Đã gửi yêu cầu tham gia nhóm thành công!`);
-      // Sau khi tham gia thành công, cập nhật lại danh sách nhóm
-      setNotJoinedGroups((prevGroups) => prevGroups.filter(group => group._id !== selectedGroup._id));
-      handleCloseDialog(); // Đóng dialog sau khi xử lý xong
+
+      // Cập nhật lại trạng thái nhóm thành `pending`
+      setNotJoinedGroups((prevGroups) =>
+        prevGroups.map((group) =>
+          group._id === selectedGroup._id ? { ...group, userState: 'pending' } : group
+        )
+      );
+
+      handleCloseDialog();
     } catch (error) {
       console.error('Lỗi khi gửi yêu cầu tham gia nhóm:', error);
     }
   };
 
+  // Xử lý khi nhấn "Thu hồi yêu cầu"
+  const handleRevokeRequest = async (groupId: string) => {
+    try {
+      const userId = localStorage.getItem('userId');
+      await axios.post(`http://localhost:3000/v1/group/${groupId}/revoke-request`, { userId });
+
+      // Cập nhật lại trạng thái nhóm thành `not_joined`
+      setNotJoinedGroups((prevGroups) =>
+        prevGroups.map((group) =>
+          group._id === groupId ? { ...group, userState: 'not_joined' } : group
+        )
+      );
+
+      alert(`Yêu cầu tham gia nhóm đã được thu hồi.`);
+    } catch (error) {
+      console.error('Lỗi khi thu hồi yêu cầu tham gia nhóm:', error);
+    }
+  };
+
   return (
-    <Box sx={{ width: '100%', padding: 2, overflowX: 'hidden', boxSizing: 'border-box' }}> {/* Ngăn tràn ngang */}
+    <Box sx={{ width: '100%', padding: 2, overflowX: 'hidden', boxSizing: 'border-box' }}>
       <Box sx={{ marginBottom: 4 }}>
-        {/* Sửa Typography để giống với YourGroups */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.2rem', flexGrow: 1 }}>
             Nhóm chưa tham gia
@@ -68,11 +96,11 @@ const ExploreGroups: React.FC = () => {
 
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" height="60vh">
-            <CircularProgress /> {/* Hiển thị trạng thái loading */}
+            <CircularProgress />
           </Box>
         ) : notJoinedGroups.length > 0 ? (
           <Grid container spacing={2} sx={{ maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
-            {notJoinedGroups.map(group => (
+            {notJoinedGroups.map((group) => (
               <Grid item xs={12} sm={6} md={4} key={group._id}>
                 <Box
                   sx={{
@@ -87,9 +115,8 @@ const ExploreGroups: React.FC = () => {
                     boxSizing: 'border-box',
                   }}
                 >
-                  {/* Hình ảnh nhóm */}
                   <img
-                    src={group.avt || 'https://via.placeholder.com/180'} // Hiển thị ảnh placeholder nếu không có ảnh
+                    src={group.avt || 'https://via.placeholder.com/180'}
                     alt={group.groupName}
                     style={{
                       width: '100%',
@@ -98,28 +125,37 @@ const ExploreGroups: React.FC = () => {
                       borderRadius: '8px',
                     }}
                   />
-
-                  {/* Thông tin nhóm */}
                   <Box sx={{ mt: 2 }}>
                     <Typography variant="h6" fontWeight="bold">
                       {group.groupName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {group.members.count} thành viên • {group.article.count}+ bài viết mỗi ngày
+                      {group.members.count} Thành Viên • {group.article.count} Bài Viết
                     </Typography>
 
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      fullWidth
-                      sx={{ marginTop: 2 }}
-                      onClick={() => handleOpenDialog(group)} // Mở dialog khi nhấn vào nút
-                    >
-                      Tham gia nhóm
-                    </Button>
+                    {/* Hiển thị trạng thái dựa vào `userState` */}
+                    {group.userState === 'pending' ? (
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        fullWidth
+                        sx={{ marginTop: 2 }}
+                        onClick={() => handleRevokeRequest(group._id)}
+                      >
+                        Đã gửi yêu cầu - Thu hồi
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        sx={{ marginTop: 2 }}
+                        onClick={() => handleOpenDialog(group)}
+                      >
+                        Tham gia nhóm
+                      </Button>
+                    )}
                   </Box>
-
-                  {/* Icon đóng */}
                   <IconButton
                     sx={{
                       position: 'absolute',
@@ -144,7 +180,6 @@ const ExploreGroups: React.FC = () => {
           </Typography>
         )}
 
-        {/* Dialog xác nhận tham gia nhóm */}
         <Dialog
           open={openDialog}
           onClose={handleCloseDialog}

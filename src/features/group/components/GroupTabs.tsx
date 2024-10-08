@@ -17,13 +17,13 @@ const GroupTabs: React.FC<GroupTabsProps> = ({ groupId }) => {
     'admins': 3,
     'pending': 4,
     'invite-members': 5,
-    'pending-admin-group': 6,
+    'personal-management': 6
   };
 
   const currentTab = tabMap[location.pathname.split('/').pop() || ''] || 0;
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    const pathMap = ['', 'members', 'rules', 'admins', 'pending', 'invite-members','pending-admin-group'];
+    const pathMap = ['', 'members', 'rules', 'admins', 'pending', 'invite-members','personal-management'];
     navigate(`/group/${groupId}/${pathMap[newValue]}`);
   };
 
@@ -36,7 +36,7 @@ const GroupTabs: React.FC<GroupTabsProps> = ({ groupId }) => {
         <Tab label="Quản trị viên" />
         <Tab label="Chờ phê duyệt bài" />
         <Tab label="Yêu cầu tham gia" />
-        <Tab label="Phản hồi quản trị viên" />
+        <Tab label="Quản lí cá nhân" />
       </Tabs>
     </Box>
   );

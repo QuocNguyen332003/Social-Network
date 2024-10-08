@@ -1,16 +1,36 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
+ 
 import React, { useEffect, useState } from 'react';
-import { Box, Avatar, Button, List, ListItem, ListItemAvatar, ListItemText, Typography, Divider } from '@mui/material';
+import {
+  Box,
+  Avatar,
+  Button,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Typography,
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import { Group } from '../../../../../../interface/interface.ts';
 import axios from 'axios';
-import { format } from 'date-fns'; // Nhập hàm format từ date-fns
-import { toast } from 'react-toastify'; // Nhập toast
+import { format } from 'date-fns';
+import { toast } from 'react-toastify';
 
 const MemberGroupContent: React.FC = () => {
   const { group } = useOutletContext<{ group: Group }>();
   const [members, setMembers] = useState<{ idUser: { _id: string; displayName: string }; joinDate: Date; _id: string }[]>([]); // State để lưu danh sách thành viên
-
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // State để hiển thị hộp thoại xác nhận
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null); // Lưu ID thành viên được chọn để xóa
+  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorage
+  
   // Gọi API để lấy danh sách thành viên của nhóm
   useEffect(() => {
     const fetchMembers = async () => {
@@ -25,14 +45,28 @@ const MemberGroupContent: React.FC = () => {
     fetchMembers();
   }, [group._id]);
 
-  const handleRemoveMember = async (userId: string) => { // Đảm bảo sử dụng userId
+  // Xác nhận trước khi xóa thành viên
+  const handleOpenConfirmDialog = (userId: string) => {
+    setSelectedMemberId(userId); // Lưu ID thành viên được chọn
+    setOpenConfirmDialog(true); // Mở hộp thoại xác nhận
+  };
+
+  const handleCloseConfirmDialog = () => {
+    setSelectedMemberId(null); // Đặt lại ID thành viên
+    setOpenConfirmDialog(false); // Đóng hộp thoại xác nhận
+  };
+
+  // Xóa thành viên ra khỏi nhóm
+  const handleRemoveMember = async () => {
     try {
-      await axios.delete(`http://localhost:3000/v1/group/${group._id}/member/${userId}`); // Gọi API với userId
-      setMembers((prevMembers) => prevMembers.filter(member => member.idUser._id !== userId)); // Cập nhật lại danh sách thành viên
-      toast.success('Thành viên đã được xóa khỏi nhóm!'); // Hiển thị thông báo thành công
-    } catch (error: any) {
-      console.error('Error removing member:', error);
-      toast.error(error.response?.data.message || 'Có lỗi xảy ra khi xóa thành viên.'); // Hiển thị thông báo lỗi
+      const response = await axios.delete(`http://localhost:3000/v1/group/${group._id}/member/${selectedMemberId}`, {
+        data: { requesterId: currentUserId }
+      });
+      setMembers((prev) => prev.filter((member) => member.idUser._id !== selectedMemberId));
+      setOpenConfirmDialog(false);
+      toast.success(response.data.message);
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi xóa thành viên.');
     }
   };
   
@@ -75,7 +109,7 @@ const MemberGroupContent: React.FC = () => {
                   color="error"
                   size="small"
                   sx={{ marginRight: 1 }}
-                  onClick={() => handleRemoveMember(member.idUser._id)} // Gọi hàm xóa thành viên với userId
+                  onClick={() => handleOpenConfirmDialog(member.idUser._id)} // Mở hộp thoại xác nhận xóa
                 >
                   Xóa
                 </Button>
@@ -85,6 +119,22 @@ const MemberGroupContent: React.FC = () => {
           ))}
         </List>
       </Box>
+
+      {/* Dialog xác nhận xóa thành viên */}
+      <Dialog open={openConfirmDialog} onClose={handleCloseConfirmDialog} maxWidth="xs" fullWidth>
+        <DialogTitle>Xác nhận xóa thành viên</DialogTitle>
+        <DialogContent>
+          <Typography>Bạn có chắc chắn muốn xóa thành viên này khỏi nhóm và xóa các bài viết của họ không?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmDialog} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={handleRemoveMember} color="error">
+            Đồng ý
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -15,19 +15,20 @@ const ReplyComment: React.FC<ReplyCommentProps> = ({ replies, onLikeReply, onRep
   return (
     <Box sx={{ marginTop: 2, paddingLeft: 2, borderLeft: '2px solid #bdbdbd' }}>
       {replies.map((reply, replyIndex) => {
-        const replyLikes = reply.emoticons.filter((emoticon) => emoticon.typeEmoticons === 'like').length;
-        const isReplyLiked = reply.emoticons.some((emoticon) => emoticon._iduser === currentUserId); // Kiểm tra trạng thái like hiện tại
+        const replyLikes = Array.isArray(reply.emoticons) ? reply.emoticons.filter((emoticon) => emoticon.typeEmoticons === 'like').length : 0;
+        const isReplyLiked = Array.isArray(reply.emoticons) && reply.emoticons.some((emoticon) => emoticon._iduser === currentUserId);
+
 
         return (
           <Box key={replyIndex} sx={{ marginTop: 2 }}>
             <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
-              {reply._iduser.displayName} 
+            {typeof reply._iduser === 'object' && reply._iduser !== null ? reply._iduser.displayName : 'Người dùng chưa xác định'}
             </Typography>
             <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
               {reply.content}
             </Typography>
             <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
-              {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
+              {reply.createdAt ? formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true }) : 'Invalid date'}
             </Typography>
 
             <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>

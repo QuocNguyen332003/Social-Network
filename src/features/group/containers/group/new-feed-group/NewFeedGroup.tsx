@@ -18,7 +18,7 @@ const NewFeedGroup: React.FC = () => {
     setIsLoading(true);
     setError(null); // Reset lỗi trước khi gọi API
     try {
-      const response = await axios.get(`http://localhost:3000/v1/group/${currentUserId}/articles`);
+      const response = await axios.get(`http://localhost:3000/v1/group/articles/${currentUserId}`);
       setPosts(response.data);
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);

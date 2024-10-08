@@ -63,6 +63,8 @@ const SidebarLeftGroup = () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
+    
+    userState: ''
   };
 
 const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData);

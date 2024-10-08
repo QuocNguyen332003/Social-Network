@@ -44,6 +44,8 @@ export interface User {
 
     // Thêm để không bị lỗi thôi (Bỏ qua phần này)
     idUser: any;
+    state: any;
+    joinDate: string | number | Date;
 }
   
   
@@ -193,5 +195,9 @@ export interface Article {
     createdAt: Date;
     updatedAt: Date;
     _destroy: Date;
+
+
+ // Thêm để không bị lỗi thôi (Bỏ qua phần  này)
+    userState: string;
 }
   
