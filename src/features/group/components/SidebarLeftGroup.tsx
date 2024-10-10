@@ -36,6 +36,7 @@ import { useNavigate } from 'react-router-dom';
 import { Group } from '../../../interface/interface';
 import axios from 'axios'; // Thêm axios để gọi API
 
+
 const SidebarLeftGroup = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState('');
@@ -63,8 +64,6 @@ const SidebarLeftGroup = () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
-    
-    userState: ''
   };
 
 const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData);
@@ -81,9 +80,6 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
     setGroupData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleGroupTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGroupData((prev) => ({ ...prev, type: event.target.value as 'public' | 'private' }));
-  };
 
   const handleSelectHobbies = (event: any) => {
     const value = event.target.value;
@@ -96,23 +92,50 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
   // Xử lý tải ảnh đại diện và ảnh nền
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, imageType: 'avt' | 'backGround') => {
     if (event.target.files && event.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setGroupData((prev) => ({ ...prev, [imageType]: reader.result as string }));
-      };
-      reader.readAsDataURL(event.target.files[0]);
+      const file = event.target.files[0];
+      setGroupData((prev) => ({
+        ...prev,
+        [`${imageType}File`]: file, // Lưu tệp ảnh vào groupData để gửi qua FormData
+        [imageType]: URL.createObjectURL(file), // Lưu URL để hiển thị xem trước ảnh
+      }));
     }
   };
-
+  
   const handleCreateGroup = async () => {
     setLoading(true);
     setError('');
   
     try {
-      // Thay đổi URL để khớp với cổng backend đang chạy
-      const response = await axios.post('http://localhost:3000/v1/group/create', groupData);
+      const formData = new FormData();
+      formData.append('groupName', groupData.groupName);
+      formData.append('type', groupData.type);
+      formData.append('idAdmin', groupData.idAdmin);
+      formData.append('introduction', groupData.introduction);
+
+      // Thêm từng giá trị của mảng hobbies vào FormData mà không dùng JSON.stringify()
+      groupData.hobbies.forEach((hobby) => formData.append('hobbies', hobby));
+      // Thêm từng quy định vào FormData mà không dùng JSON.stringify()
+      groupData.rule.forEach((rule) => formData.append('rule', rule));
   
-      // Nếu thành công, in thông báo và reset form
+      // Thêm ảnh đại diện và ảnh nền nếu có
+      if (groupData.avtFile) {
+        formData.append('avt', groupData.avtFile);
+      }
+      if (groupData.backGroundFile) {
+        formData.append('backGround', groupData.backGroundFile);
+      }
+  
+      // Log tất cả các giá trị của FormData để kiểm tra
+      for (const pair of formData.entries()) {
+        console.log(`${pair[0]}, ${pair[1]}`);
+      }
+  
+      const response = await axios.post('http://localhost:3000/v1/group/create', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
       console.log('Group created successfully:', response.data.group);
       alert('Nhóm đã được tạo thành công!');
       handleCloseCreateGroupDialog();
@@ -123,6 +146,9 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
       setLoading(false);
     }
   };
+  
+  
+  
   const handleAddRule = () => {
     if (editIndex !== null) {
       const updatedRules = [...groupData.rule];
@@ -379,11 +405,6 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
               </ListItem>
             ))}
           </List>
-
-          <RadioGroup value={groupData.type} onChange={handleGroupTypeChange} row>
-            <FormControlLabel value="public" control={<Radio />} label="Công khai" />
-            <FormControlLabel value="private" control={<Radio />} label="Riêng tư" />
-          </RadioGroup>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', mt: 1 }}>
           <Button onClick={handleCloseCreateGroupDialog} variant="outlined" sx={{ borderRadius: '8px', px: 3 }}>

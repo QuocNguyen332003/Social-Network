@@ -41,28 +41,39 @@ const HomeGroupContent = () => {
     visibility: string,
     hashTags: string[]
   ) => {
+    if (!newPost || !visibility || !currentUserId || !group._id) {
+      console.error('Dữ liệu đầu vào không hợp lệ, không thể tạo bài viết.');
+      return;
+    }
+  
     const formData = new FormData();
-    formData.append('content', newPost); // Thêm nội dung bài viết
-    formData.append('scope', visibility); // Phạm vi của bài viết
-    formData.append('userId', currentUserId); // ID người dùng hiện tại
-    formData.append('groupId', group._id); // ID của nhóm hiện tại
+    formData.append('content', newPost); 
+    formData.append('scope', visibility);
+    formData.append('userId', currentUserId); 
+    formData.append('groupId', group._id); 
   
-    // Thêm các hashtag vào formData
-    hashTags.forEach(tag => {
-      formData.append('hashTag[]', tag);
-    });
+    if (hashTags && hashTags.length > 0) {
+      hashTags.forEach(tag => {
+        formData.append('hashTag[]', tag);
+      });
+    } else {
+      console.warn('Danh sách hashtag rỗng hoặc không hợp lệ.');
+    }
   
-    // Kiểm tra nếu `images` là một mảng và có ít nhất một tệp
     if (images && images.length > 0) {
       images.forEach((image) => {
-        formData.append('images', image); // Thêm từng tệp hình ảnh vào formData
+        formData.append('images', image); 
       });
     } else {
       console.warn('Danh sách hình ảnh rỗng hoặc không hợp lệ.');
     }
   
+    // Kiểm tra `FormData` trước khi gửi
+    for (const pair of formData.entries()) {
+      console.log(pair[0], pair[1]); // Xem từng key-value trong `FormData`
+    }
+  
     try {
-      // Đảm bảo sử dụng đúng `headers` cho `multipart/form-data`
       const response = await axios.post(
         `http://localhost:3000/v1/group/${group._id}/article`,
         formData,
@@ -72,8 +83,14 @@ const HomeGroupContent = () => {
           },
         }
       );
-      console.log('Bài viết đã được tạo thành công:', response.data);
-    } catch (error: unknown) { // Khai báo kiểu error là unknown
+  
+      if (response.status === 201) {
+        console.log('Bài viết đã được tạo thành công:', response.data);
+        alert('Bài viết của bạn đã được đăng thành công!'); 
+      } else {
+        console.warn(`Có lỗi xảy ra: ${response.status} - ${response.statusText}`);
+      }
+    } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error('Lỗi Axios:', error.response?.data || error.message);
       } else if (error instanceof Error) {
@@ -83,7 +100,7 @@ const HomeGroupContent = () => {
       }
     }
   };
-
+  
   const handleLikePost = async (postId: string) => {
     try {
       const response = await axios.post(`http://localhost:3000/v1/article/${postId}/like`, { userId: currentUserId });

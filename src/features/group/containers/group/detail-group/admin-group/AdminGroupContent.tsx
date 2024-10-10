@@ -1,5 +1,5 @@
- 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -22,7 +22,7 @@ import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 
 const AdminGroupContent: React.FC = () => {
-  const { group } = useOutletContext<{ group: Group }>();
+  const { group, role } = useOutletContext<{ group: Group; role: string }>(); // Nhận `role` từ context
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
   const [openPendingDialog, setOpenPendingDialog] = useState(false);
   const [availableMembers, setAvailableMembers] = useState<User[]>([]);
@@ -36,8 +36,7 @@ const AdminGroupContent: React.FC = () => {
     fetchAcceptedAdmins();
   }, [group._id]);
 
-  // Lấy danh sách thành viên có thể mời làm quản trị viên
- const fetchAvailableMembers = async () => {
+  const fetchAvailableMembers = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/available-members`);
       setAvailableMembers(response.data.availableMembers);
@@ -45,7 +44,7 @@ const AdminGroupContent: React.FC = () => {
       console.error('Error fetching available members:', error);
     }
   };
-  
+
   const fetchAcceptedAdmins = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/accepted-admins`);
@@ -54,8 +53,7 @@ const AdminGroupContent: React.FC = () => {
       console.error('Error fetching accepted administrators:', error);
     }
   };
-  
-  // Lấy danh sách lời mời đang ở trạng thái "pending"
+
   const fetchPendingInvites = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/pending-invites`);
@@ -81,7 +79,6 @@ const AdminGroupContent: React.FC = () => {
     setOpenPendingDialog(false);
   };
 
-  // Hủy lời mời quản trị viên
   const handleCancelInvite = async (userId: string) => {
     try {
       await axios.post(`http://localhost:3000/v1/group/${group._id}/cancel-invite`, { userId, currentUserId });
@@ -92,7 +89,7 @@ const AdminGroupContent: React.FC = () => {
       toast.error(error.response?.data.message || 'Có lỗi xảy ra khi hủy lời mời.');
     }
   };
-  // Xóa quản trị viên khỏi nhóm
+
   const handleRemoveAdmin = async (userId: string) => {
     try {
       await axios.post(`http://localhost:3000/v1/group/${group._id}/remove-admin`, { userId });
@@ -104,7 +101,6 @@ const AdminGroupContent: React.FC = () => {
     }
   };
 
-  // Thêm quản trị viên với trạng thái "pending"
   const handleAddAdmin = async (userId: string) => {
     try {
       if (!userId || userId.length !== 24) {
@@ -114,10 +110,8 @@ const AdminGroupContent: React.FC = () => {
       await axios.post(`http://localhost:3000/v1/group/${group._id}/add-admin`, {
         adminId: userId,
         currentUserId: currentUserId,
-      }); 
+      });
       toast.success(`Đã gửi lời mời quản trị viên.`);
-      
-      // Gọi lại các hàm để cập nhật danh sách lời mời và thành viên
       await fetchAvailableMembers();
       await fetchPendingInvites();
     } catch (error: any) {
@@ -125,7 +119,6 @@ const AdminGroupContent: React.FC = () => {
       toast.error(error.response?.data.message || 'Có lỗi xảy ra khi gửi lời mời.');
     }
   };
-  
 
   return (
     <Box
@@ -140,17 +133,20 @@ const AdminGroupContent: React.FC = () => {
         },
       }}
     >
-      {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
         <Typography variant="h5" fontWeight="bold">Quản trị viên</Typography>
-        <Box>
-          <Button variant="contained" color="primary" onClick={handleOpenPendingDialog} sx={{ marginRight: 2 }}>
-            Xem lời mời
-          </Button>
-          <Button variant="contained" color="primary" onClick={handleOpenInviteDialog}>
-            Thêm quản trị viên
-          </Button>
-        </Box>
+        
+        {/* Chỉ hiển thị các nút này nếu `role` là `owner` */}
+        {role === 'owner' && (
+          <Box>
+            <Button variant="contained" color="primary" onClick={handleOpenPendingDialog} sx={{ marginRight: 2 }}>
+              Xem lời mời
+            </Button>
+            <Button variant="contained" color="primary" onClick={handleOpenInviteDialog}>
+              Thêm quản trị viên
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* Danh sách quản trị viên */}
@@ -170,9 +166,11 @@ const AdminGroupContent: React.FC = () => {
                   }
                   secondary={`Tham gia vào: ${format(new Date(admin.joinDate), 'dd/MM/yyyy')}`}
                 />
-                 <Button variant="outlined" color="error" onClick={() => handleRemoveAdmin(admin.idUser._id)}>
-                  Xóa quản trị viên
-                </Button>
+                {role === 'owner' && (
+                  <Button variant="outlined" color="error" onClick={() => handleRemoveAdmin(admin.idUser._id)}>
+                    Xóa quản trị viên
+                  </Button>
+                )}
               </ListItem>
             ))
           ) : (

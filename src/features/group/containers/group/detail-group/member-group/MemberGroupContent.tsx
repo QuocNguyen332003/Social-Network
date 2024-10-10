@@ -1,7 +1,4 @@
- 
 /* eslint-disable @typescript-eslint/no-unused-vars */
- 
- 
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -25,12 +22,12 @@ import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 
 const MemberGroupContent: React.FC = () => {
-  const { group } = useOutletContext<{ group: Group }>();
+  const { group, role } = useOutletContext<{ group: Group; role: string }>(); // Nhận role từ context
   const [members, setMembers] = useState<{ idUser: { _id: string; displayName: string }; joinDate: Date; _id: string }[]>([]); // State để lưu danh sách thành viên
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // State để hiển thị hộp thoại xác nhận
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null); // Lưu ID thành viên được chọn để xóa
   const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorage
-  
+
   // Gọi API để lấy danh sách thành viên của nhóm
   useEffect(() => {
     const fetchMembers = async () => {
@@ -60,16 +57,15 @@ const MemberGroupContent: React.FC = () => {
   const handleRemoveMember = async () => {
     try {
       const response = await axios.delete(`http://localhost:3000/v1/group/${group._id}/member/${selectedMemberId}`, {
-        data: { requesterId: currentUserId }
+        data: { requesterId: currentUserId },
       });
-      setMembers((prev) => prev.filter((member) => member.idUser._id !== selectedMemberId));
+      setMembers((prev) => prev.filter((member) => member.idUser._id !== selectedMemberId)); // Cập nhật lại danh sách thành viên
       setOpenConfirmDialog(false);
       toast.success(response.data.message);
     } catch (error) {
       toast.error('Có lỗi xảy ra khi xóa thành viên.');
     }
   };
-  
 
   return (
     <Box
@@ -104,15 +100,19 @@ const MemberGroupContent: React.FC = () => {
                   }
                   secondary={`Tham gia: ${format(new Date(member.joinDate), 'dd/MM/yyyy')}`} // Định dạng ngày tham gia
                 />
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  sx={{ marginRight: 1 }}
-                  onClick={() => handleOpenConfirmDialog(member.idUser._id)} // Mở hộp thoại xác nhận xóa
-                >
-                  Xóa
-                </Button>
+
+                {/* Chỉ hiển thị nút Xóa cho vai trò owner hoặc admin */}
+                {(role === 'owner' || role === 'admin') && (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    sx={{ marginRight: 1 }}
+                    onClick={() => handleOpenConfirmDialog(member.idUser._id)} // Mở hộp thoại xác nhận xóa
+                  >
+                    Xóa
+                  </Button>
+                )}
               </ListItem>
               {index < members.length - 1 && <Divider />}
             </React.Fragment>

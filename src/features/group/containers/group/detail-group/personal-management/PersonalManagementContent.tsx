@@ -11,20 +11,25 @@ import { toast, ToastContainer } from 'react-toastify';
 
 const PersonalManagementContent = () => {
   // Get the group and setGroup function from OutletContext (passed from parent)
-  const { group } = useOutletContext<{ group: Group, setGroup: (group: Group) => void }>();
+  const { group, role: parentRole } = useOutletContext<{ group: Group, role: 'owner' | 'admin' | 'member' | 'none' }>(); // Nhận role từ OutletContext
   const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
   const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
   const [error, setError] = useState<string | null>(null); // State cho lỗi
+  const [isLoadingRole, setIsLoadingRole] = useState(true);
   const [pendingInvites, setPendingInvites] = useState<User[]>([]); // State cho lời mời làm quản trị viên
   const [currentRole, setCurrentRole] = useState<'member' | 'admin' | 'owner' | 'none'>('none'); // Vai trò hiện tại của người dùng
   const [openInviteDialog, setOpenInviteDialog] = useState(false); // State để mở và đóng Dialog
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // State để mở/đóng Dialog xác nhận
   const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
   useEffect(() => {
+    // Thiết lập vai trò từ parent ngay khi component được render
+    if (parentRole) {
+      setCurrentRole(parentRole);
+      setIsLoadingRole(false); // Khi đã có vai trò, tắt trạng thái loading
+    }
     fetchUserPosts();
     fetchPendingInvites();
-    fetchCurrentUserRole();
-  }, []);
+  }, [parentRole]);
   // Gọi API lấy danh sách bài viết khi component render lần đầu
   const fetchUserPosts = async () => {
     setIsLoading(true);
@@ -50,14 +55,6 @@ const PersonalManagementContent = () => {
     }
   };
   
-  const fetchCurrentUserRole = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/role?userId=${currentUserId}`);
-      setCurrentRole(response.data.role); // Vai trò hiện tại: 'member', 'admin', 'owner', 'none'
-    } catch (error) {
-      console.error('Lỗi khi lấy vai trò hiện tại:', error);
-    }
-  };
 
   const handleLikePost = async (postId: string) => {
     try {
@@ -302,134 +299,160 @@ const PersonalManagementContent = () => {
 
   return (
     <Box sx={{ padding: 2, height: '85vh', overflowY: 'auto' }}>
-        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
-        <Box
-        sx={{
-            marginBottom: 4,
-            padding: 3,
-            borderRadius: 3,
-            backgroundColor: '#fff',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-        }}
-        >
-        {/* Sử dụng Box với display: flex để căn chỉnh Typography và Button */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography
-            variant="h6"
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+  
+      {/* Hiển thị trạng thái loading khi role chưa được tải */}
+      {isLoadingRole ? (
+        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+          <Typography variant="h6">Đang tải...</Typography>
+        </Box>
+      ) : (
+        <>
+          {/* Thông tin vai trò của người dùng trong nhóm */}
+          <Box
             sx={{
-                color: '#ffffff',
-                fontWeight: 'bold',
-                padding: 1,
-                borderRadius: 1,
-                backgroundColor: '#1976d2',
-                display: 'inline-block',
-                marginBottom: 0,
+              marginBottom: 4,
+              padding: 3,
+              borderRadius: 3,
+              backgroundColor: '#fff',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             }}
-            >
-            {currentRole === 'owner'
-                ? 'Chủ nhóm'
-                : currentRole === 'admin'
-                ? 'Quản trị viên'
-                : currentRole === 'member'
-                ? 'Thành viên'
-                : 'Chưa có vai trò trong nhóm'}
-            </Typography>
-
-            {/* Nút "Không làm quản trị viên nữa" nằm góc phải */}
-            {currentRole === 'admin' && (
-            <Button
-                variant="contained"
-                sx={{ backgroundColor: '#e57373', color: '#ffffff' }}
-                onClick={handleRemoveAdminRole}
-            >
-                Xoá chức vụ
-            </Button>
-            )}
-        </Box>
-        </Box>
-
-        {/* Dialog xác nhận hành động bỏ vai trò quản trị viên */}
-        <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Bạn có chắc chắn?</DialogTitle>
-        <DialogContent>
-            <Typography>Bạn có chắc chắn muốn không làm quản trị viên nữa không?</Typography>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={() => setOpenConfirmDialog(false)} color="primary">
-            Hủy
-            </Button>
-            <Button onClick={handleConfirmRemoveAdminRole} color="error">
-            Đồng ý
-            </Button>
-        </DialogActions>
-        </Dialog>
-
-      {/* Hiển thị danh sách lời mời làm quản trị viên */}
-      <Button variant="contained" color="primary" onClick={() => setOpenInviteDialog(true)} sx={{ marginBottom: 2 }}>
-        Hiển thị lời mời làm quản trị viên
-      </Button>
-
-      {/* Dialog hiển thị lời mời làm quản trị viên */}
-      <Dialog open={openInviteDialog} onClose={() => setOpenInviteDialog(false)} maxWidth="md" fullWidth >
-        <DialogTitle  sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '24px', color: '#1976d2' }} >Lời mời làm quản trị viên</DialogTitle>
-        <DialogContent dividers>
-          {pendingInvites.length > 0 ? (
-            <List>
-              {pendingInvites.map((invite, index) => (
-                <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
-                  <ListItemText
-                    primary={<Typography variant="h6" sx={{ color: '#1976d2'}}>{invite.displayName} đã được mời làm quản trị viên</Typography>}
-                    secondary={`Ngày mời: ${new Date(invite.joinDate).toLocaleDateString()}`}
-                  />
-                  <Button variant="contained" sx={{ backgroundColor: '#1976d2', color: '#ffffff' }} onClick={() => handleAcceptInvite(invite.idUser)}>
-                    Chấp nhận
-                  </Button>
-                  <Button variant="outlined" sx={{ borderColor: '#1976d2', color: '#1976d2', marginLeft: 2 }} onClick={() => handleRejectInvite(invite.idUser)}>
-                    Từ chối
-                  </Button>
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Typography variant="body1">Không có lời mời nào đang chờ.</Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenInviteDialog(false)} color="primary">
-            Đóng
+          >
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: '#ffffff',
+                  fontWeight: 'bold',
+                  padding: 1,
+                  borderRadius: 1,
+                  backgroundColor: '#1976d2',
+                  display: 'inline-block',
+                  marginBottom: 0,
+                }}
+              >
+                {currentRole === 'owner'
+                  ? 'Chủ nhóm'
+                  : currentRole === 'admin'
+                  ? 'Quản trị viên'
+                  : currentRole === 'member'
+                  ? 'Thành viên'
+                  : 'Chưa có vai trò trong nhóm'}
+              </Typography>
+  
+              {/* Nút "Xoá chức vụ" cho quản trị viên */}
+              {currentRole === 'admin' && (
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: '#e57373', color: '#ffffff' }}
+                  onClick={handleRemoveAdminRole}
+                >
+                  Xoá chức vụ
+                </Button>
+              )}
+            </Box>
+          </Box>
+  
+          {/* Dialog xác nhận bỏ vai trò quản trị viên */}
+          <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)} maxWidth="xs" fullWidth>
+            <DialogTitle>Bạn có chắc chắn?</DialogTitle>
+            <DialogContent>
+              <Typography>Bạn có chắc chắn muốn không làm quản trị viên nữa không?</Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenConfirmDialog(false)} color="primary">
+                Hủy
+              </Button>
+              <Button onClick={handleConfirmRemoveAdminRole} color="error">
+                Đồng ý
+              </Button>
+            </DialogActions>
+          </Dialog>
+  
+          {/* Hiển thị lời mời làm quản trị viên */}
+          <Button variant="contained" color="primary" onClick={() => setOpenInviteDialog(true)} sx={{ marginBottom: 2 }}>
+            Hiển thị lời mời làm quản trị viên
           </Button>
-        </DialogActions>
-      </Dialog>
-        <Typography variant="h5" fontWeight="bold" sx={{ color: '#1976d2', marginBottom: 2 }}>Bài viết của bạn</Typography>
-        <Box>
-        {isLoading ? (
-            <p>Đang tải...</p>
-        ) : error ? (
-            <p>{error}</p>
-        ) : posts.length > 0 ? (
-            posts.map((post, index) => (
-            <Post
-                key={index}
-                post={post}
-                onLikeComment={handleLikeComment}
-                onAddComment={handleAddComment}
-                onLikeReplyComment={handleLikeReplyComment}
-                onAddReply={handleAddReply}
-                onLikePost={handleLikePost}
-                onDeletePost={handleDeletePost}
-                onReportPost={handleReportPost}
-                onSavePost={handleSavePost} // Truyền hàm `onReportPost` vào Post component
-                onEditPost={handleEditPost}
-                currentUserId={currentUserId}
-                onSharePost={handleSharePost}
-            />
-            ))
-        ) : (
-            <p>Không có bài viết nào.</p>
-        )}
-        </Box>
-     </Box>
+  
+          {/* Dialog hiển thị lời mời làm quản trị viên */}
+          <Dialog open={openInviteDialog} onClose={() => setOpenInviteDialog(false)} maxWidth="md" fullWidth>
+            <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '24px', color: '#1976d2' }}>
+              Lời mời làm quản trị viên
+            </DialogTitle>
+            <DialogContent dividers>
+              {pendingInvites.length > 0 ? (
+                <List>
+                  {pendingInvites.map((invite, index) => (
+                    <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
+                      <ListItemText
+                        primary={<Typography variant="h6" sx={{ color: '#1976d2' }}>{invite.displayName} đã được mời làm quản trị viên</Typography>}
+                        secondary={`Ngày mời: ${new Date(invite.joinDate).toLocaleDateString()}`}
+                      />
+                      <Button variant="contained" sx={{ backgroundColor: '#1976d2', color: '#ffffff' }} onClick={() => handleAcceptInvite(invite.idUser)}>
+                        Chấp nhận
+                      </Button>
+                      <Button variant="outlined" sx={{ borderColor: '#1976d2', color: '#1976d2', marginLeft: 2 }} onClick={() => handleRejectInvite(invite.idUser)}>
+                        Từ chối
+                      </Button>
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography variant="body1">Không có lời mời nào đang chờ.</Typography>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenInviteDialog(false)} color="primary">
+                Đóng
+              </Button>
+            </DialogActions>
+          </Dialog>
+  
+          {/* Hiển thị danh sách bài viết của người dùng */}
+          <Typography variant="h5" fontWeight="bold" sx={{ color: '#1976d2', marginBottom: 2 }}>
+            Bài viết của bạn
+          </Typography>
+          <Box>
+            {isLoading ? (
+              <p>Đang tải...</p>
+            ) : error ? (
+              <p>{error}</p>
+            ) : posts.length > 0 ? (
+              posts.map((post, index) => (
+                <Post
+                  key={index}
+                  post={post}
+                  onLikeComment={handleLikeComment}
+                  onAddComment={handleAddComment}
+                  onLikeReplyComment={handleLikeReplyComment}
+                  onAddReply={handleAddReply}
+                  onLikePost={handleLikePost}
+                  onDeletePost={handleDeletePost}
+                  onReportPost={handleReportPost}
+                  onSavePost={handleSavePost}
+                  onEditPost={handleEditPost}
+                  currentUserId={currentUserId}
+                  onSharePost={handleSharePost}
+                />
+              ))
+            ) : (
+              <p>Không có bài viết nào.</p>
+            )}
+          </Box>
+        </>
+      )}
+    </Box>
   );
-};
+}
+  
 
 export default PersonalManagementContent;

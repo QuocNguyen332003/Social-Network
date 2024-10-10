@@ -7,8 +7,9 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const RulesGroupContent: React.FC = () => {
-  const context = useOutletContext<{ group: Group, handleUpdateRules: (rules: string[]) => void }>(); // Lấy dữ liệu và hàm từ Outlet context
-  const { group, handleUpdateRules } = context;
+  const context = useOutletContext<{ group: Group; role: string; handleUpdateRules: (rules: string[]) => void }>(); // Nhận thêm role từ context
+  const { group, role, handleUpdateRules } = context;
+
   const [openDialog, setOpenDialog] = useState(false);
   const [newRule, setNewRule] = useState('');
   const [rules, setRules] = useState<string[]>(group.rule);
@@ -21,26 +22,25 @@ const RulesGroupContent: React.FC = () => {
     try {
       const response = await axios.put(`http://localhost:3000/v1/group/${group._id}/rules`, {
         rules: rules,
-        userId: localStorage.getItem('userId'), // Gửi userId để xác thực
+        userId: localStorage.getItem('userId'),
       });
-      toast.success(response.data.message); // Hiển thị thông báo thành công
-      handleUpdateRules(rules); // Cập nhật quy định trong DetailGroupContent
-      setOpenDialog(false); // Đóng dialog
+      toast.success(response.data.message);
+      handleUpdateRules(rules);
+      setOpenDialog(false);
     } catch (error: any) {
-      console.error('Error updating group rules:', error);
       toast.error(error.response?.data.message || 'Có lỗi xảy ra khi cập nhật quy định.');
     }
   };
 
   const handleAddRule = () => {
     if (newRule.trim() !== '') {
-      setRules((prevRules) => [...prevRules, newRule.trim()]); // Thêm quy định mới vào danh sách
-      setNewRule(''); // Reset quy định mới
+      setRules((prevRules) => [...prevRules, newRule.trim()]);
+      setNewRule('');
     }
   };
 
   const handleDeleteRule = (index: number) => {
-    setRules((prevRules) => prevRules.filter((_, i) => i !== index)); // Xóa quy định tại vị trí index
+    setRules((prevRules) => prevRules.filter((_, i) => i !== index));
   };
 
   return (
@@ -50,10 +50,6 @@ const RulesGroupContent: React.FC = () => {
         backgroundColor: '#e9e9e9',
         height: '60vh',
         overflowY: 'auto',
-        scrollbarWidth: 'none',
-        '&::-webkit-scrollbar': {
-          display: 'none',
-        },
       }}
     >
       <Paper sx={{ padding: 2 }}>
@@ -74,9 +70,11 @@ const RulesGroupContent: React.FC = () => {
         )}
       </Paper>
 
-      <Button variant="contained" color="primary" onClick={() => setOpenDialog(true)} sx={{ marginTop: 2 }}>
-        Cập Nhật Quy Định
-      </Button>
+      {role === 'owner' && (
+        <Button variant="contained" color="primary" onClick={() => setOpenDialog(true)} sx={{ marginTop: 2 }}>
+          Cập Nhật Quy Định
+        </Button>
+      )}
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle sx={{ textAlign: 'center', padding: 2 }}>Cập Nhật Quy Định Nhóm</DialogTitle>

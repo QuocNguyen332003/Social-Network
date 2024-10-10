@@ -197,7 +197,11 @@ export interface Article {
     _destroy: Date;
 
 
+
+
  // Thêm để không bị lỗi thôi (Bỏ qua phần  này)
-    userState: string;
+  userState?: string;
+  avtFile?: File;  // <-- Add these properties
+  backGroundFile?: File;  // <-- Add these properties
 }
   
