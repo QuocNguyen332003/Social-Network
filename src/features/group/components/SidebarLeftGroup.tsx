@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react';
 import {
   List,
@@ -16,7 +18,11 @@ import {
   Button,
   Radio,
   RadioGroup,
-  FormControlLabel
+  FormControlLabel,
+  Select,
+  MenuItem,
+  Box,
+  ListItemSecondaryAction
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -24,19 +30,29 @@ import FeedIcon from '@mui/icons-material/Feed';
 import ExploreIcon from '@mui/icons-material/Explore';
 import GroupIcon from '@mui/icons-material/Group';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
-import { Group } from '../../../interface/interface'; // Assuming this is the path to your Group interface
+import { Group } from '../../../interface/interface';
+import axios from 'axios'; // Thêm axios để gọi API
+
 
 const SidebarLeftGroup = () => {
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState(''); 
+  const [selectedTab, setSelectedTab] = useState('');
   const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
-  const [groupData, setGroupData] = useState<Group>({
-    _id: '',
+  const [hobbiesOptions] = useState(['Sports', 'Music', 'Travel', 'Reading', 'Movies']);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [newRule, setNewRule] = useState(''); // Dùng để nhập quy định mới
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
+
+  const initialGroupData: Omit<Group, '_id'> = {
     warningLevel: 0,
     groupName: '',
     type: 'public',
-    idAdmin: '',
+    idAdmin: currentUserId,
     introduction: '',
     avt: '',
     backGround: '',
@@ -48,23 +64,113 @@ const SidebarLeftGroup = () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
-  });
+  };
+
+const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData);
 
   const handleOpenCreateGroupDialog = () => setOpenCreateGroupDialog(true);
-  const handleCloseCreateGroupDialog = () => setOpenCreateGroupDialog(false);
+  const resetForm = () => setGroupData(initialGroupData);
+  const handleCloseCreateGroupDialog = () => {
+    resetForm(); // Gọi hàm reset dữ liệu
+    setOpenCreateGroupDialog(false);
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setGroupData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleGroupTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGroupData((prev) => ({ ...prev, type: event.target.value as 'public' | 'private' }));
+
+  const handleSelectHobbies = (event: any) => {
+    const value = event.target.value;
+    setGroupData((prev) => ({
+      ...prev,
+      hobbies: typeof value === 'string' ? value.split(',') : value,
+    }));
   };
 
-  const handleCreateGroup = () => {
-    console.log('Group created:', groupData);
-    handleCloseCreateGroupDialog(); 
+  // Xử lý tải ảnh đại diện và ảnh nền
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, imageType: 'avt' | 'backGround') => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setGroupData((prev) => ({
+        ...prev,
+        [`${imageType}File`]: file, // Lưu tệp ảnh vào groupData để gửi qua FormData
+        [imageType]: URL.createObjectURL(file), // Lưu URL để hiển thị xem trước ảnh
+      }));
+    }
+  };
+  
+  const handleCreateGroup = async () => {
+    setLoading(true);
+    setError('');
+  
+    try {
+      const formData = new FormData();
+      formData.append('groupName', groupData.groupName);
+      formData.append('type', groupData.type);
+      formData.append('idAdmin', groupData.idAdmin);
+      formData.append('introduction', groupData.introduction);
+
+      // Thêm từng giá trị của mảng hobbies vào FormData mà không dùng JSON.stringify()
+      groupData.hobbies.forEach((hobby) => formData.append('hobbies', hobby));
+      // Thêm từng quy định vào FormData mà không dùng JSON.stringify()
+      groupData.rule.forEach((rule) => formData.append('rule', rule));
+  
+      // Thêm ảnh đại diện và ảnh nền nếu có
+      if (groupData.avtFile) {
+        formData.append('avt', groupData.avtFile);
+      }
+      if (groupData.backGroundFile) {
+        formData.append('backGround', groupData.backGroundFile);
+      }
+  
+      // Log tất cả các giá trị của FormData để kiểm tra
+      for (const pair of formData.entries()) {
+        console.log(`${pair[0]}, ${pair[1]}`);
+      }
+  
+      const response = await axios.post('http://localhost:3000/v1/group/create', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      console.log('Group created successfully:', response.data.group);
+      alert('Nhóm đã được tạo thành công!');
+      handleCloseCreateGroupDialog();
+    } catch (err: any) {
+      console.error('Error creating group:', err.message);
+      setError('Có lỗi xảy ra khi tạo nhóm. Vui lòng thử lại!');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+  
+  const handleAddRule = () => {
+    if (editIndex !== null) {
+      const updatedRules = [...groupData.rule];
+      updatedRules[editIndex] = newRule;
+      setGroupData((prev) => ({ ...prev, rule: updatedRules }));
+      setEditIndex(null);
+    } else {
+      setGroupData((prev) => ({ ...prev, rule: [...prev.rule, newRule] }));
+    }
+    setNewRule('');
+  };
+
+  const handleEditRule = (index: number) => {
+    setNewRule(groupData.rule[index]);
+    setEditIndex(index);
+  };
+
+  const handleDeleteRule = (index: number) => {
+    setGroupData((prev) => ({
+      ...prev,
+      rule: prev.rule.filter((_, idx) => idx !== index),
+    }));
   };
 
   const handleSelectTab = (tabName: string, route: string) => {
@@ -232,10 +338,73 @@ const SidebarLeftGroup = () => {
               },
             }}
           />
-          <RadioGroup value={groupData.type} onChange={handleGroupTypeChange} row>
-            <FormControlLabel value="public" control={<Radio />} label="Công khai" />
-            <FormControlLabel value="private" control={<Radio />} label="Riêng tư" />
-          </RadioGroup>
+          {/* Thêm trường tải ảnh đại diện */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Button variant="contained" component="label">
+              Chọn ảnh đại diện
+              <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, 'avt')} />
+            </Button>
+            <Button variant="contained" component="label">
+              Chọn ảnh nền
+              <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, 'backGround')} />
+            </Button>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            {groupData.avt && (
+              <Box sx={{ border: '1px solid #ddd', borderRadius: '8px', p: 1 }}>
+                <Typography textAlign="center" fontSize="14px" fontWeight="bold">
+                  Ảnh đại diện
+                </Typography>
+                <img src={groupData.avt} alt="Avatar" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+              </Box>
+            )}
+
+            {groupData.backGround && (
+              <Box sx={{ border: '1px solid #ddd', borderRadius: '8px', p: 1, ml: 2 }}>
+                <Typography textAlign="center" fontSize="14px" fontWeight="bold">
+                  Ảnh nền
+                </Typography>
+                <img src={groupData.backGround} alt="Background" style={{ width: '200px', height: '100px', borderRadius: '8px' }} />
+              </Box>
+            )}
+          </Box>
+
+          {/* Thêm lựa chọn sở thích */}
+          <Select
+            multiple
+            fullWidth
+            value={groupData.hobbies}
+            onChange={handleSelectHobbies}
+            renderValue={(selected) => selected.join(', ')}
+            sx={{ mb: 2 }}
+          >
+            {hobbiesOptions.map((hobby) => (
+              <MenuItem key={hobby} value={hobby}>
+                {hobby}
+              </MenuItem>
+            ))}
+          </Select>
+          <Box sx={{ display: 'flex', mb: 2 }}>
+            <TextField fullWidth label="Quy định nhóm" variant="outlined" value={newRule} onChange={(e) => setNewRule(e.target.value)} />
+            <Button variant="contained" onClick={handleAddRule} sx={{ ml: 1 }}>{editIndex !== null ? 'Cập nhật' : 'Thêm'}</Button>
+          </Box>
+
+          <List>
+            {groupData.rule.map((rule, index) => (
+              <ListItem key={index}>
+                <ListItemText primary={rule} />
+                <ListItemSecondaryAction>
+                  <IconButton edge="end" aria-label="edit" onClick={() => handleEditRule(index)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteRule(index)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+          </List>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', mt: 1 }}>
           <Button onClick={handleCloseCreateGroupDialog} variant="outlined" sx={{ borderRadius: '8px', px: 3 }}>

@@ -149,6 +149,7 @@ const NewFeedsContent = () => {
       alert('Đã xảy ra lỗi khi xóa bài viết!');
     }
   };
+
   const handleEditPost = async (postId: string, updatedContent: string, updatedScope: string) => {
     try {
       const response = await axios.put(`http://localhost:3000/v1/article/${postId}/edit`, {

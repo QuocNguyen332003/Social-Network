@@ -5,22 +5,20 @@ import { User, Article } from '../../../../interface/interface';
 
 interface MainContentProps {
   user: User;
-  setUser: React.Dispatch<React.SetStateAction<User>>; // Add setUser prop to update the user
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   articles: Article[];
-  selectedCollectionId: string | null; // Truyền collectionId để lọc bài viết
+  selectedCollectionId: string | null;
 }
 
 const MainContent: React.FC<MainContentProps> = ({ user, setUser, articles, selectedCollectionId }) => {
-  // Lọc các bài viết dựa trên bộ sưu tập được chọn
+  // Filter articles based on the selected collection
   const filteredArticles = selectedCollectionId
     ? articles.filter(article =>
         user.collections
           .find(collection => collection._id === selectedCollectionId)
           ?.items.includes(article._id)
       )
-    : articles.filter(article =>
-        user.collections.some(collection => collection.items.includes(article._id))
-      );
+    : articles;
 
   return (
     <Box sx={{ padding: 2, color: 'black', height: '100vh', overflowY: 'auto' }}>
@@ -34,8 +32,8 @@ const MainContent: React.FC<MainContentProps> = ({ user, setUser, articles, sele
             <SavedItemCard
               article={article}
               collections={user.collections.map(col => col.name)}
-              user={user}             // Pass user prop
-              setUser={setUser}         // Pass setUser prop
+              user={user}
+              setUser={setUser}
             />
           </Grid>
         ))}

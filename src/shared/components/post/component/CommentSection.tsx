@@ -1,9 +1,11 @@
-import React from 'react';
+ 
+import React, { useEffect } from 'react';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { formatDistanceToNow } from 'date-fns';
 import { ThumbUpAlt, Reply } from '@mui/icons-material';
 import { Comment as CommentType } from '../../../../interface/interface';
 import ReplyComment from './ReplyComment'; // Import ReplyComment component
+import { useState } from 'react';
 
 interface CommentSectionProps {
   comments: CommentType[];
@@ -13,7 +15,6 @@ interface CommentSectionProps {
   replyTexts: { [key: string]: string };
   replyInputs: { [key: string]: boolean };
   handleSubmitReply: (commentId: string) => void;
-  likedComments: { [key: string]: boolean };
   onLikeReply: (commentId: string, replyId: string) => void; // Thêm hàm xử lý like reply
   currentUserId: string;
 }
@@ -26,16 +27,31 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   replyTexts,
   replyInputs,
   handleSubmitReply,
-  likedComments,
   onLikeReply,
   currentUserId
 }) => {
+  const [commentLikes, setCommentLikes] = useState<{ [key: string]: boolean }>({});
+
+  // Đồng bộ hóa `likedComments` khi dữ liệu `comments` thay đổi
+  useEffect(() => {
+    if (comments && comments.length > 0) {
+      const initialLikes: { [key: string]: boolean } = {};
+      comments.forEach((comment) => {
+        const isLiked = comment.emoticons.some(
+          (emoticon) => emoticon.typeEmoticons === 'like' && emoticon._iduser === currentUserId
+        );
+        initialLikes[comment._id] = isLiked;
+      });
+      setCommentLikes(initialLikes); // Cập nhật state `commentLikes`
+    }
+  }, [comments, currentUserId]);
+  
   return (
     <Box sx={{ marginTop: 2 }}>
       {comments.length > 0 ? (
         comments.map((comment, index) => {
-          const commentLikes = comment.emoticons.filter((emoticon) => emoticon.typeEmoticons === 'like').length;
-          const isCommentLiked = likedComments[comment._id] || false; // Trạng thái like hiện tại
+          const totalLikes = comment.emoticons.filter((emoticon) => emoticon.typeEmoticons === 'like').length;
+          const isLiked = commentLikes[comment._id] || false;
           return (
             <Box key={index} sx={{ marginBottom: 2, padding: 2, borderRadius: 2, backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
               <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
@@ -50,12 +66,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 
               <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
                 <Button
-                  size="small"
-                  startIcon={<ThumbUpAlt />}
-                  sx={{ color: isCommentLiked ? '#2e7d32' : '#757575', textTransform: 'none' }}
-                  onClick={() => onLikeComment(comment._id)}
-                >
-                  {isCommentLiked ? 'Bỏ thích' : 'Thích'} ({commentLikes})
+                    size="small"
+                    startIcon={<ThumbUpAlt />}
+                    sx={{ color: isLiked ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                    onClick={() => {
+                      // Thay đổi trạng thái like của bình luận
+                      onLikeComment(comment._id);
+                      setCommentLikes((prevLikes) => ({
+                        ...prevLikes,
+                        [comment._id]: !prevLikes[comment._id],
+                      }));
+                    }}
+                  >
+                  {isLiked ? 'Bỏ thích' : 'Thích'} ({totalLikes})
                 </Button>
                 <Button
                   size="small"

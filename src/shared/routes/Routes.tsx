@@ -30,7 +30,8 @@ import ApprovalGroupContent from '../../features/group/containers/group/detail-g
 import AdminGroupContent from '../../features/group/containers/group/detail-group/admin-group/AdminGroupContent'
 import Hobby from '../../features/user-authentication/containers/register/Hobby';
 import ProfileCollection from '../../features/profile/containers/personal-collection/ProfileCollection';
-
+import InviteGroupContent from '../../features/group/containers/group/detail-group/invite-group/InviteGroupContent'
+import PersonalManagementContent from '../../features/group/containers/group/detail-group/personal-management/PersonalManagementContent'
 const Routes = () => {
 
   function MessagesWrapper() {
@@ -79,6 +80,10 @@ const Routes = () => {
       element: <NewGroup />, // Default to the main content of the group (Trang chủ)
       children: [
         {
+          path: '',
+          element: <NewFeedGroup />, // Default to the main content of the group (Trang chủ)
+        },
+        {
           path: 'your-feed',
           element: <NewFeedGroup />, // Default to the main content of the group (Trang chủ)
         },
@@ -103,6 +108,10 @@ const Routes = () => {
               element: <MemberGroupContent />,
             },
             {
+              path: 'invite-members',
+              element: <InviteGroupContent />,
+            },
+            {
               path: 'rules',
               element: <RulesGroupContent />,
             },
@@ -113,6 +122,10 @@ const Routes = () => {
             {
               path: 'pending',
               element: <ApprovalGroupContent />,
+            },
+            {
+              path: 'personal-management',
+              element: <PersonalManagementContent />,
             },
           ], // Default to the main content of the group (Trang chủ)
         },

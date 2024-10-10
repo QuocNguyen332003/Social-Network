@@ -1,3 +1,4 @@
+ 
 import React, { useState } from 'react';
 import {
   Box,
@@ -21,8 +22,11 @@ import { MoreHoriz, Favorite, Comment, Share } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
 import { Comment as CommentType, Article } from '../../../interface/interface';
 import PostMenu from './component/PostMenu.tsx';
+import { useNavigate } from 'react-router-dom';
 import CommentSection from './component/CommentSection.tsx';
+import axios from 'axios';
 import ShareItemCard from './component/ShareItemCard'; // Nhập SavedItemCard để hiển thị bài viết được chia sẻ
+import { v4 as uuidv4 } from 'uuid';
 
 interface PostComponentProps {
   post: Article;
@@ -53,8 +57,9 @@ const Post = ({
   currentUserId,
   onSharePost
 }: PostComponentProps) => {
+  const navigate = useNavigate(); 
   const [showComments, setShowComments] = useState(false);
-  const [likedComments, setLikedComments] = useState<{ [key: string]: boolean }>({});
+  const [, setLikedComments] = useState<{ [key: string]: boolean }>({});
   const [replyInputs, setReplyInputs] = useState<{ [key: string]: boolean }>({});
   const [replyTexts, setReplyTexts] = useState<{ [key: string]: string }>({});
   const [newComment, setNewComment] = useState('');
@@ -71,6 +76,12 @@ const Post = ({
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareContent, setShareContent] = useState('');
   const [shareScope, setShareScope] = useState('public');
+
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false); // Trạng thái mở `Dialog`
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // Chỉ số của ảnh đang được hiển thị
+  
+  
+
 
   const isLiked = post.interact.emoticons.some(emoticon => emoticon._iduser === currentUserId && emoticon.typeEmoticons === 'like');
 
@@ -111,6 +122,7 @@ const Post = ({
     const replyText = replyTexts[commentId] || ''; // Đảm bảo replyText luôn là một chuỗi rỗng nếu undefined
     if (replyText.trim()) {
       const reply: CommentType = {
+        _id: uuidv4(), // Thêm `_id` bằng uuid
         _iduser: currentUserId,
         content: replyText,
         img: [],
@@ -132,6 +144,7 @@ const Post = ({
       }));
     }
   };
+  
 
   const handleNewCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewComment(event.target.value);
@@ -140,6 +153,7 @@ const Post = ({
   const handleSubmitNewComment = () => {
     if (newComment.trim()) {
       const comment: CommentType = {
+        _id: uuidv4(), // Thêm `_id` bằng uuid
         _iduser: currentUserId,
         content: newComment,
         img: [],
@@ -230,11 +244,50 @@ const Post = ({
     handleShareDialogClose();
   };
 
+  const handleOpenImageViewer = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsImageViewerOpen(true);
+  };
+  
+  // Hàm đóng Dialog
+  const handleCloseImageViewer = () => {
+    setIsImageViewerOpen(false);
+  };
+  
+  // Hàm chuyển sang ảnh trước
+  const handlePreviousImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? post.listPhoto.length - 1 : prevIndex - 1));
+  };
+  
+  // Hàm chuyển sang ảnh tiếp theo
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex === post.listPhoto.length - 1 ? 0 : prevIndex + 1));
+  };
+
+  const handleNavigateToOriginalPost = async (sharedPostId: string | null) => {
+    if (!sharedPostId) return; 
+
+    try {
+      // Gọi API để lấy dữ liệu bài viết gốc
+      const response = await axios.get(`http://localhost:3000/v1/article/${sharedPostId}`);
+      const articleData = response.data;
+
+      // Điều hướng đến bài viết gốc và truyền articleData vào state
+      navigate(`/new-feeds/${sharedPostId}`, { state: { article: articleData } });
+    } catch (error) {
+      console.error('Lỗi khi lấy bài viết gốc:', error);
+    }
+  };
+
   return (
     <Paper sx={{ padding: 2, marginBottom: 3, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
         <Box display="flex" alignItems="center">
-          <Avatar alt={post.createdBy ?? 'Anonymous'} src={post.createdBy?.avt || '/static/images/avatar/default.jpg'} sx={{ width: 48, height: 48 }} />
+        <Avatar 
+          alt={typeof post.createdBy === 'string' ? post.createdBy : 'Anonymous'} 
+          src={typeof post.createdBy?.avt === 'string' ? post.createdBy.avt : '/static/images/avatar/default.jpg'} 
+          sx={{ width: 48, height: 48 }} 
+        />
           <Box sx={{ marginLeft: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#333' }}>
               {post?.createdBy?.displayName}
@@ -257,7 +310,7 @@ const Post = ({
           handleOpenEditDialog={handleOpenEditDialog}
           handleOpenReportDialog={handleOpenReportDialog}
           handleDeletePost={handleDeletePost}
-          isOwner={post.createdBy === currentUserId || post.createdBy?._id === currentUserId}
+          isOwner={post.createdBy?._id === currentUserId}
         />
       </Box>
       <Divider sx={{ marginY: 2 }} />
@@ -267,9 +320,12 @@ const Post = ({
 
       {/* Hiển thị bài viết chia sẻ nếu có */}
       {post.sharedPostId && (
-        <ShareItemCard
-          sharedPostId={post.sharedPostId} // Truyền sharedPostId từ bài viết hiện tại
-        />
+        <Box
+          onClick={() => handleNavigateToOriginalPost(post.sharedPostId)} // Điều hướng đến bài viết gốc khi nhấn vào
+          sx={{ cursor: 'pointer' }} // Thay đổi con trỏ khi hover
+        >
+          <ShareItemCard sharedPostId={post.sharedPostId} />
+        </Box>
       )}
 
       <Box display="flex" flexWrap="wrap" gap={1} sx={{ marginBottom: 2 }}>
@@ -290,17 +346,110 @@ const Post = ({
       </Box>
 
       {post.listPhoto.length > 0 && (
-        <Box sx={{ marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {post.listPhoto.map((url, index) => (
-            <img
-              key={index}
-              src={url}
-              alt={`post-image-${index}`}
-              style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '8px', objectFit: 'cover' }}
-            />
-          ))}
-        </Box>
+        <>
+          <Box sx={{ marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {post.listPhoto.slice(0, 3).map((url, index) => (
+              <Box key={index} sx={{ position: 'relative', cursor: 'pointer' }} onClick={() => handleOpenImageViewer(index)}>
+                <img
+                  src={url}
+                  alt={`post-image-${index}`}
+                  style={{ width: '200px', height: '200px', borderRadius: '8px', objectFit: 'cover' }}
+                />
+                {/* Hiển thị lớp phủ +n nếu là ảnh thứ 3 và còn ảnh khác */}
+                {index === 2 && post.listPhoto.length > 3 && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Typography variant="h4" sx={{ color: '#fff' }}>
+                      +{post.listPhoto.length - 3}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            ))}
+          </Box>
+
+          {/* Dialog hiển thị từng ảnh */}
+          <Dialog open={isImageViewerOpen} onClose={handleCloseImageViewer} maxWidth="md" fullWidth>
+            <DialogTitle sx={{ textAlign: 'center', color: '#1976d2' }}>
+              Ảnh {currentImageIndex + 1} / {post.listPhoto.length}
+            </DialogTitle>
+            <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+              {/* Nút mũi tên trái */}
+              <IconButton
+                onClick={handlePreviousImage}
+                sx={{
+                  position: 'absolute',
+                  left: '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  color: '#fff',
+                  borderRadius: '50%',
+                  width: '48px',
+                  height: '48px',
+                  '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                {/* Sử dụng biểu tượng SVG mũi tên tùy chỉnh */}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 6L9 12L15 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </IconButton>
+
+              {/* Hình ảnh đang hiển thị */}
+              <img
+                src={post.listPhoto[currentImageIndex]}
+                alt={`view-image-${currentImageIndex}`}
+                style={{ maxWidth: '80%', maxHeight: '80%', borderRadius: '8px', objectFit: 'cover', transition: 'all 0.5s ease' }}
+              />
+
+              {/* Nút mũi tên phải */}
+              <IconButton
+                onClick={handleNextImage}
+                sx={{
+                  position: 'absolute',
+                  right: '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  color: '#fff',
+                  borderRadius: '50%',
+                  width: '48px',
+                  height: '48px',
+                  '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                {/* Sử dụng biểu tượng SVG mũi tên tùy chỉnh */}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 6L15 12L9 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </IconButton>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseImageViewer} sx={{ color: '#1976d2' }}>
+                Đóng
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
       )}
+
+
+
 
       <Divider sx={{ marginY: 2 }} />
 
@@ -375,7 +524,6 @@ const Post = ({
             replyTexts={replyTexts}
             replyInputs={replyInputs}
             handleSubmitReply={handleSubmitReply}
-            likedComments={likedComments}
             onLikeReply={handleLikeReply}
             currentUserId={currentUserId}
           />

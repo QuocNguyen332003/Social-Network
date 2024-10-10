@@ -59,11 +59,12 @@ const Register: React.FC = () => {
                 alignItems: 'center',
               }}
             >
-              <img src="./src/assets/images/logoSocialNetwork.png" alt="Logo" style={{ marginBottom: 16 }} /> {/* Thêm logo */}
+              <img src="./src/assets/images/QQ Social.png" alt="Logo" style={{ marginBottom: 16, maxWidth: '50%' }} /> {/* Thêm logo */}
               <Typography
                 component="h1"
                 variant="h5"
                 sx={{ fontWeight: 800, fontSize: 40 }}
+                
               >
                 Đăng ký
               </Typography>

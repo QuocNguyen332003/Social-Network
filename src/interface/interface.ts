@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // User Interface
 export interface User {
     _id: string;
@@ -38,6 +39,12 @@ export interface User {
     createdAt: Date;
     updatedAt: Date | null;
     _destroy: Date | null;
+  
+      // Thêm để không bị lỗi thôi (Bỏ qua phần này)
+    idUser: any;
+    state: any;
+    joinDate: string | number | Date;
+
 }
   
   // Conversation Interface
@@ -107,7 +114,7 @@ export interface Emoticon {
   
   export interface Comment {
     _id: string;
-    _iduser: string;
+    _iduser: User | string;
     content: string;
     img: string[];
     replyComment: Array<Comment>; // Đệ quy: bình luận có thể có các bình luận con
@@ -127,7 +134,7 @@ export interface Emoticon {
     // Article Interface
 export interface Article {
     _id: string;
-    createdBy: string, // Mã người tạo bài viết
+    createdBy: User, // Mã người tạo bài viết
     sharedPostId: string | null; // Mã bài viết gốc được chia sẻ (nếu có)
     idHandler: string | null;
     handleDate: Date | null;
@@ -146,6 +153,9 @@ export interface Article {
     createdAt: Date;
     updatedAt: Date;
     _destroy: Date | null;
+
+    //Dưới đây là những thứ không nằm trong database (thêm để tránh bị lỗi)
+    totalComments: number; // 
 }
   // Group Interface
   export interface Group {
@@ -161,6 +171,7 @@ export interface Article {
       count: number;
       listUsers: Array<{
         idUser: string;
+        state: 'accepted' | 'pending' | 'rejected';
         joinDate: string;
       }>;
     };
@@ -174,11 +185,20 @@ export interface Article {
     rule: string[];
     Administrators: Array<{
       idUser: string;
+      state: 'accepted' | 'pending' | 'rejected';
       joinDate: string;
     }>;
     hobbies: string[];
     createdAt: Date;
     updatedAt: Date;
     _destroy: Date;
+
+
+
+
+ // Thêm để không bị lỗi thôi (Bỏ qua phần  này)
+  userState?: string;
+  avtFile?: File;  // <-- Add these properties
+  backGroundFile?: File;  // <-- Add these properties
 }
   

@@ -90,9 +90,9 @@ const Login: React.FC = () => {
               }}
             >
               <img
-                src="./src/assets/images/logoSocialNetwork.png"
+                src="./src/assets/images/QQ Social.png"
                 alt="Logo"
-                style={{ marginBottom: 16, maxWidth: '100%' }}
+                style={{ marginBottom: 16, maxWidth: '50%' }}
               />
               {/* Đảm bảo logo có thể thu nhỏ */}
               <Typography component="h1" variant="h5" sx={{ fontWeight: 600 }}>

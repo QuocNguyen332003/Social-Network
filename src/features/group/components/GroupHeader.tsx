@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
+ 
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -14,18 +14,19 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
   Select,
   Checkbox,
   MenuItem,
   InputAdornment,
+  InputLabel,
+  FormControl,
+  OutlinedInput,
+  Chip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { Group } from '../../../interface/interface';
+import axios from 'axios';
 
-// Sample friends list
 const friends = [
   { id: '1', name: 'Alice', avatar: '/static/images/avatar/1.jpg' },
   { id: '2', name: 'Bob', avatar: '/static/images/avatar/2.jpg' },
@@ -34,52 +35,105 @@ const friends = [
 
 interface GroupHeaderProps {
   group: Group;
+  role: 'owner' | 'admin' | 'member' | 'none';
   onUpdateGroup: (updatedGroup: Group) => void;
 }
 
-const hobbiesOptions = ['Sports', 'Music', 'Travel', 'Technology', 'Reading', 'Art', 'Cooking'];
+const hobbiesOptions = ['Sports', 'Music', 'Travel', 'Technology', 'Reading', 'Art', 'Cooking', '223'];
 
-const GroupHeader: React.FC<GroupHeaderProps> = ({ group, onUpdateGroup }) => {
+const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup }) => {
+  const currentUserId = localStorage.getItem('userId') || '';
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
-  const [groupData, setGroupData] = useState<Group>(group);
+  const [editedGroup, setEditedGroup] = useState<Group>(group);
+  const [hobbies, setHobbies] = useState<string[]>(group.hobbies || []);
+  const [newHobby, setNewHobby] = useState<string>('');
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [avtPreview, setAvtPreview] = useState<string | undefined>(group.avt);
+  const [backGroundPreview, setBackGroundPreview] = useState<string | undefined>(group.backGround);
+
+  useEffect(() => {
+    if (group) {
+      setEditedGroup(group);
+      setHobbies(group.hobbies || []);
+      setAvtPreview(group.avt);
+      setBackGroundPreview(group.backGround);
+    }
+  }, [group]);
 
   const handleOpenEditDialog = () => setOpenEditDialog(true);
   const handleCloseEditDialog = () => setOpenEditDialog(false);
+
   const handleOpenInviteDialog = () => setOpenInviteDialog(true);
   const handleCloseInviteDialog = () => setOpenInviteDialog(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
-    setGroupData((prev) => ({ ...prev, [name]: value }));
+    setEditedGroup((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleGroupTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGroupData((prev) => ({ ...prev, type: event.target.value as 'public' | 'private' }));
-  };
-
-  const handleHobbiesChange = (event: any) => {
-    const { value } = event.target;
-    setGroupData((prev) => ({
-      ...prev,
-      hobbies: typeof value === 'string' ? value.split(',') : value,
-    }));
-  };
-
-  const handleSelectFriend = (friendId: string) => {
-    if (selectedFriends.includes(friendId)) {
-      setSelectedFriends((prev) => prev.filter((id) => id !== friendId));
-    } else {
-      setSelectedFriends((prev) => [...prev, friendId]);
+  const handleAddHobby = () => {
+    if (newHobby && !hobbies.includes(newHobby)) {
+      setHobbies([...hobbies, newHobby]);
+      setNewHobby('');
     }
   };
 
-  const handleUpdateGroup = () => {
-    onUpdateGroup(groupData);
-    handleCloseEditDialog();
+  const handleDeleteHobby = (hobbyToDelete: string) => {
+    setHobbies((prev) => prev.filter((hobby) => hobby !== hobbyToDelete));
   };
+
+  const handleSelectFriend = (friendId: string) => {
+    setSelectedFriends((prev) =>
+      prev.includes(friendId) ? prev.filter((id) => id !== friendId) : [...prev, friendId]
+    );
+  };
+
+  const handleUpdateGroup = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('userId', currentUserId);
+      formData.append('groupName', editedGroup.groupName);
+      formData.append('introduction', editedGroup.introduction);
+      formData.append('hobbies', hobbies.join(','));
+  
+      if (editedGroup.avtFile) formData.append('avt', editedGroup.avtFile);
+      if (editedGroup.backGroundFile) formData.append('backGround', editedGroup.backGroundFile);
+  
+      // Gửi yêu cầu cập nhật nhóm
+      const response = await axios.put(`http://localhost:3000/v1/group/${editedGroup._id}/edit`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      if (response.status === 200) {
+        onUpdateGroup(response.data.group);
+        alert('Nhóm đã được cập nhật thành công!');
+        handleCloseEditDialog();
+      }
+    } catch (error) {
+      console.error('Lỗi khi cập nhật nhóm:', error);
+      alert('Có lỗi xảy ra khi cập nhật nhóm!');
+    }
+  };
+  
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, imageType: 'avt' | 'backGround') => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const fileURL = URL.createObjectURL(file);
+      if (imageType === 'avt') {
+        setEditedGroup((prev) => ({ ...prev, avtFile: file }));
+        setAvtPreview(fileURL);
+      } else if (imageType === 'backGround') {
+        setEditedGroup((prev) => ({ ...prev, backGroundFile: file }));
+        setBackGroundPreview(fileURL);
+      }
+    }
+  };
+  
 
   const handleSendInvitations = () => {
     console.log('Inviting friends:', selectedFriends);
@@ -94,7 +148,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, onUpdateGroup }) => {
     <Box
       sx={{
         position: 'relative',
-        backgroundImage: `url(${group.avt})`,
+        backgroundImage: `url(${group.backGround})`,
         height: '280px', // Increased height for better view
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -131,80 +185,142 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, onUpdateGroup }) => {
       </Box>
 
       {/* Buttons */}
-      <Box sx={{ position: 'absolute', top: '16px', right: '20px', display: 'flex', alignItems: 'center' }}>
-        <Button variant="contained" sx={{ marginRight: '12px', padding: '10px 20px' }} onClick={handleOpenEditDialog}>
-          Chỉnh sửa nhóm
-        </Button>
-      </Box>
+      {role === 'owner' && (
+        <Box sx={{ position: 'absolute', top: '16px', right: '20px', display: 'flex', alignItems: 'center' }}>
+          <Button variant="contained" sx={{ marginRight: '12px', padding: '10px 20px' }} onClick={handleOpenEditDialog}>
+            Chỉnh sửa nhóm
+          </Button>
+        </Box>
+      )}
 
       <Box sx={{ position: 'absolute', top: '220px', right: '20px', display: 'flex', alignItems: 'center' }}>
         <Button variant="contained" sx={{ marginRight: '12px', padding: '10px 20px' }} onClick={handleOpenInviteDialog}>
           Mời thành viên
         </Button>
-        <Button variant="contained" sx={{ padding: '10px 20px' }}>Chia sẻ</Button>
       </Box>
 
-      {/* Edit Group Dialog */}
-      <Dialog
-        open={openEditDialog}
-        onClose={handleCloseEditDialog}
-        PaperProps={{
-          sx: { borderRadius: '15px', padding: '20px', maxWidth: '550px', boxShadow: '0px 5px 25px rgba(0, 0, 0, 0.2)' },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '24px' }}>Chỉnh sửa nhóm</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="Tên nhóm"
-            variant="outlined"
-            name="groupName"
-            value={groupData.groupName}
-            onChange={handleInputChange}
-            sx={{ mb: 3 }}
-          />
-          <TextField
-            fullWidth
-            label="Giới thiệu"
-            variant="outlined"
-            name="introduction"
-            multiline
-            rows={3}
-            value={groupData.introduction}
-            onChange={handleInputChange}
-            sx={{ mb: 3 }}
-          />
+       {/* Edit Group Dialog */}
+        <Dialog
+          open={openEditDialog}
+          onClose={handleCloseEditDialog}
+          PaperProps={{
+            sx: { borderRadius: '12px', padding: '16px', maxWidth: '500px', boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)' },
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center', pb: 0 }}>Chỉnh sửa nhóm</DialogTitle>
+          <DialogContent>
+            {/* Tên nhóm */}
+            <TextField
+              fullWidth
+              label="Tên nhóm"
+              variant="outlined"
+              name="groupName"
+              value={editedGroup.groupName}
+              onChange={handleInputChange}
+              sx={{ mb: 2, mt: 2 }}
+              InputProps={{
+                sx: {
+                  borderRadius: '8px',
+                  backgroundColor: '#f9f9f9',
+                },
+              }}
+            />
 
-          <RadioGroup value={groupData.type} onChange={handleGroupTypeChange} row>
-            <FormControlLabel value="public" control={<Radio />} label="Công khai" />
-            <FormControlLabel value="private" control={<Radio />} label="Riêng tư" />
-          </RadioGroup>
+            {/* Giới thiệu nhóm */}
+            <TextField
+              fullWidth
+              label="Giới thiệu"
+              variant="outlined"
+              name="introduction"
+              multiline
+              rows={3}
+              value={editedGroup.introduction}
+              onChange={handleInputChange}
+              sx={{ mb: 2 }}
+              InputProps={{
+                sx: {
+                  borderRadius: '8px',
+                  backgroundColor: '#f9f9f9',
+                },
+              }}
+            />
 
-          <Select
-            fullWidth
-            multiple
-            value={groupData.hobbies}
-            onChange={handleHobbiesChange}
-            renderValue={(selected) => selected.join(', ')}
-            sx={{ mb: 3 }}
-          >
-            {hobbiesOptions.map((hobby) => (
-              <MenuItem key={hobby} value={hobby}>
-                <Checkbox checked={groupData.hobbies.indexOf(hobby) > -1} />
-                <ListItemText primary={hobby} />
-              </MenuItem>
+            {/* Tải ảnh đại diện và ảnh nền */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Button variant="contained" component="label">
+                Chọn ảnh đại diện
+                <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, 'avt')} />
+              </Button>
+              <Button variant="contained" component="label">
+                Chọn ảnh nền
+                <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, 'backGround')} />
+              </Button>
+            </Box>
+
+            {/* Hiển thị ảnh đại diện và ảnh nền */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              {avtPreview && (
+                <Box sx={{ border: '1px solid #ddd', borderRadius: '8px', p: 1 }}>
+                  <Typography textAlign="center" fontSize="14px" fontWeight="bold">
+                    Ảnh đại diện
+                  </Typography>
+                  <img src={avtPreview} alt="Avatar" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                </Box>
+              )}
+
+              {backGroundPreview && (
+                <Box sx={{ border: '1px solid #ddd', borderRadius: '8px', p: 1, ml: 2 }}>
+                  <Typography textAlign="center" fontSize="14px" fontWeight="bold">
+                    Ảnh nền
+                  </Typography>
+                  <img src={backGroundPreview} alt="Background" style={{ width: '200px', height: '100px', borderRadius: '8px' }} />
+                </Box>
+              )}
+            </Box>
+              
+            {/* Lựa chọn sở thích với danh sách hiện tại */}
+            <Box sx={{ mb: 2 }}>
+            {hobbies.map((hobby) => (
+              <Chip
+                key={hobby}
+                label={hobby}
+                onDelete={() => handleDeleteHobby(hobby)}
+                sx={{ margin: '5px' }}
+              />
             ))}
-          </Select>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center' }}>
-          <Button onClick={handleCloseEditDialog} variant="outlined" sx={{ borderRadius: '10px', px: 4 }}>
-            Hủy
-          </Button>
-          <Button variant="contained" onClick={handleUpdateGroup} sx={{ px: 4 }}>
-            Cập nhật nhóm
-          </Button>
-        </DialogActions>
-      </Dialog>
+          </Box>
+            {/* Lựa chọn sở thích */}
+            {/* Chọn sở thích mới */}
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="hobbies-label">Thêm sở thích</InputLabel>
+              <Select
+                labelId="hobbies-label"
+                value={newHobby}
+                onChange={(e) => setNewHobby(e.target.value)}
+                input={<OutlinedInput label="Thêm sở thích" />}
+              >
+                {hobbiesOptions.map((hobby) => (
+                  <MenuItem key={hobby} value={hobby}>
+                    {hobby}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Button variant="outlined" sx={{ mt: 1 }} onClick={handleAddHobby}>
+                Thêm sở thích
+              </Button>
+            </FormControl>
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: 'center', mt: 1 }}>
+            <Button onClick={handleCloseEditDialog} variant="outlined" sx={{ borderRadius: '8px', px: 3 }}>
+              Hủy
+            </Button>
+            <Button variant="contained" onClick={handleUpdateGroup} sx={{ backgroundColor: '#1976d2', borderRadius: '8px', px: 3 }}>
+              Cập nhật nhóm
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+
 
       {/* Invite Friends Dialog */}
       <Dialog

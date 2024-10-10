@@ -1,21 +1,49 @@
 import React, { useState } from 'react';
-import { Box, Typography, List, ListItem, ListItemText, Avatar, Divider, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, IconButton, Menu, MenuItem } from '@mui/material';
+import {
+  Box,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Avatar,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
+  IconButton,
+  Menu,
+  MenuItem
+} from '@mui/material';
 import { Add, MoreHoriz } from '@mui/icons-material';
 import { User } from '../../../interface/interface';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface SavedSidebarProps {
-  user: User;
+  user: User | null;
   onSelectCollection: (collectionId: string | null) => void;
-  setUser: React.Dispatch<React.SetStateAction<User>>; // Add setUser prop to update user
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, setUser }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // State for menu anchor
-  const [editingCollection, setEditingCollection] = useState<string | null>(null); // State to track editing collection
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [editingCollection, setEditingCollection] = useState<string | null>(null);
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (collectionId: string | null = null) => {
+    if (collectionId) {
+      const collection = user?.collections.find(col => col._id === collectionId);
+      if (collection) {
+        setNewCollectionName(collection.name); // Set tên bộ sưu tập đang được chỉnh sửa
+        setEditingCollection(collectionId); // Cập nhật bộ sưu tập đang chỉnh sửa
+      }
+    } else {
+      setNewCollectionName(''); // Reset tên cho bộ sưu tập mới
+      setEditingCollection(null); // Reset trạng thái chỉnh sửa
+    }
     setOpenDialog(true);
   };
 
@@ -24,120 +52,157 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
     setNewCollectionName('');
   };
 
-  const handleCreateCollection = () => {
-    if (newCollectionName.trim()) {
-      const newCollection = {
-        _id: `collection${user.collections.length + 1}`,
-        name: newCollectionName,
-        items: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        _destroy: new Date(),
-      };
+  const handleCreateCollection = async () => {
+    if (newCollectionName.trim() && user) {
+      try {
+        const response = await axios.post('http://localhost:3000/v1/saved', {
+          userId: user._id,
+          name: newCollectionName
+        });
 
-      user.collections.push(newCollection);
-      setUser({ ...user }); // Cập nhật user với bộ sưu tập mới
-      handleCloseDialog();
+        const { collection } = response.data;
+        setUser((prevUser) =>
+          prevUser ? { ...prevUser, collections: [...prevUser.collections, collection] } : prevUser
+        );
+        handleCloseDialog();
+        toast.success('Bộ sưu tập đã được tạo thành công!');
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          toast.error(`Error while calling API: ${error.message}`);
+        } else {
+          toast.error('Unknown error occurred!');
+        }
+      }
     }
   };
 
-  const handleSavedClick = () => {
-    onSelectCollection(null);
+  const handleEditCollection = async () => {
+    if (editingCollection && newCollectionName.trim() && user) {
+      try {
+        await axios.put(`http://localhost:3000/v1/saved/${editingCollection}`, {
+          userId: user._id,
+          newName: newCollectionName
+        });
+
+        const updatedCollections = user.collections.map(col => {
+          if (col._id === editingCollection) {
+            return { ...col, name: newCollectionName };
+          }
+          return col;
+        });
+        setUser({ ...user, collections: updatedCollections });
+        handleCloseDialog();
+        toast.success('Bộ sưu tập đã được chỉnh sửa thành công!');
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          toast.error(`Error while editing collection: ${error.message}`);
+        } else {
+          toast.error('Unknown error occurred!');
+        }
+      }
+    }
   };
 
-  // Mở menu
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>, collectionId: string) => {
     setAnchorEl(event.currentTarget);
-    setEditingCollection(collectionId); // Set bộ sưu tập đang được chọn
+    setEditingCollection(collectionId);
   };
 
-  // Đóng menu
   const handleMenuClose = () => {
     setAnchorEl(null);
     setEditingCollection(null);
   };
 
-  // Xử lý việc xóa bộ sưu tập
-  const handleDeleteCollection = () => {
-    if (editingCollection) {
-      const updatedCollections = user.collections.filter(col => col._id !== editingCollection);
-      setUser({ ...user, collections: updatedCollections });
-      onSelectCollection(null); // Xoá xong thì trở về hiển thị tất cả các bài viết
-      handleMenuClose();
+  const handleDeleteCollection = async () => {
+    if (editingCollection && user) {
+      try {
+        await axios.patch(`http://localhost:3000/v1/saved/${editingCollection}/delete`, {
+          userId: user._id
+        });
+
+        const updatedCollections = user.collections.map(col => {
+          if (col._id === editingCollection) {
+            return { ...col, _destroy: new Date() }; // Đánh dấu bộ sưu tập là đã xóa
+          }
+          return col;
+        });
+
+        setUser({ ...user, collections: updatedCollections });
+        onSelectCollection(null);
+        handleMenuClose();
+        toast.success('Bộ sưu tập đã được xóa thành công!');
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          toast.error(`${error.message}`);
+        } else {
+          toast.error('Lỗi không xác định');
+        }
+      }
     }
   };
 
-  // Chỉnh sửa tên bộ sưu tập
-  const handleEditCollection = () => {
-    const updatedCollections = user.collections.map(col => {
-      if (col._id === editingCollection && newCollectionName.trim()) {
-        return { ...col, name: newCollectionName };
-      }
-      return col;
-    });
-    setUser({ ...user, collections: updatedCollections });
-    handleCloseDialog();
-    handleMenuClose();
-  };
-
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: { xs: 2, sm: 3 }, gap: 2, backgroundColor: '#fafafa' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', color: '#1e88e5', fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
-          Đã lưu
-        </Typography>
-      </Box>
-
-      <List>
-        <ListItem button sx={{ borderRadius: 2, backgroundColor: '#e3f2fd', padding: { xs: 1, sm: 1.5 }, display: 'flex', alignItems: 'center', gap: 2 }} onClick={handleSavedClick}>
-          <Avatar sx={{ backgroundColor: '#1e88e5', width: { xs: 24, sm: 32 }, height: { xs: 24, sm: 32 } }} />
-          <ListItemText primary="Mục đã lưu" sx={{ color: '#424242', fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1rem' } }} />
-        </ListItem>
-      </List>
-
-      <Divider sx={{ my: 2 }} />
-
-      <Typography variant="subtitle1" color="gray" sx={{ fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-        Bộ sưu tập của tôi
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: { xs: 2, sm: 3 }, gap: 2, backgroundColor: '#fafafa', fontFamily: 'Arial, sans-serif' }}>
+      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1e88e5', fontSize: { xs: '1.2rem', sm: '1.4rem' }, marginBottom: 1 }}>
+        Bộ Sưu Tập Của Tôi
       </Typography>
+
       <List sx={{ gap: 1, display: 'flex', flexDirection: 'column' }}>
-        {user.collections.map((collection, index) => (
+        {user?.collections.filter(col => !col._destroy).map((collection, index) => (
           <ListItem
             button
             key={index}
-            sx={{ borderRadius: 2, backgroundColor: '#f5f5f5', padding: { xs: 1, sm: 1.5 }, display: 'flex', alignItems: 'center', gap: 2 }}
-            onClick={() => onSelectCollection(collection._id)}
+            sx={{
+              borderRadius: 2,
+              backgroundColor: collection._id === editingCollection ? '#BBDEFB' : '#f5f5f5',
+              padding: { xs: 1, sm: 1.5 },
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              '&:hover': { backgroundColor: '#e3f2fd' }
+            }}
+            onClick={() => {
+              onSelectCollection(collection._id);
+              setEditingCollection(collection._id);
+            }}
           >
-            <Avatar alt={collection.name} src={`/static/images/${collection.name.toLowerCase()}.jpg`} sx={{ width: { xs: 24, sm: 32 }, height: { xs: 24, sm: 32 } }} />
-            <ListItemText primary={collection.name} sx={{ color: '#424242', fontSize: { xs: '0.9rem', sm: '1rem' } }} />
-            <IconButton onClick={(e) => { e.stopPropagation(); handleMenuClick(e, collection._id); }}>
-              <MoreHoriz />
-            </IconButton>
+            <Avatar alt={collection.name} sx={{ width: { xs: 24, sm: 32 }, height: { xs: 24, sm: 32 } }} />
+            <ListItemText 
+              primary={collection.name} 
+              sx={{ 
+                color: '#424242', 
+                fontSize: { xs: '0.9rem', sm: '1rem' }, 
+                fontWeight: '500' 
+              }} 
+            />
+            {collection.name !== 'Tất cả mục đã lưu' && (
+              <IconButton onClick={(e) => { e.stopPropagation(); handleMenuClick(e, collection._id); }}>
+                <MoreHoriz />
+              </IconButton>
+            )}
           </ListItem>
         ))}
       </List>
 
-      <Button variant="contained" sx={{ width: '100%', padding: { xs: 1, sm: 1.5 }, borderRadius: 3, backgroundColor: '#1e88e5', fontSize: { xs: '0.9rem', sm: '1rem' }, ':hover': { backgroundColor: '#1565c0' } }} startIcon={<Add />} onClick={handleOpenDialog}>
-        Tạo bộ sưu tập mới
+      <Button variant="contained" sx={{ width: '100%', padding: { xs: 1, sm: 1.5 }, borderRadius: 3, backgroundColor: '#1e88e5', fontSize: { xs: '0.9rem', sm: '1rem' }, ':hover': { backgroundColor: '#1565c0' } }} startIcon={<Add />} onClick={() => handleOpenDialog()}>
+        Tạo Bộ Sưu Tập Mới
       </Button>
 
-      {/* Dialog tạo bộ sưu tập mới */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>{editingCollection ? 'Chỉnh sửa bộ sưu tập' : 'Tạo bộ sưu tập mới'}</DialogTitle>
+        <DialogTitle>{editingCollection ? 'Chỉnh Sửa Bộ Sưu Tập' : 'Tạo Bộ Sưu Tập Mới'}</DialogTitle>
         <DialogContent>
-          <TextField autoFocus margin="dense" label="Tên bộ sưu tập" fullWidth value={newCollectionName} onChange={(e) => setNewCollectionName(e.target.value)} />
+          <TextField autoFocus margin="dense" label="Tên Bộ Sưu Tập" fullWidth value={newCollectionName} onChange={(e) => setNewCollectionName(e.target.value)} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Hủy</Button>
           <Button onClick={editingCollection ? handleEditCollection : handleCreateCollection} variant="contained">
-            {editingCollection ? 'Chỉnh sửa' : 'Tạo'}
+            {editingCollection ? 'Chỉnh Sửa' : 'Tạo'}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Menu hiển thị khi bấm dấu ba chấm */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem onClick={handleOpenDialog}>Chỉnh sửa</MenuItem>
+        <MenuItem onClick={() => { handleOpenDialog(editingCollection); }}>Chỉnh Sửa</MenuItem>
         <MenuItem onClick={handleDeleteCollection} style={{ color: 'red' }}>Xóa</MenuItem>
       </Menu>
     </Box>
