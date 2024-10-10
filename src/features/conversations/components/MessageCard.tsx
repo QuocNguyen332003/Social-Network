@@ -1,19 +1,45 @@
 import { Box, Typography} from "@mui/material";
-import { DataChatListProps } from "../containers/useChatList";
+import { CardConversationAPI } from "../containers/interfaceMessage";
+
 interface MessageCardProps {
-    dataCard: DataChatListProps;
+    dataCard: CardConversationAPI;
     onClick: () => void;
   }
 
 const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
+  const currentUserId = localStorage.getItem('userId') || '';
 
-  if (!dataCard || !dataCard.sendDate) {
+  if (!dataCard || dataCard.content === null) {
     return null;
   }
-  const formattedDate = dataCard.sendDate.toLocaleDateString('en-US', {
-    month: 'long', 
-    day: 'numeric'
-  });
+
+  const lastContent = dataCard.content;
+  let formattedDate;
+
+  if (lastContent.sendDate) {
+    // Chuyển đổi sendDate thành Date nếu cần
+    const sendDate = new Date(lastContent.sendDate);
+    if (!isNaN(sendDate.getTime())) { // Kiểm tra nếu sendDate là một đối tượng Date hợp lệ
+        formattedDate = sendDate.toLocaleDateString('en-US', {
+            month: 'long', 
+            day: 'numeric'
+        });
+    } else {
+        formattedDate = 'Invalid Date'; // Xử lý trường hợp không hợp lệ
+    }
+  } else {
+      formattedDate = 'No Date Available'; // Xử lý trường hợp không có sendDate
+  }
+
+  const isRead = (() => {
+    if (lastContent.userId === currentUserId) {
+        return true;
+    } else if (lastContent.viewDate !== null) {
+        return true;
+    }
+    return false;
+  })();
+
 
   return (
     <button 
@@ -25,6 +51,7 @@ const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
       borderBottom: "1px solid #e0e0e0",
       cursor: "pointer",
       transition: "background-color 0.3s ease",
+      borderRadius: 10,
     }}
     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#fff"}
@@ -36,15 +63,15 @@ const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
         <Box
           sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 10px'}}>
           <img
-            src= {dataCard.avt}
+            src= {dataCard.dataUser[0].avt[dataCard.dataUser[0].avt.length - 1]}
             alt="Ảnh đại diện"
             style={{width: '30px', height: '30px', borderRadius: 50 }}
           />
         </Box>
         <Box sx={{width: '100%'}}>
             <Box display='flex' justifyContent='space-between'>
-                <Typography variant="subtitle2" component="h2" fontWeight={dataCard.isRead? 'regular': 'bold'}>
-                    {dataCard.name}
+                <Typography variant="subtitle2" component="h2" fontWeight={isRead? 'regular': 'bold'}>
+                    {dataCard.dataUser[0].name}
                 </Typography>
                 <Typography variant="subtitle2" component="h2" color='#333' fontWeight='regular'>
                     {formattedDate}
@@ -60,11 +87,11 @@ const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
                   WebkitBoxOrient: "vertical",
                   textAlign: "left",
                   fontSize: 12,
-                }, dataCard.isRead? {}: {fontWeight: 'bold'}]}
+                }, isRead? {}: {fontWeight: 'bold'}]}
               >
-              {dataCard.lastMessage.message}
+              {lastContent.message.data}
               </Typography>
-                {!dataCard.isRead && <div style={{width: '8px', height: '8px', backgroundColor: 'black', borderRadius: 50}}/>}
+                {!isRead && <div style={{width: '8px', height: '8px', backgroundColor: 'black', borderRadius: 50}}/>}
             </Box>
         </Box>
     </Box>

@@ -1,17 +1,29 @@
 import { Box, Button, IconButton, TextField } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import { useState } from "react";
+import { Content } from "../interfaceMessage";
 
 interface MessageInputProps{
-  sendMessage: (type: string, data: string, userID: string) => void;
-  userID: string;
+  idConversation: string;
+  sendMessage: (idConversation: string, content: Content) => void;
 }
 
-const MessageInput = ({sendMessage, userID}: MessageInputProps) => {
+const MessageInput = ({idConversation, sendMessage}: MessageInputProps) => {
+  const currentUserId = localStorage.getItem('userId') || '';
   const [text, setText] = useState<string>("");
+
   const handlePressSend = () => {
     if (text != ""){
-      sendMessage("text", text, userID);
+      const newContent : Content = {
+        userId: currentUserId,
+        message: {
+          type: 'text', 
+          data: text
+        },
+        sendDate: new Date(),
+        viewDate: null
+      }
+      sendMessage(idConversation, newContent);
       setText("");
     }
   }

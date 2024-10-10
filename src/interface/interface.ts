@@ -28,8 +28,8 @@ export interface User {
       name: string;
       items: string[];
       createdAt: Date;
-      updatedAt: Date;
-      _destroy: Date;
+      updatedAt: Date | null;
+      _destroy: Date | null;
     }>;
     groups: string[];
     backGround: string[];
@@ -37,25 +37,20 @@ export interface User {
     hobbies: string[];
     listArticle: string[];
     createdAt: Date;
-    updatedAt: Date;
-    _destroy: Date;
-
-
-
-    // Thêm để không bị lỗi thôi (Bỏ qua phần này)
+    updatedAt: Date | null;
+    _destroy: Date | null;
+  
+      // Thêm để không bị lỗi thôi (Bỏ qua phần này)
     idUser: any;
     state: any;
     joinDate: string | number | Date;
+
 }
-  
   
   // Conversation Interface
 export interface Conversation {
     _id: string;
-    _user: {
-      user1: string;
-      user2: string;
-    };
+    _user: string[];
     content: Array<{
       userId: string;
       message: {
@@ -63,6 +58,7 @@ export interface Conversation {
         data: string;
       };
       sendDate: Date;
+      viewDate: Date | null;
     }>;
 }
   
@@ -71,8 +67,9 @@ export interface AddFriends {
     senderId: string;
     receiverId: string;
     status: 'accepted' | 'pending' | 'rejected';
+    message: string;
     createdAt: Date;
-    acceptedAt?: Date;
+    acceptedAt: Date | null;
 }
   
   // Notification Interface
@@ -93,7 +90,7 @@ export interface Hobby {
     name: string;
     createdAt: Date;
     updatedAt: Date;
-    _destroy?: Date;
+    _destroy: Date | null;
 }
   
   // MyPhoto Interface
