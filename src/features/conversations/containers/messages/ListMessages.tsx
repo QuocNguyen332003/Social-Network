@@ -2,11 +2,11 @@ import { Search } from "@mui/icons-material";
 import { Box, IconButton, TextField, Typography } from "@mui/material";
 import ButtonCreateMessage from "../../components/ButtonCreateMessage";
 import ChatList from "./ChatList";
-import { DataChatListProps } from "../useChatList";
+import { CardConversationAPI } from "../interfaceMessage";
 
 export type ListMessagesProps = {
-  data: DataChatListProps[];
-  changeChat: (userID: string) => void;
+  data: CardConversationAPI[];
+  changeChat: (userID: string, _idConversation: string) => void;
 }
 
 const ListMesssages = ({data, changeChat} : ListMessagesProps) => {
@@ -17,6 +17,7 @@ const ListMesssages = ({data, changeChat} : ListMessagesProps) => {
         border: '1px solid #e0e0e0',
         padding: '20px',
         backgroundColor: 'white',
+        borderRadius: 3,
       }}
     >
         <Box 

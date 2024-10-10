@@ -1,32 +1,23 @@
 import { Box, Grid } from "@mui/material";
 import ListMesssages from "./messages/ListMessages";
 import Conversations from "./conversations/Conversations";
-import { useConversations } from "./useConversations";
 import { useChatList } from "./useChatList";
 import { useMessage } from "./useMessage";
-import { useEffect } from "react";
 import { MessageProps } from "./Messages";
+import { Content } from "./interfaceMessage";
 
 const App = ({userIDStart}: MessageProps) => {  
-  const myAvt = "src/assets/images/avt.png";
-  const {dataConversation, chooseFriendChat, addNewMessage} = useConversations();
-  const {data, readMessage} = useChatList();
-  const {userChat, changeUserChat} = useMessage(data);
+  const {data,setValueMessageList, readMessage} = useChatList();
+  const {conversation, changeUserChat, sendNewMessage} = useMessage(userIDStart);
 
-  useEffect(()=> {
-    if (userIDStart != ""){
-      changeChat(userIDStart);
-    }
-  }, []);
-
-  const changeChat = (userID: string) => {
-    readMessage(userID);
-    chooseFriendChat(userID);
+  const changeChat = (userID: string, _idConversation: string) => {
+    readMessage(_idConversation);
     changeUserChat(userID);
   }
 
-  const sendMessage = (type: string, data: string, userID: string) => {
-    addNewMessage(type, data, userID);
+  const sendMessage = (idConversation: string, content: Content) => {
+    setValueMessageList(idConversation, content);
+    sendNewMessage(idConversation, content);
   }
   return (
     <Box 
@@ -42,8 +33,8 @@ const App = ({userIDStart}: MessageProps) => {
           <ListMesssages data={data} changeChat={changeChat}/>
         </Grid>
         <Grid item xs={8}>
-          <Conversations dataConversation={dataConversation} myAvt={myAvt} userChat={userChat}
-           sendMessage={sendMessage}/>
+          <Conversations conversation={conversation}
+          sendMessage={sendMessage}/>
         </Grid>
       </Grid>
     </Box>

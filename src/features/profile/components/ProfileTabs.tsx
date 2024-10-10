@@ -12,7 +12,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ userID }) => {
 
   const tabMap: { [key: string]: number } = {
     '': 0,
-    'user-collection': 1,
+    'personal-collection': 1,
   };
 
   const currentTab = tabMap[location.pathname.split('/').pop() || ''] || 0; 

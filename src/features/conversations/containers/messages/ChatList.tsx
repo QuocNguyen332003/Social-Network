@@ -12,10 +12,10 @@ const BorderButton = styled(Button)<ButtonProps>(() => ({
   }));
 
 const ChatList = ({data, changeChat} : ListMessagesProps) => {
-  
+  const currentUserId = localStorage.getItem('userId') || '';
 
-  const clickChatList = (userID: string) => {
-    changeChat(userID);
+  const clickChatList = (userID: string, _idConversation: string) => {
+    changeChat(userID, _idConversation);
   }
   return (
     <Box 
@@ -34,9 +34,13 @@ const ChatList = ({data, changeChat} : ListMessagesProps) => {
             },
           }}>
           {data.map((item)=> 
-            <MessageCard dataCard={item} onClick={() => {clickChatList(item.userID)}}/>)}
+            <MessageCard dataCard={item} onClick={() => {
+              const friendID = item.dataUser.find((userData) => currentUserId.toString() !== userData.userID);
+              if (friendID !== undefined){
+                clickChatList(friendID?.userID, item._id)
+              }
+              }}/>)}
         </Box>
-
     </Box>
   );
 }
