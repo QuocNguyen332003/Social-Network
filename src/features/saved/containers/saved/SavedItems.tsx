@@ -11,12 +11,19 @@ const SavedItems = () => {
   const [user, setUser] = useState<User | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const currentUserId = localStorage.getItem('userId') || '';
+  const token = localStorage.getItem('token'); // Lấy token từ localStorage
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (currentUserId) {
         try {
-          const response = await axios.get(`http://localhost:3000/v1/user/${currentUserId}`);
+          const response = await axios.get(`http://localhost:3000/v1/user/${currentUserId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Thêm token vào header
+              },
+            }
+          );
           setUser(response.data);
         } catch (error: unknown) {
           if (axios.isAxiosError(error)) {
@@ -35,7 +42,13 @@ const SavedItems = () => {
     const fetchArticles = async () => {
       if (selectedCollectionId && user) {
         try {
-          const response = await axios.get(`http://localhost:3000/v1/user/${currentUserId}/collections/${selectedCollectionId}/articles`);
+          const response = await axios.get(`http://localhost:3000/v1/user/${currentUserId}/collections/${selectedCollectionId}/articles`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Thêm token vào header
+              },
+            }
+          );
           setArticles(response.data);
         } catch (error: unknown) {
           if (axios.isAxiosError(error)) {

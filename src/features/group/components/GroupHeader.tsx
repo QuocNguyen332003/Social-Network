@@ -42,6 +42,7 @@ interface GroupHeaderProps {
 const hobbiesOptions = ['Sports', 'Music', 'Travel', 'Technology', 'Reading', 'Art', 'Cooking', '223'];
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup }) => {
+  const token = localStorage.getItem('token'); // Lấy token từ localStorage
   const currentUserId = localStorage.getItem('userId') || '';
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
@@ -105,6 +106,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
       const response = await axios.put(`http://localhost:3000/v1/group/${editedGroup._id}/edit`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`, // Thêm token vào header
         },
       });
   

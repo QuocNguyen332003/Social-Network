@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {useEffect, useState } from "react"
 import { Content, ConversationAPI, DataUser } from "./interfaceMessage";
 import axios from "axios";
 
 export const useMessage = (friendID: string) => {
+  const token = localStorage.getItem('token');
     const currentUserId = localStorage.getItem('userId') || '';
     const [conversation, setConversation] = useState<ConversationAPI | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +21,13 @@ export const useMessage = (friendID: string) => {
     const fetchMessagesWithFriend = async (changeID: string) => {
         setIsLoading(true); 
         try {
-          const response = await axios.get(`http://localhost:3000/v1/messages/${currentUserId}/${changeID}`);
+          const response = await axios.get(`http://localhost:3000/v1/messages/${currentUserId}/${changeID}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Thêm token vào header
+              },
+            }
+          );
           setConversation(response.data);
         } catch (error) {
           console.error('Lỗi khi lấy bài viết:', error);
@@ -56,6 +64,7 @@ export const useMessage = (friendID: string) => {
             {
               headers: {
                 'Content-Type': 'application/json',
+                 Authorization: `Bearer ${token}` 
               },
             }
           );
@@ -74,11 +83,17 @@ export const useMessage = (friendID: string) => {
                     friendID: idFriend,
                     message: content
                  },
+                 {
+                  headers: {
+                    Authorization: `Bearer ${token}`, // Thêm token vào header
+                  },
+                }
             );
             setConversation(response.data);
           } catch (error) {
             console.error('Lỗi khi lấy bài viết:', error);
           } finally {
+            console.error('Lỗi khi lấy bài viết:', error);
           }
     }
 

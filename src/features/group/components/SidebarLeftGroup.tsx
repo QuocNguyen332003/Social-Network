@@ -39,6 +39,7 @@ import axios from 'axios'; // Thêm axios để gọi API
 
 const SidebarLeftGroup = () => {
   const navigate = useNavigate();
+  const token = localStorage.getItem('token'); // Lấy token từ localStorage
   const [selectedTab, setSelectedTab] = useState('');
   const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
   const [hobbiesOptions] = useState(['Sports', 'Music', 'Travel', 'Reading', 'Movies']);
@@ -133,6 +134,7 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
       const response = await axios.post('http://localhost:3000/v1/group/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`, // Thêm token vào header
         },
       });
   

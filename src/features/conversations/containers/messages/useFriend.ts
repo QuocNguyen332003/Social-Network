@@ -8,6 +8,7 @@ export interface UserWithoutChat {
     userName: string;
   }
 const useFriend = () => {
+    const token = localStorage.getItem('token');
     const currentUserId = localStorage.getItem('userId') || '';
     const [usersWithoutChat, setUsersWithoutChat] = useState<UserWithoutChat[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -15,7 +16,13 @@ const useFriend = () => {
     const getDataUserWithoutChat = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get(`http://localhost:3000/v1/messages/friends/newchat/${currentUserId}`);
+            const response = await axios.get(`http://localhost:3000/v1/messages/friends/newchat/${currentUserId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`, // Thêm token vào header
+                },
+              }
+            );
             setUsersWithoutChat(response.data);
           } catch (error) {
             console.error('Lỗi:', error);

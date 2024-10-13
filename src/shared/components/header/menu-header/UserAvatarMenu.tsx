@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { IconButton, Avatar, Menu, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import axios để gọi API
+import { toast } from 'react-toastify'; // Optional: Sử dụng toast để hiển thị thông báo
 
 const userID = "u123";
 
@@ -19,6 +21,38 @@ const UserAvatarMenu = () => {
   const handleMenuClick = (path: string) => {
     handleCloseAvatarMenu();
     navigate(path);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Token không tồn tại. Vui lòng đăng nhập lại.');
+        return navigate('/login');
+      }
+
+      await axios.post('http://localhost:3000/v1/auth/logout', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
+      });
+
+      // Xóa token khỏi localStorage (nếu bạn sử dụng localStorage để lưu token)
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('avt');
+      localStorage.removeItem('displayName');
+      
+      // Hiển thị thông báo thành công
+      toast.success('Đăng xuất thành công!');
+
+      // Điều hướng về trang đăng nhập sau khi đăng xuất
+      navigate('/login');
+    } catch (error) {
+      // Xử lý lỗi nếu đăng xuất thất bại
+      console.error('Lỗi khi đăng xuất:', error);
+      toast.error('Đăng xuất thất bại. Vui lòng thử lại.');
+    }
   };
 
   return (
@@ -63,7 +97,8 @@ const UserAvatarMenu = () => {
       >
         <MenuItem onClick={() => handleMenuClick(`/profile/${userID}`)}>Trang Cá Nhân</MenuItem>
         <MenuItem onClick={() => handleMenuClick('/settings')}>Cài đặt</MenuItem>
-        <MenuItem onClick={() => handleMenuClick('/login')}>Log out</MenuItem>
+        {/* Thêm hàm handleLogout cho chức năng đăng xuất */}
+        <MenuItem onClick={handleLogout}>Log out</MenuItem>
       </Menu>
     </>
   );

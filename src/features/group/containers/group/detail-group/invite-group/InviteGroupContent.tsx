@@ -10,6 +10,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const InviteGroupContent: React.FC = () => {
+  const token = localStorage.getItem('token');
   const { group } = useOutletContext<{ group: Group }>(); // Nhận group từ Outlet context
   const [users, setUsers] = useState<User[]>([]); // State chứa danh sách người dùng
   const [sortCriteria, setSortCriteria] = useState<string>('name'); // Tiêu chí sắp xếp
@@ -20,7 +21,13 @@ const InviteGroupContent: React.FC = () => {
   useEffect(() => {
     const fetchRequestUsers = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/requests`);
+        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/requests`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
+        );
         setUsers(response.data.requests); // Cập nhật danh sách người dùng từ API
         setFilteredUsers(response.data.requests); // Cập nhật danh sách đã lọc
       } catch (error) {
@@ -46,7 +53,13 @@ const InviteGroupContent: React.FC = () => {
   // Xử lý chấp nhận yêu cầu
   const handleAccept = async (userId: string) => {
     try {
-        const response = await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/accept`, { userId });
+        const response = await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/accept`, { userId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
+        );
         setProcessedRequests((prev) => ({ ...prev, [userId]: 'accepted' }));
         toast.success(`Đã chấp nhận yêu cầu tham gia nhóm của người dùng ID: ${userId}!`);
     } catch (error: any) {
@@ -59,7 +72,13 @@ const InviteGroupContent: React.FC = () => {
   // Xử lý từ chối yêu cầu
   const handleReject = async (userId: string) => {
     try {
-      await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/reject`, { userId });
+      await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/reject`, { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setProcessedRequests((prev) => ({ ...prev, [userId]: 'rejected' }));
       toast.success(`Đã từ chối yêu cầu tham gia nhóm của người dùng ID: ${userId}.`);
     } catch (error) {

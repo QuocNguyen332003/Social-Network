@@ -7,6 +7,7 @@ import axios from 'axios';
 import { Group } from '../../../../../interface/interface';
 
 const YourGroups: React.FC = () => {
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const [joinedGroups, setJoinedGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +31,13 @@ const YourGroups: React.FC = () => {
 
       try {
         // Gọi API từ backend với userId hiện tại
-        const response = await axios.get(`http://localhost:3000/v1/group/${currentUserId}/joined-groups`);
+        const response = await axios.get(`http://localhost:3000/v1/group/${currentUserId}/joined-groups`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
+        );
         const groups = response.data.groups || [];
         setJoinedGroups(groups); // Lưu danh sách nhóm vào state
 
@@ -38,8 +45,12 @@ const YourGroups: React.FC = () => {
         const roles: { [groupId: string]: string } = {};
         for (const group of groups) {
           const roleResponse = await axios.get(`http://localhost:3000/v1/group/${group._id}/role`, {
+            headers: {
+              Authorization: `Bearer ${token}` // Thêm token vào headers
+            },
             params: { userId: currentUserId },
-          });
+          },
+        );
           roles[group._id] = roleResponse.data.role;
         }
         setUserRoles(roles); // Lưu role của từng nhóm vào state
@@ -94,6 +105,9 @@ const YourGroups: React.FC = () => {
     if (!selectedGroupId) return;
     try {
       const response = await axios.delete(`http://localhost:3000/v1/group/${selectedGroupId}/delete`, {
+        headers: {
+          Authorization: `Bearer ${token}` // Thêm token vào headers
+        },
         params: { userId: currentUserId },
       });
       if (response.status === 200) {
@@ -114,6 +128,11 @@ const YourGroups: React.FC = () => {
     try {
       const response = await axios.post(`http://localhost:3000/v1/group/${selectedGroupId}/leave`, {
         userId: currentUserId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       if (response.status === 200) {
         alert('Bạn đã rời nhóm thành công!');

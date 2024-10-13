@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Typography} from "@mui/material";
 import { Position } from "./MessageReceived";
 import VideoCard from "../../../shared/components/video-card/VideoCard";

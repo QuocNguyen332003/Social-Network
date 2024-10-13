@@ -34,6 +34,7 @@ import PersonalManagementContent from '../../features/group/containers/group/det
 import InfoPersonal from '../../features/user-authentication/containers/register/InfoPersonal';
 import InfoAccount from '../../features/user-authentication/containers/register/InfoAccount';
 import AddAvtAndBackground from '../../features/user-authentication/containers/register/AddAvtAndBackground';
+import { ProtectedRoute } from './ProtectedRoute';
 const Routes = () => {
 
   function MessagesWrapper() {
@@ -43,6 +44,7 @@ const Routes = () => {
   }
   
   const router = createBrowserRouter([
+    // Các route công khai (public)
     {
       path: '/',
       element: <Login />,
@@ -60,14 +62,14 @@ const Routes = () => {
           element: <InfoAccount />,
         },
         {
-          path: 'fill-infomation',
+          path: 'fill-information',
           element: <InfoPersonal />,
         },
         {
           path: 'choose-interest',
           element: <Hobby />,
         },
-      ]
+      ],
     },
     {
       path: '/new-user/avt-background',
@@ -76,92 +78,118 @@ const Routes = () => {
     {
       path: '/forgot',
       element: <Forgot />,
-    }, 
+    },
+
+    // Các route yêu cầu xác thực (protected)
     {
       path: '/new-feeds',
-      element: <NewFeeds />,
+      element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
       children: [
         {
           path: '',
-          element: <NewFeedsContent />, 
-        },
-        {
-          path: ':postId',
-          element: <DetailArticles />,
-        },
-      ],
-    },
-    {
-      path: '/group/',
-      element: <NewGroup />, // Default to the main content of the group (Trang chủ)
-      children: [
-        {
-          path: '',
-          element: <NewFeedGroup />, // Default to the main content of the group (Trang chủ)
-        },
-        {
-          path: 'your-feed',
-          element: <NewFeedGroup />, // Default to the main content of the group (Trang chủ)
-        },
-        {
-          path: 'your-groups',
-          element: <YourGroups />, // Default to the main content of the group (Trang chủ)
-        },
-        {
-          path: 'explore-groups',
-          element: <ExploreGroups />, // Default to the main content of the group (Trang chủ)
-        },
-        {
-          path: ':id',
-          element: <DetailGroupContent />,
+          element: <NewFeeds />,
           children: [
             {
               path: '',
-              element: < HomeGroupContent/>, 
+              element: <NewFeedsContent />,
             },
             {
-              path: 'members',
-              element: <MemberGroupContent />,
+              path: ':postId',
+              element: <DetailArticles />,
             },
-            {
-              path: 'invite-members',
-              element: <InviteGroupContent />,
-            },
-            {
-              path: 'rules',
-              element: <RulesGroupContent />,
-            },
-            {
-              path: 'admins',
-              element: <AdminGroupContent />,
-            },
-            {
-              path: 'pending',
-              element: <ApprovalGroupContent />,
-            },
-            {
-              path: 'personal-management',
-              element: <PersonalManagementContent />,
-            },
-          ], // Default to the main content of the group (Trang chủ)
+          ],
         },
       ],
     },
-    
     {
-      path: '/saved', 
-      element: <SavedItems/> // Protect this route
-    },
-    {
-      path: '/messages',
-      element: <MessagesWrapper/>,
-    },
-    {
-      path: '/friends',
+      path: '/group',
+      element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
       children: [
         {
           path: '',
-          element: <AllFriends/>,
+          element: <NewGroup />,
+          children: [
+            {
+              path: '',
+              element: <NewFeedGroup />,
+            },
+            {
+              path: 'your-feed',
+              element: <NewFeedGroup />,
+            },
+            {
+              path: 'your-groups',
+              element: <YourGroups />,
+            },
+            {
+              path: 'explore-groups',
+              element: <ExploreGroups />,
+            },
+            {
+              path: ':id',
+              element: <DetailGroupContent />,
+              children: [
+                {
+                  path: '',
+                  element: <HomeGroupContent />,
+                },
+                {
+                  path: 'members',
+                  element: <MemberGroupContent />,
+                },
+                {
+                  path: 'invite-members',
+                  element: <InviteGroupContent />,
+                },
+                {
+                  path: 'rules',
+                  element: <RulesGroupContent />,
+                },
+                {
+                  path: 'admins',
+                  element: <AdminGroupContent />,
+                },
+                {
+                  path: 'pending',
+                  element: <ApprovalGroupContent />,
+                },
+                {
+                  path: 'personal-management',
+                  element: <PersonalManagementContent />,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      path: '/saved',
+      element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
+      children: [
+        {
+          path: '',
+          element: <SavedItems />,
+        },
+      ],
+    },
+    {
+      path: '/messages',
+      element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
+      children: [
+        {
+          path: '',
+          element: <MessagesWrapper />,
+        },
+      ],
+    },
+    {
+      path: '/friends',
+      element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
+      children: [
+        {
+          path: '',
+          element: <AllFriends />,
         },
         {
           path: 'friends-request',
@@ -179,33 +207,51 @@ const Routes = () => {
     },
     {
       path: '/profile/:userID',
-      element: <Profile />,
+      element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
       children: [
         {
           path: '',
-          element: <ProfilePost />,
-        },
-        {
-          path: 'personal-collection',
-          element: <ProfileCollection />, 
+          element: <Profile />,
+          children: [
+            {
+              path: '',
+              element: <ProfilePost />,
+            },
+            {
+              path: 'personal-collection',
+              element: <ProfileCollection />,
+            },
+          ],
         },
       ],
     },
     {
       path: '/edit-profile/:userID',
-      element: <ProfileEdit/>
-    },
-    {
-      path: '/collections',
-      element: <CollectionsMain/>,
+      element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
       children: [
         {
           path: '',
-          element: <Collections />,
+          element: <ProfileEdit />,
         },
+      ],
+    },
+    {
+      path: '/collections',
+      element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
+      children: [
         {
-          path: 'article',
-          element: <DetailArticle />, 
+          path: '',
+          element: <CollectionsMain />,
+          children: [
+            {
+              path: '',
+              element: <Collections />,
+            },
+            {
+              path: 'article',
+              element: <DetailArticle />,
+            },
+          ],
         },
       ],
     },

@@ -1,19 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Avatar, Divider } from '@mui/material';
 import axios from 'axios';
-import { Article } from '../../../../interface/interface'; // Đảm bảo rằng đường dẫn này là chính xác
+import { Article } from '../../../../interface/interface'; 
 
 interface ShareItemCardProps {
   sharedPostId: string; // Nhận sharedPostId từ props
 }
 
 const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
-  const [article, setArticle] = useState<Article | null>(null); // State để lưu thông tin bài viết
+  const token = localStorage.getItem('token');
+  const [article, setArticle] = useState<Article | null>(null); 
 
   useEffect(() => {
     const fetchSharedArticle = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/v1/article/${sharedPostId}`);
+        const response = await axios.get(`http://localhost:3000/v1/article/${sharedPostId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+          }
+        );
         setArticle(response.data);
       } catch (error) {
         console.error('Lỗi khi lấy bài viết chia sẻ:', error);
@@ -24,7 +31,7 @@ const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
   }, [sharedPostId]);
 
   if (!article) {
-    return null; // Nếu không có thông tin bài viết, không hiển thị gì
+    return null;
   }
 
   return (
@@ -33,9 +40,9 @@ const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
         padding: 2,
         marginTop: 2,
         borderRadius: 2,
-        boxShadow: '0 3px 10px rgba(0, 0, 0, 0.2)', // Tăng độ sâu bóng
-        backgroundColor: '#ffffff', // Đổi màu nền để nổi bật hơn
-        border: '1px solid #bdbdbd', // Thêm viền màu xám
+        boxShadow: '0 3px 10px rgba(0, 0, 0, 0.2)', 
+        backgroundColor: '#ffffff', 
+        border: '1px solid #bdbdbd', 
       }}
     >
       {/* Header thông tin bài viết */}
@@ -69,13 +76,13 @@ const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
       {article.listPhoto.length > 0 && (
         <Box>
           <img
-            src={article.listPhoto[0]} // Hiển thị ảnh đầu tiên trong danh sách
+            src={article.listPhoto[0]}
             alt={`Shared item image`}
             style={{
               width: '100%',
               borderRadius: '8px',
               objectFit: 'cover',
-              maxHeight: '300px', // Giới hạn chiều cao của ảnh
+              maxHeight: '300px', 
             }}
           />
         </Box>

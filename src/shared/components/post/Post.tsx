@@ -25,7 +25,7 @@ import PostMenu from './component/PostMenu.tsx';
 import { useNavigate } from 'react-router-dom';
 import CommentSection from './component/CommentSection.tsx';
 import axios from 'axios';
-import ShareItemCard from './component/ShareItemCard'; // Nhập SavedItemCard để hiển thị bài viết được chia sẻ
+import ShareItemCard from './component/ShareItemCard'; 
 import { v4 as uuidv4 } from 'uuid';
 
 interface PostComponentProps {
@@ -57,6 +57,7 @@ const Post = ({
   currentUserId,
   onSharePost
 }: PostComponentProps) => {
+  const token = localStorage.getItem('token');
   const navigate = useNavigate(); 
   const [showComments, setShowComments] = useState(false);
   const [, setLikedComments] = useState<{ [key: string]: boolean }>({});
@@ -77,8 +78,8 @@ const Post = ({
   const [shareContent, setShareContent] = useState('');
   const [shareScope, setShareScope] = useState('public');
 
-  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false); // Trạng thái mở `Dialog`
-  const [currentImageIndex, setCurrentImageIndex] = useState(0); // Chỉ số của ảnh đang được hiển thị
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false); 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   
 
@@ -86,7 +87,7 @@ const Post = ({
   const isLiked = post.interact.emoticons.some(emoticon => emoticon._iduser === currentUserId && emoticon.typeEmoticons === 'like');
 
   const handleLikeClick = () => {
-    onLikePost(post._id); // Gọi hàm onLikePost từ props
+    onLikePost(post._id); 
   };
   const handleToggleComments = () => {
     setShowComments(!showComments);
@@ -96,7 +97,7 @@ const Post = ({
     onLikeComment(post._id, commentId);
     setLikedComments(prevLikedComments => ({
       ...prevLikedComments,
-      [commentId]: !prevLikedComments[commentId], // Toggle trạng thái like của comment
+      [commentId]: !prevLikedComments[commentId], 
     }));
   };
 
@@ -107,19 +108,19 @@ const Post = ({
   const handleReplyToComment = (commentId: string) => {
     setReplyInputs(prevReplyInputs => ({
       ...prevReplyInputs,
-      [commentId]: !prevReplyInputs[commentId], // Toggle the reply input visibility for the specific comment
+      [commentId]: !prevReplyInputs[commentId], 
     }));
   };
 
   const handleReplyChange = (commentId: string, text: string) => {
     setReplyTexts(prevReplyTexts => ({
       ...prevReplyTexts,
-      [commentId]: text, // Track reply text for each comment
+      [commentId]: text, 
     }));
   };
 
   const handleSubmitReply = (commentId: string) => {
-    const replyText = replyTexts[commentId] || ''; // Đảm bảo replyText luôn là một chuỗi rỗng nếu undefined
+    const replyText = replyTexts[commentId] || ''; 
     if (replyText.trim()) {
       const reply: CommentType = {
         _id: uuidv4(), // Thêm `_id` bằng uuid
@@ -269,10 +270,15 @@ const Post = ({
 
     try {
       // Gọi API để lấy dữ liệu bài viết gốc
-      const response = await axios.get(`http://localhost:3000/v1/article/${sharedPostId}`);
+      const response = await axios.get(`http://localhost:3000/v1/article/${sharedPostId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+      );
       const articleData = response.data;
 
-      // Điều hướng đến bài viết gốc và truyền articleData vào state
       navigate(`/new-feeds/${sharedPostId}`, { state: { article: articleData } });
     } catch (error) {
       console.error('Lỗi khi lấy bài viết gốc:', error);
@@ -321,8 +327,8 @@ const Post = ({
       {/* Hiển thị bài viết chia sẻ nếu có */}
       {post.sharedPostId && (
         <Box
-          onClick={() => handleNavigateToOriginalPost(post.sharedPostId)} // Điều hướng đến bài viết gốc khi nhấn vào
-          sx={{ cursor: 'pointer' }} // Thay đổi con trỏ khi hover
+          onClick={() => handleNavigateToOriginalPost(post.sharedPostId)} 
+          sx={{ cursor: 'pointer' }} 
         >
           <ShareItemCard sharedPostId={post.sharedPostId} />
         </Box>
@@ -463,7 +469,7 @@ const Post = ({
             color: isLiked ? '#d32f2f' : '#1976d2', 
             marginRight: 1, 
             '&:hover': { backgroundColor: '#f5f5f5' },
-            flex: 1 // Chiếm 1 phần trong tỷ lệ flex
+            flex: 1 
           }}
           onClick={handleLikeClick}
         >
@@ -477,7 +483,7 @@ const Post = ({
             color: '#1976d2', 
             marginRight: 1, 
             '&:hover': { backgroundColor: '#f5f5f5' },
-            flex: 1 // Chiếm 1 phần trong tỷ lệ flex
+            flex: 1 
           }} 
           onClick={handleToggleComments}
         >
@@ -490,7 +496,7 @@ const Post = ({
           sx={{ 
             color: '#1976d2', 
             '&:hover': { backgroundColor: '#f5f5f5' },
-            flex: 1 // Chiếm 1 phần trong tỷ lệ flex
+            flex: 1 
           }} 
           onClick={handleShareDialogOpen}
         >

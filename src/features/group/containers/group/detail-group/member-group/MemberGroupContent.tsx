@@ -22,6 +22,7 @@ import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 
 const MemberGroupContent: React.FC = () => {
+  const token = localStorage.getItem('token');
   const { group, role } = useOutletContext<{ group: Group; role: string }>(); // Nhận role từ context
   const [members, setMembers] = useState<{ idUser: { _id: string; displayName: string }; joinDate: Date; _id: string }[]>([]); // State để lưu danh sách thành viên
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // State để hiển thị hộp thoại xác nhận
@@ -32,7 +33,13 @@ const MemberGroupContent: React.FC = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/members`); // Gọi API để lấy thành viên
+        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/members`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
+        ); // Gọi API để lấy thành viên
         setMembers(response.data.members); // Lưu danh sách thành viên vào state
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -57,8 +64,12 @@ const MemberGroupContent: React.FC = () => {
   const handleRemoveMember = async () => {
     try {
       const response = await axios.delete(`http://localhost:3000/v1/group/${group._id}/member/${selectedMemberId}`, {
+        headers: {
+          Authorization: `Bearer ${token}` // Thêm token vào headers
+        },
         data: { requesterId: currentUserId },
-      });
+      },
+    );
       setMembers((prev) => prev.filter((member) => member.idUser._id !== selectedMemberId)); // Cập nhật lại danh sách thành viên
       setOpenConfirmDialog(false);
       toast.success(response.data.message);
