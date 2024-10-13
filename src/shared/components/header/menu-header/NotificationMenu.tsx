@@ -1,71 +1,123 @@
 import React, { useState, useEffect } from 'react';
-import { IconButton, Menu, Badge, List, ListItem, ListItemAvatar, ListItemText, Avatar, Divider, MenuItem, Typography } from '@mui/material';
-import { Notifications } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-
-// Khai báo interface cho notification
-interface Notification {
-  _id: string;
-  senderId: string;
-  receiverId: string;
-  message: string;
-  status: string;
-  readAt: string | null;
-  createdAt: string;
-  _destroy: string | null;
-}
+import { IconButton, Menu, MenuItem, Badge, List, ListItem, ListItemAvatar, ListItemText, Avatar, Divider, Typography, Box, Button } from '@mui/material';
+import { Notifications, MoreVert } from '@mui/icons-material'; 
+import { Notification } from '../../../../interface/interface'; 
 
 const NotificationMenu = () => {
   const [anchorNotification, setAnchorNotification] = useState<null | HTMLElement>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]); // Khai báo kiểu Notification[]
-  const [unreadCount, setUnreadCount] = useState(0); // Số thông báo chưa đọc
-  const navigate = useNavigate();
+  const [notifications, setNotifications] = useState<Notification[]>([]); 
+  const [unreadCount, setUnreadCount] = useState(0); 
+  const [showAll, setShowAll] = useState(false); 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); 
+  const [selectedNotification, setSelectedNotification] = useState<string | null>(null); 
+  const currentUserId = localStorage.getItem('userId') || ''; 
 
-  // Sử dụng useEffect để giả lập việc gọi API và lấy dữ liệu thông báo
+  // Fetch notifications from backend API
   useEffect(() => {
-    // Dữ liệu giả định (mock data) cho thông báo
-    const mockNotifications: Notification[] = [
-      {
-        _id: "1",
-        senderId: "123",
-        receiverId: "456",
-        message: "Order Giày, Quần Áo Puma Chính Hãng đã nhắc đến bạn",
-        status: "Chưa đọc",
-        readAt: null,
-        createdAt: new Date().toISOString(),
-        _destroy: null,
-      },
-      {
-        _id: "2",
-        senderId: "789",
-        receiverId: "456",
-        message: "Running Man Vietnam đã đăng video mới",
-        status: "Đã đọc",
-        readAt: new Date().toISOString(),
-        createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 ngày trước
-        _destroy: null,
-      },
-      {
-        _id: "3",
-        senderId: "321",
-        receiverId: "456",
-        message: "Cổng Thông tin Đồng Tháp đã phát trực tiếp",
-        status: "Đã đọc",
-        readAt: new Date().toISOString(),
-        createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 ngày trước
-        _destroy: null,
-      },
-    ];
+    const fetchNotifications = async () => {
+      if (currentUserId) {
+        try {
+          const response = await fetch(`http://localhost:3000/v1/notifications?userId=${currentUserId}`);
+          const data = await response.json();
 
-    // Cập nhật state với mock data
-    setNotifications(mockNotifications);
+          if (data && Array.isArray(data.data)) {
+            setNotifications(data.data);
+            const unread = data.data.filter((notification: Notification) => notification.status === 'unread').length;
+            setUnreadCount(unread);
+          } else {
+            setNotifications([]); 
+          }
+        } catch (error) {
+          console.error('Error fetching notifications:', error);
+        }
+      }
+    };
+    fetchNotifications();
+  }, [currentUserId]);
 
-    // Đếm số thông báo chưa đọc
-    const unread = mockNotifications.filter(notification => notification.status === "Chưa đọc").length;
-    setUnreadCount(unread);
-  }, []);
+  // Mark notification as read
+  const markAsRead = async (notificationId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/v1/notifications/${notificationId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'read',
+          readAt: new Date(), 
+        }),
+      });
 
-  const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
+      if (response.ok) {
+        setNotifications((prevNotifications) =>
+          prevNotifications.map((notification) =>
+            notification._id === notificationId
+              ? { ...notification, status: 'read', readAt: new Date() } 
+              : notification
+          )
+        );
+        setUnreadCount((prevCount) => prevCount - 1);
+      }
+    } catch (error) {
+      console.error('Error updating notification:', error);
+    }
+  };
+
+  // Mark notification as unread
+  const markAsUnread = async () => {
+    if (selectedNotification) {
+      try {
+        const response = await fetch(`http://localhost:3000/v1/notifications/${selectedNotification}/unread`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          setNotifications((prevNotifications) =>
+            prevNotifications.map((notification) =>
+              notification._id === selectedNotification
+                ? { ...notification, status: 'unread', readAt: null }
+                : notification
+            )
+          );
+          setUnreadCount((prevCount) => prevCount + 1);
+        }
+      } catch (error) {
+        console.error('Error marking as unread:', error);
+      }
+    }
+    handleMoreClose(); 
+  };
+
+  // Soft delete notification
+  const deleteNotification = async (notificationId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/v1/notifications/${notificationId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setNotifications((prevNotifications) =>
+          prevNotifications.filter((notification) => notification._id !== notificationId)
+        );
+      } else {
+        console.error('Error deleting notification');
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  };
+
+  const handleNotificationClick = (notificationId: string, isUnread: boolean) => {
+    if (isUnread) {
+      markAsRead(notificationId);
+    }
+  };
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorNotification(event.currentTarget);
   };
 
@@ -73,22 +125,35 @@ const NotificationMenu = () => {
     setAnchorNotification(null);
   };
 
-  const handleViewAllNotifications = () => {
-    navigate('/notifications'); // Điều hướng tới trang tất cả thông báo
-    handleCloseNotificationMenu();
+  const handleMoreClick = (event: React.MouseEvent<HTMLElement>, notificationId: string) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedNotification(notificationId); 
   };
+
+  const handleMoreClose = () => {
+    setAnchorEl(null);
+    setSelectedNotification(null);
+  };
+
+  const handleShowMore = () => {
+    setShowAll(true); 
+  };
+
+  const handleShowLess = () => {
+    setShowAll(false); 
+  };
+
+  const displayedNotifications = showAll ? notifications : notifications.slice(0, 5);
 
   return (
     <>
       <IconButton
         sx={{
           color: '#333333',
-          '&:hover': {
-            color: '#d32f2f',
-          },
+          '&:hover': { color: '#d32f2f' },
           marginLeft: '16px',
         }}
-        onClick={handleNotificationClick}
+        onClick={handleMenuClick}
       >
         <Badge badgeContent={unreadCount} color="error">
           <Notifications />
@@ -107,43 +172,98 @@ const NotificationMenu = () => {
             overflow: 'visible',
             boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)',
             minWidth: '300px',
-            '&:before': {
-              content: '""',
-              display: 'block',
-              position: 'absolute',
-              top: 0,
-              right: 14,
-              width: 10,
-              height: 10,
-              bgcolor: 'background.paper',
-              transform: 'translateY(-50%) rotate(45deg)',
-              zIndex: 0,
-            },
           },
         }}
       >
-        <List>
-          {notifications.map((notification, index) => (
-            <div key={index}>
-              <ListItem button>
-                <ListItemAvatar>
-                  <Avatar alt="Sender" src="path_to_sender_avatar.jpg" /> {/* Có thể thay đổi để lấy avatar người gửi */}
-                </ListItemAvatar>
-                <ListItemText
-                  primary={notification.message}
-                  secondary={new Date(notification.createdAt).toLocaleString()}
-                />
-              </ListItem>
-              {index < notifications.length - 1 && <Divider variant="inset" />}
-            </div>
-          ))}
+        <List
+          sx={{
+            maxHeight: showAll ? 600 : 'auto',
+            overflowY: showAll ? 'auto' : 'visible',
+            paddingBottom: 0,
+          }}
+        >
+          {displayedNotifications.length > 0 ? (
+            displayedNotifications.map((notification) => (
+              <div key={notification._id}>
+                <ListItem 
+                  button 
+                  onClick={() => handleNotificationClick(notification._id, notification.status === 'unread')}
+                  secondaryAction={
+                    <IconButton
+                      onClick={(event) => handleMoreClick(event, notification._id)} 
+                      edge="end"
+                    >
+                      <MoreVert />
+                    </IconButton>
+                  }
+                >
+                  <ListItemAvatar>
+                    <Avatar alt="Sender" src={`path_to_sender_avatar/${notification.senderId}.jpg`} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={notification.message}
+                    secondary={new Date(notification.createdAt).toLocaleString()}
+                  />
+                  {notification.status === 'unread' && (
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        bgcolor: '#1976d2',
+                        borderRadius: '50%',
+                        ml: 2,
+                      }}
+                    />
+                  )}
+                </ListItem>
+                <Divider variant="inset" />
+              </div>
+            ))
+          ) : (
+            <Typography variant="body2" sx={{ p: 2, textAlign: 'center' }}>
+              Không có thông báo nào
+            </Typography>
+          )}
         </List>
 
-        <MenuItem onClick={handleViewAllNotifications} sx={{ justifyContent: 'center', paddingTop: '10px', paddingBottom: '10px' }}>
-          <Typography variant="body2" color="primary" sx={{ fontWeight: 'bold' }}>
-            Xem tất cả thông báo
-          </Typography>
-        </MenuItem>
+        {notifications.length > 5 && (
+          !showAll ? (
+            <Button
+              onClick={handleShowMore}
+              fullWidth
+              sx={{
+                p: 1,
+                justifyContent: 'center',
+                bgcolor: '#1976d2',
+                color: '#fff',
+                '&:hover': { bgcolor: '#1565c0' },
+                borderRadius: 0,
+              }}
+            >
+              Xem các thông báo trước đó
+            </Button>
+          ) : (
+            <Button
+              onClick={handleShowLess}
+              fullWidth
+              sx={{
+                p: 1,
+                justifyContent: 'center',
+                bgcolor: '#1976d2',
+                color: '#fff',
+                '&:hover': { bgcolor: '#1565c0' },
+                borderRadius: 0,
+              }}
+            >
+              Ẩn bớt
+            </Button>
+          )
+        )}
+      </Menu>
+
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMoreClose}>
+        <MenuItem onClick={markAsUnread}>Đánh dấu là chưa đọc</MenuItem>
+        <MenuItem onClick={() => deleteNotification(selectedNotification as string)}>Xóa thông báo</MenuItem>
       </Menu>
     </>
   );
