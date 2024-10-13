@@ -2,14 +2,27 @@ import { Search } from "@mui/icons-material";
 import { Box, IconButton, TextField, Typography } from "@mui/material";
 import ButtonCreateMessage from "../../components/ButtonCreateMessage";
 import ChatList from "./ChatList";
-import { CardConversationAPI } from "../interfaceMessage";
+import { CardConversationAPI, DataUser } from "../interfaceMessage";
+import DialogNewChat from "../../components/DialogNewChat";
+import { useState } from "react";
+import useFriend from "./useFriend";
 
 export type ListMessagesProps = {
   data: CardConversationAPI[];
   changeChat: (userID: string, _idConversation: string) => void;
+  createNewChat: (dataFriend: DataUser) => void;
+  searchChat: (value: string) => void;
 }
 
-const ListMesssages = ({data, changeChat} : ListMessagesProps) => {
+const ListMesssages = ({data, changeChat, createNewChat, searchChat} : ListMessagesProps) => {
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const { isLoading, usersWithoutChat, getDataUserWithoutChat } = useFriend();
+  const [textSearch, setTextSearch] = useState<string>("");
+
+  const handlePressItemDialog = (dataFriend: DataUser) => {
+    setOpenDialog(false);
+    createNewChat(dataFriend)
+  }
   return (
     <Box 
       sx={{ 
@@ -45,11 +58,19 @@ const ListMesssages = ({data, changeChat} : ListMessagesProps) => {
                 >
                     <Search />
                 </IconButton>
-                <TextField size="small" id="standard-basic" label="Search" variant="standard"/>
+                <TextField size="small" id="standard-basic" label="Search" variant="standard"
+                  value={textSearch}  onChange={(event) => {
+                    setTextSearch(event.target.value);
+                    searchChat(event.target.value)
+                  }}/>  
             </Box>
         </Box>
-        <ButtonCreateMessage/>
+        <ButtonCreateMessage handlePress={()=> {setOpenDialog(true);
+          getDataUserWithoutChat();
+        }}/>
         <ChatList data={data} changeChat={changeChat}/>
+        <DialogNewChat open={openDialog} isLoading={isLoading} usersWithoutChat={usersWithoutChat}
+      onClose={() => { setOpenDialog(false); } } handleListItemClick={handlePressItemDialog} />
     </Box>
   );
 }

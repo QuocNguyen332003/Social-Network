@@ -1,28 +1,23 @@
-import { Box, Button, ButtonProps, styled} from "@mui/material";
+import { Box} from "@mui/material";
 import MessageCard from "../../components/MessageCard";
-import { ListMessagesProps } from "./ListMessages";
+import { useState } from "react";
+import { CardConversationAPI } from "../interfaceMessage";
 
+export type ChatListProps = {
+  data: CardConversationAPI[];
+  changeChat: (userID: string, _idConversation: string) => void;
+}
 
-const BorderButton = styled(Button)<ButtonProps>(() => ({
-    color: '#ffffff',
-    backgroundColor: '#1976d2',
-    borderRadius: 25,
-    padding: '5px 40px',
-    fontSize: 12,
-  }));
-
-const ChatList = ({data, changeChat} : ListMessagesProps) => {
+const ChatList = ({data, changeChat} : ChatListProps) => {
   const currentUserId = localStorage.getItem('userId') || '';
-
+  const [currMessage, setCurrMessage] = useState<string|null>(null);
   const clickChatList = (userID: string, _idConversation: string) => {
     changeChat(userID, _idConversation);
+    setCurrMessage(_idConversation);
   }
   return (
     <Box 
     >
-        <BorderButton variant="contained">
-            Tất cả
-        </BorderButton>
         <Box 
           sx={{
             height: '60vh',
@@ -34,12 +29,13 @@ const ChatList = ({data, changeChat} : ListMessagesProps) => {
             },
           }}>
           {data.map((item)=> 
-            <MessageCard dataCard={item} onClick={() => {
+            <MessageCard dataCard={item} currMessage={item._id.toString() === currMessage? true: false} 
+            onClick={() => {
               const friendID = item.dataUser.find((userData) => currentUserId.toString() !== userData.userID);
-              if (friendID !== undefined){
-                clickChatList(friendID?.userID, item._id)
+              if (friendID !== undefined) {
+                clickChatList(friendID?.userID, item._id);
               }
-              }}/>)}
+            } } />)}
         </Box>
     </Box>
   );

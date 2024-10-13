@@ -1,6 +1,6 @@
-import { Button, ButtonProps, styled } from "@mui/material";
+import { Button, styled } from "@mui/material";
 
-const ColorButton = styled(Button)<ButtonProps>(() => ({
+const ColorButton = styled(Button)(() => ({
     color: '#fff',
     backgroundColor: '#1976d2',
     '&:hover': {
@@ -8,18 +8,17 @@ const ColorButton = styled(Button)<ButtonProps>(() => ({
     },
     margin: '20px 0',
   }));
-  
-function ButtonCreateMessage() {
+
+interface ButtonCreateMessageProps {
+  handlePress: () => void;
+}
+const ButtonCreateMessage = ({handlePress}: ButtonCreateMessageProps) => {
   return (
-    <ColorButton variant="contained" startIcon={
-        <img
-            src="src/assets/images/dialogue.png"
-            alt="Lotus"
-            style={{ marginRight: '20px', height: '20px' }}
-          />
-    }
-    sx={{fontSize: 12}}
-    >
+    <ColorButton variant="contained" startIcon={<img
+      src="src/assets/images/dialogue.png"
+      alt="Lotus"
+      style={{ marginRight: '20px', height: '20px' }} />}
+    sx={{ fontSize: 12 }} onClick={handlePress}    >
         Tin nhắn mới
     </ColorButton>
   );

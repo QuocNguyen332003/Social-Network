@@ -1,5 +1,5 @@
 import {useEffect, useState } from "react"
-import { Content, ConversationAPI } from "./interfaceMessage";
+import { Content, ConversationAPI, DataUser } from "./interfaceMessage";
 import axios from "axios";
 
 export const useMessage = (friendID: string) => {
@@ -7,12 +7,14 @@ export const useMessage = (friendID: string) => {
     const [conversation, setConversation] = useState<ConversationAPI | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [idFriend, setIdFriend] = useState<string | null>(null);
+    const [newChat, setNewChat] = useState<boolean>(false);
 
     useEffect(()=>{
         if (friendID != ""){
             fetchMessagesWithFriend(friendID);
           }
-    }, []);
+    }, [friendID]);
 
     const fetchMessagesWithFriend = async (changeID: string) => {
         setIsLoading(true); 
@@ -26,9 +28,6 @@ export const useMessage = (friendID: string) => {
           setIsLoading(false); 
         }
       };
-    const changeUserChat = (userID: string) => {
-        fetchMessagesWithFriend(userID);
-    }
 
     const sendNewMessage = (idConversation: string, content: Content) => {
         setConversation(prevConversation => {
@@ -67,12 +66,48 @@ export const useMessage = (friendID: string) => {
           setIsLoading(false); 
         }
     };
+    const addNewMessage = async (content: Content) => {
+        try {
+            const response = await axios.post(`http://localhost:3000/v1/messages/create-conversation`,
+                {   
+                    userID: currentUserId,
+                    friendID: idFriend,
+                    message: content
+                 },
+            );
+            setConversation(response.data);
+          } catch (error) {
+            console.error('Lỗi khi lấy bài viết:', error);
+          } finally {
+          }
+    }
 
+    const createNewChat = (dataFriend: DataUser) => {
+        setIdFriend(dataFriend.userID);
+        setNewChat(true);
+        const currentUserAvt = JSON.parse(localStorage.getItem('avt') || '[]');
+        const currentUserName = localStorage.getItem('displayName') || '';
+        const userData : DataUser = {
+            userID: currentUserId,
+            avt: currentUserAvt,
+            name: currentUserName,
+        }
+        if (idFriend !== null){
+            setConversation({
+                _id: "",
+                _user: [currentUserId, dataFriend.userID],
+                content: [],
+                dataUser: [dataFriend, userData],
+            })
+        }
+    }
     return {
         isLoading, error,
         conversation,
-        changeUserChat,
         sendNewMessage,
+        createNewChat,
+        addNewMessage,
+        newChat, setNewChat
     }
 }
 

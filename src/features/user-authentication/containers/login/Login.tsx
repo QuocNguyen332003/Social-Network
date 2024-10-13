@@ -33,6 +33,7 @@ const Login: React.FC = () => {
       // Lưu token vào localStorage hoặc sessionStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userId', response.data.user._id); 
+      localStorage.setItem('avt', JSON.stringify(response.data.user.avt));
       localStorage.setItem('displayName', response.data.user.displayName); 
       
       // Điều hướng người dùng tới trang chính (ví dụ: /new-feeds)
