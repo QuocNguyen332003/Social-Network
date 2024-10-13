@@ -11,7 +11,6 @@ import ProfilePost from '../../features/profile/containers/personal-page/Profile
 import Profile from '../../features/profile/containers/Profile';
 import ProfileEdit from '../../features/profile/containers/edit-profile/ProfileEdit';
 import SavedItems from '../../features/saved/containers/saved/SavedItems';
-import NotificationPage from '../../features/notifications/containers/notifications/NotificationPage';
 import CollectionsMain from '../../features/collections/containers/CollectionsMain';
 import Collections from '../../features/collections/containers/collection/Collection';
 import DetailArticle from '../../features/collections/containers/article-collection/DetailArticle'
@@ -156,10 +155,6 @@ const Routes = () => {
     {
       path: '/messages',
       element: <MessagesWrapper/>,
-    },
-    {
-      path: '/notifications', 
-      element: <NotificationPage/> // Protect this route
     },
     {
       path: '/friends',

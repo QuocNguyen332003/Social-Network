@@ -79,9 +79,9 @@ export interface Notification {
     receiverId: string;
     message: string;
     status: 'read' | 'unread';
-    readAt?: Date;
+    readAt?:  Date | null;
     createdAt: Date;
-    _destroy?: Date;
+    _destroy?: Date | null;
 }
   
   // Hobbies Interface
