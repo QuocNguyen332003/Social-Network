@@ -5,19 +5,27 @@ import { useChatList } from "./useChatList";
 import { useMessage } from "./useMessage";
 import { MessageProps } from "./Messages";
 import { Content } from "./interfaceMessage";
+import { useNavigate } from "react-router-dom";
 
-const App = ({userIDStart}: MessageProps) => {  
-  const {data,setValueMessageList, readMessage} = useChatList();
-  const {conversation, changeUserChat, sendNewMessage} = useMessage(userIDStart);
+const App = ({friendID}: MessageProps) => {  
+  const navigate = useNavigate();
+  const {filterData, searchChat, setValueMessageList, readMessage, fetchMessages} = useChatList();
+  const {conversation, sendNewMessage, setNewChat, createNewChat, addNewMessage, newChat} = useMessage(friendID);
 
-  const changeChat = (userID: string, _idConversation: string) => {
+  const changeChat = (friendID: string, _idConversation: string) => {
+    setNewChat(false);
     readMessage(_idConversation);
-    changeUserChat(userID);
+    navigate(`/messages?friendID=${friendID}`)
   }
 
   const sendMessage = (idConversation: string, content: Content) => {
-    setValueMessageList(idConversation, content);
-    sendNewMessage(idConversation, content);
+    if (newChat){
+      addNewMessage(content);
+      fetchMessages();
+    } else{
+      setValueMessageList(idConversation, content);
+      sendNewMessage(idConversation, content);
+    }
   }
   return (
     <Box 
@@ -30,7 +38,8 @@ const App = ({userIDStart}: MessageProps) => {
     >
       <Grid container >
         <Grid item xs={4}>
-          <ListMesssages data={data} changeChat={changeChat}/>
+          <ListMesssages data={filterData} changeChat={changeChat} 
+            createNewChat={createNewChat} searchChat={searchChat}/>
         </Grid>
         <Grid item xs={8}>
           <Conversations conversation={conversation}

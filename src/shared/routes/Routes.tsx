@@ -32,12 +32,15 @@ import Hobby from '../../features/user-authentication/containers/register/Hobby'
 import ProfileCollection from '../../features/profile/containers/personal-collection/ProfileCollection';
 import InviteGroupContent from '../../features/group/containers/group/detail-group/invite-group/InviteGroupContent'
 import PersonalManagementContent from '../../features/group/containers/group/detail-group/personal-management/PersonalManagementContent'
+import InfoPersonal from '../../features/user-authentication/containers/register/InfoPersonal';
+import InfoAccount from '../../features/user-authentication/containers/register/InfoAccount';
+import AddAvtAndBackground from '../../features/user-authentication/containers/register/AddAvtAndBackground';
 const Routes = () => {
 
   function MessagesWrapper() {
     const [searchParams] = useSearchParams();
-    const userIDStart = searchParams.get('userIDStart');
-    return <Messages userIDStart={userIDStart || ""} />;
+    const friendID = searchParams.get('friendID');
+    return <Messages friendID={friendID || ""} />;
   }
   
   const router = createBrowserRouter([
@@ -52,10 +55,24 @@ const Routes = () => {
     {
       path: '/register',
       element: <Register />,
+      children: [
+        {
+          path: '',
+          element: <InfoAccount />,
+        },
+        {
+          path: 'fill-infomation',
+          element: <InfoPersonal />,
+        },
+        {
+          path: 'choose-interest',
+          element: <Hobby />,
+        },
+      ]
     },
     {
-      path: '/choose-interest',
-      element: <Hobby />,
+      path: '/new-user/avt-background',
+      element: <AddAvtAndBackground />,
     },
     {
       path: '/forgot',

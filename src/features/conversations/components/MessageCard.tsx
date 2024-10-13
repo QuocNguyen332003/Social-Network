@@ -1,12 +1,14 @@
 import { Box, Typography} from "@mui/material";
-import { CardConversationAPI } from "../containers/interfaceMessage";
+import { CardConversationAPI, DataUser } from "../containers/interfaceMessage";
+import { useEffect, useState } from "react";
 
 interface MessageCardProps {
+    currMessage: boolean;
     dataCard: CardConversationAPI;
     onClick: () => void;
   }
 
-const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
+const MessageCard = ({currMessage, dataCard, onClick}: MessageCardProps) => {
   const currentUserId = localStorage.getItem('userId') || '';
 
   if (!dataCard || dataCard.content === null) {
@@ -16,6 +18,16 @@ const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
   const lastContent = dataCard.content;
   let formattedDate;
 
+  const [dataFriend, setDataFriend] = useState<DataUser | null>(null);
+
+  useEffect(()=> {
+    dataCard.dataUser.map((userData) => {
+        if (userData.userID !== currentUserId){
+            setDataFriend(userData);
+        }
+    })
+  }, [dataCard]);
+  
   if (lastContent.sendDate) {
     // Chuyển đổi sendDate thành Date nếu cần
     const sendDate = new Date(lastContent.sendDate);
@@ -52,9 +64,10 @@ const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
       cursor: "pointer",
       transition: "background-color 0.3s ease",
       borderRadius: 10,
+      backgroundColor: currMessage? "#e9e9e9": "#fff",
     }}
     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
-    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#fff"}
+    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = currMessage ? "#e9e9e9" : "#fff"}
     onClick={onClick}
     >
     <Box 
@@ -63,7 +76,7 @@ const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
         <Box
           sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 10px'}}>
           <img
-            src= {dataCard.dataUser[0].avt[dataCard.dataUser[0].avt.length - 1]}
+            src= {dataFriend?.avt[dataFriend.avt.length - 1]}
             alt="Ảnh đại diện"
             style={{width: '30px', height: '30px', borderRadius: 50 }}
           />
@@ -71,7 +84,7 @@ const MessageCard = ({dataCard, onClick}: MessageCardProps) => {
         <Box sx={{width: '100%'}}>
             <Box display='flex' justifyContent='space-between'>
                 <Typography variant="subtitle2" component="h2" fontWeight={isRead? 'regular': 'bold'}>
-                    {dataCard.dataUser[0].name}
+                    {dataFriend?.name}
                 </Typography>
                 <Typography variant="subtitle2" component="h2" color='#333' fontWeight='regular'>
                     {formattedDate}

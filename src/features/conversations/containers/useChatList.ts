@@ -10,6 +10,8 @@ export const useChatList = () => {
     const [error, setError] = useState<string | null>(null);
 
     const [data, setData] = useState<CardConversationAPI[]>([]);
+    const [filterData, setFilterData] = useState<CardConversationAPI[]>([]);
+
     useEffect(()=> {
       fetchMessages();
     },[]);
@@ -50,6 +52,7 @@ export const useChatList = () => {
       try {
         const response = await axios.get(`http://localhost:3000/v1/messages/${currentUserId}`);
         setData(response.data);
+        setFilterData(response.data);
       } catch (error) {
         console.error('Lỗi khi lấy bài viết:', error);
         setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
@@ -68,12 +71,35 @@ export const useChatList = () => {
             : conversation
         )
       );
+      setFilterData(data);
+    }
+
+    const removeAccents = (str: string) => {
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    };
+
+    const searchChat = (value: string) => {
+      const searchValue = removeAccents(value.toLowerCase());
+
+
+    const result = data.filter((conversation) =>
+      conversation.dataUser.some(
+        (user) =>
+          removeAccents(user.name.toLowerCase()).includes(searchValue) &&
+          user.userID !== currentUserId
+      )
+    );
+
+      setFilterData(result);
     }
 
     return {
         isLoading, error,
         data, setData,
         readMessage,
-        setValueMessageList
+        setValueMessageList,
+        fetchMessages,
+        filterData,
+        searchChat
     }
 }

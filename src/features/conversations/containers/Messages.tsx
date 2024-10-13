@@ -4,10 +4,10 @@ import  SidebarLeft  from '../../../shared/components/sidebarLeft/SidebarLeft';
 import MainContent from './MainContent';
 
 export interface MessageProps {
-  userIDStart: string;
+  friendID: string;
 }
 
-const Messages = ({userIDStart}: MessageProps) => {
+const Messages = ({friendID}: MessageProps) => {
   return (
     <>
       <Header />
@@ -16,7 +16,7 @@ const Messages = ({userIDStart}: MessageProps) => {
           <SidebarLeft />
         </Grid>
         <Grid item xs={9.5} >
-          <MainContent userIDStart={userIDStart}/>
+          <MainContent friendID={friendID}/>
         </Grid>
       </Grid>
     </>
