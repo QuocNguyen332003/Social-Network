@@ -11,6 +11,7 @@ import { toast, ToastContainer } from 'react-toastify';
 
 const PersonalManagementContent = () => {
   // Get the group and setGroup function from OutletContext (passed from parent)
+  const token = localStorage.getItem('token');
   const { group, role: parentRole } = useOutletContext<{ group: Group, role: 'owner' | 'admin' | 'member' | 'none' }>(); // Nhận role từ OutletContext
   const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
   const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
@@ -35,7 +36,13 @@ const PersonalManagementContent = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/user/${currentUserId}/articles`);
+      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/user/${currentUserId}/articles`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setPosts(response.data.articles);
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);
@@ -48,7 +55,13 @@ const PersonalManagementContent = () => {
   // Gọi API để lấy lời mời quản trị viên của người dùng hiện tại trong nhóm
   const fetchPendingInvites = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/user/${currentUserId}/pending-invites`);
+      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/user/${currentUserId}/pending-invites`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setPendingInvites(response.data.pendingInvites);
     } catch (error) {
       console.error('Lỗi khi lấy lời mời:', error);
@@ -58,7 +71,13 @@ const PersonalManagementContent = () => {
 
   const handleLikePost = async (postId: string) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/like`, { userId: currentUserId });
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/like`, { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       if (response.status === 200) {
         setPosts((prevPosts) =>
           prevPosts.map((post) => {
@@ -80,7 +99,13 @@ const PersonalManagementContent = () => {
 
   const handleAddComment = async (postId: string, newComment: Comment) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments`, newComment);
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments`, newComment,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post._id === postId
@@ -95,7 +120,13 @@ const PersonalManagementContent = () => {
 
   const handleAddReply = async (postId: string, commentId: string, newReply: Comment) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply`, newReply);
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply`, newReply,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setPosts((prevPosts) =>
         prevPosts.map((post) => {
           if (post._id === postId) {
@@ -117,7 +148,13 @@ const PersonalManagementContent = () => {
 
   const handleReportPost = async (postId: string, reason: string) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/report`, { userId: currentUserId, reason });
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/report`, { userId: currentUserId, reason },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       console.log('Báo cáo thành công:', response.data);
     } catch (error) {
       console.error('Lỗi khi báo cáo bài viết:', error);
@@ -128,6 +165,11 @@ const PersonalManagementContent = () => {
     try {
       const response = await axios.post(`http://localhost:3000/v1/article/${postId}/save`, {
         userId: currentUserId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       if (response.status === 200) {
         alert('Lưu bài viết thành công!');
@@ -140,7 +182,13 @@ const PersonalManagementContent = () => {
 
   const handleDeletePost = async (postId: string) => {
     try {
-      const response = await axios.delete(`http://localhost:3000/v1/article/${postId}`);
+      const response = await axios.delete(`http://localhost:3000/v1/article/${postId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       if (response.status === 200) {
         setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
         toast.success('Xóa bài viết thành công!');
@@ -156,6 +204,11 @@ const PersonalManagementContent = () => {
       const response = await axios.put(`http://localhost:3000/v1/article/${postId}/edit`, {
         content: updatedContent,
         scope: updatedScope
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       if (response.status === 200) {
         setPosts((prevPosts) =>
@@ -174,7 +227,13 @@ const PersonalManagementContent = () => {
   const handleLikeComment = async (postId: string, commentId: string) => {
     try {
       
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/like`, { userId: currentUserId });
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/like`, { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       if (response.status === 200) {
         setPosts((prevPosts) =>
           prevPosts.map((post) => {
@@ -204,7 +263,12 @@ const PersonalManagementContent = () => {
     try {
       const response = await axios.post(
         `http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply/${replyId}/like`,
-        { userId: currentUserId }
+        { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
   
       if (response.status === 200) {
@@ -245,6 +309,11 @@ const PersonalManagementContent = () => {
         content: shareContent,
         scope: shareScope,
         userId: currentUserId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       console.log('Bài viết đã được chia sẻ thành công:', response.data);
       // Cập nhật danh sách bài viết sau khi chia sẻ
@@ -256,7 +325,13 @@ const PersonalManagementContent = () => {
 
   const handleAcceptInvite = async (inviteId: string) => {
     try {
-      await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/accept-admin`, { userId: inviteId });
+      await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/accept-admin`, { userId: inviteId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+      );
       fetchPendingInvites(); // Cập nhật lại lời mời sau khi chấp nhận
       toast.success('Chấp nhận lời mời thành công!');
     } catch (error) {
@@ -267,7 +342,13 @@ const PersonalManagementContent = () => {
 
   const handleRejectInvite = async (inviteId: string) => {
     try {
-      await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/reject-admin`, { userId: inviteId });
+      await axios.post(`http://localhost:3000/v1/group/${group._id}/invite/reject-admin`, { userId: inviteId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       fetchPendingInvites(); // Cập nhật lại lời mời sau khi từ chối
       toast.success('Từ chối lời mời thành công!');
     } catch (error) {
@@ -283,6 +364,11 @@ const PersonalManagementContent = () => {
     try {
       const response = await axios.post(`http://localhost:3000/v1/group/${group._id}/remove-admin`, {
         userId: currentUserId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
       });
 
       if (response.status === 200) {

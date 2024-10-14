@@ -25,6 +25,7 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
   user,
   setUser,
 }) => {
+  const token = localStorage.getItem('token'); // Lấy token từ localStorage
   const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
 
@@ -38,7 +39,13 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/v1/user/${user._id}`);
+      const response = await axios.get(`http://localhost:3000/v1/user/${user._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setUser(response.data); // Cập nhật trạng thái người dùng
     } catch (error) {
       toast.error('Lỗi khi tải lại dữ liệu người dùng');
@@ -50,6 +57,11 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
       // Add the article to the selected collection
       await axios.post(`http://localhost:3000/v1/saved/articles/${article._id}/${collection}`, {
         userId: user._id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       toast.success('Bài viết đã được thêm vào bộ sưu tập!');
       handleCloseDialog();
@@ -62,7 +74,12 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
   const handleRemoveFromCollection = async () => {
     try {
       await axios.delete(`http://localhost:3000/v1/saved/articles/${article._id}`, {
-        data: { userId: user._id },
+        headers: {
+          Authorization: `Bearer ${token}` // Thêm token vào headers
+        },
+        data: {
+          userId: user._id,
+        },
       });
       toast.success('Bài viết đã được xóa khỏi bộ sưu tập thành công!');
       await fetchUserData(); // Gọi hàm này để tải lại dữ liệu người dùng

@@ -7,18 +7,25 @@ import axios from 'axios'; // Thêm axios để gọi API
 import { Group, Article } from '../../../../../../interface/interface.ts';
 
 const ApprovaGroupContent: React.FC = () => {
+  const token = localStorage.getItem('token');
   const { group } = useOutletContext<{ group: Group }>();
-  const [pendingPosts, setPendingPosts] = useState<Article[]>([]); // State lưu trữ các bài viết pending
-  const [approvedPosts, setApprovedPosts] = useState<string[]>([]); // Lưu trữ các bài viết đã duyệt
-  const [rejectedPosts, setRejectedPosts] = useState<string[]>([]); // Lưu trữ các bài viết bị từ chối
-  const [loading, setLoading] = useState(true); // State loading để hiển thị vòng tròn chờ khi tải dữ liệu
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
+  const [pendingPosts, setPendingPosts] = useState<Article[]>([]); 
+  const [approvedPosts, setApprovedPosts] = useState<string[]>([]); 
+  const [rejectedPosts, setRejectedPosts] = useState<string[]>([]); 
+  const [loading, setLoading] = useState(true); 
+  const currentUserId = localStorage.getItem('userId') || ''; 
   // Gọi API để lấy danh sách bài viết đang chờ duyệt khi component được render lần đầu
   useEffect(() => {
     const fetchPendingArticles = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/pending-articles`);
+        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/pending-articles`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+          }
+        );
         setPendingPosts(response.data.articles || []); // Cập nhật danh sách bài viết vào state
       } catch (error) {
         console.error('Lỗi khi lấy danh sách bài viết pending:', error);
@@ -34,7 +41,12 @@ const ApprovaGroupContent: React.FC = () => {
     try {
       const response = await axios.post(
         `http://localhost:3000/v1/group/${group._id}/article/${postId}/processed`,
-        { userId: currentUserId } // Thêm userId vào body của request
+        { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        } 
       );
       
       if (response.status === 200) {
@@ -61,7 +73,12 @@ const ApprovaGroupContent: React.FC = () => {
     try {
       const response = await axios.post(
         `http://localhost:3000/v1/group/${group._id}/article/${postId}/reject`,
-        { userId: currentUserId } // Thêm userId vào body của request
+        { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        } 
       );
   
       if (response.status === 200) {

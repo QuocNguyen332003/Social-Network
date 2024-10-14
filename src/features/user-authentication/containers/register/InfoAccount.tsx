@@ -1,19 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   TextField,
-  Link,
   Grid,
   Box,
+  Typography,
+  Link,
   FormControlLabel,
   Checkbox,
-  Typography,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-
 const InfoAccount: React.FC = () => {
   const navigate = useNavigate();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Kiểm tra nếu mật khẩu không khớp
+    if (password !== confirmPassword) {
+      alert('Mật khẩu không khớp');
+      return;
+    }
+
+    // Điều hướng và truyền dữ liệu qua URL (query string)
+    navigate(`/register/fill-information?firstName=${firstName}&lastName=${lastName}&email=${email}&password=${password}`);
+  };
 
   return (
     <Box
@@ -23,15 +40,19 @@ const InfoAccount: React.FC = () => {
         alignItems: 'center',
       }}
     >
-        <img src="./src/assets/images/QQ Social.png" alt="Logo" style={{ marginBottom: 16, maxWidth: '50%' }} /> {/* Thêm logo */}
-        <Typography
-          component="h1"
-          variant="h5"
-          sx={{ fontWeight: 800, fontSize: 40 }}
-        >
-          Đăng ký
-        </Typography>
-        <Box component="form" noValidate sx={{ mt: 3 }}>
+      <img
+        src="./src/assets/images/QQ Social.png"
+        alt="Logo"
+        style={{ marginBottom: 16, maxWidth: '50%' }}
+      />
+      <Typography
+        component="h1"
+        variant="h5"
+        sx={{ fontWeight: 800, fontSize: 40 }}
+      >
+        Đăng ký
+      </Typography>
+      <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -42,6 +63,8 @@ const InfoAccount: React.FC = () => {
               id="firstName"
               label="Họ"
               autoFocus
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -52,6 +75,8 @@ const InfoAccount: React.FC = () => {
               label="Tên"
               name="lastName"
               autoComplete="family-name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -62,6 +87,8 @@ const InfoAccount: React.FC = () => {
               label="Email"
               name="email"
               autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -73,6 +100,8 @@ const InfoAccount: React.FC = () => {
               type="password"
               id="password"
               autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -84,6 +113,8 @@ const InfoAccount: React.FC = () => {
               type="password"
               id="confirmPassword"
               autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -98,7 +129,7 @@ const InfoAccount: React.FC = () => {
           fullWidth
           variant="contained"
           sx={{ mt: 3, mb: 2, bgcolor: '#1976d2', ':hover': { bgcolor: '#1565c0' } }}
-          onClick={() => navigate('/register/fill-infomation')}>
+        >
           Đăng ký
         </Button>
         <Grid container justifyContent="center">
@@ -114,7 +145,6 @@ const InfoAccount: React.FC = () => {
         </Grid>
       </Box>
     </Box>
-    
   );
 };
 

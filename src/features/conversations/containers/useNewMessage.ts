@@ -3,6 +3,7 @@ import { Content, ConversationAPI, DataUser } from "./interfaceMessage";
 import axios from "axios";
 
 const useNewMessage = () => {
+    const token = localStorage.getItem('token');
     const currentUserId = localStorage.getItem('userId') || '';
     const [NewConversation, setNewConversation] = useState<ConversationAPI | null>(null);
     const [idFriend, setIdFriend] = useState<string | null>(null);
@@ -16,11 +17,17 @@ const useNewMessage = () => {
                     friendID: idFriend,
                     message: content
                  },
+                 {
+                    headers: {
+                      Authorization: `Bearer ${token}`, // Thêm token vào header
+                    },
+                }
             );
             setNewConversation(response.data);
           } catch (error) {
             console.error('Lỗi khi lấy bài viết:', error);
           } finally {
+            console.log()
           }
     }
 

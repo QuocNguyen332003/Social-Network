@@ -7,6 +7,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const RulesGroupContent: React.FC = () => {
+  const token = localStorage.getItem('token');
   const context = useOutletContext<{ group: Group; role: string; handleUpdateRules: (rules: string[]) => void }>(); // Nhận thêm role từ context
   const { group, role, handleUpdateRules } = context;
 
@@ -23,6 +24,11 @@ const RulesGroupContent: React.FC = () => {
       const response = await axios.put(`http://localhost:3000/v1/group/${group._id}/rules`, {
         rules: rules,
         userId: localStorage.getItem('userId'),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       toast.success(response.data.message);
       handleUpdateRules(rules);

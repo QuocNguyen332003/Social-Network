@@ -6,6 +6,7 @@ import Post from '../../../../shared/components/post/Post';
 import { Article, Comment } from '../../../../interface/interface';
 
 const ProfilePost = () => {
+  const token = localStorage.getItem('token');
   const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
   const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
   const [error, setError] = useState<string | null>(null); // State cho lỗi
@@ -20,7 +21,13 @@ const ProfilePost = () => {
     setIsLoading(true);
     setError(null); // Reset lỗi trước khi gọi API
     try {
-      const response = await axios.get(`http://localhost:3000/v1/article/user/${currentUserId}/articles`);
+      const response = await axios.get(`http://localhost:3000/v1/article/user/${currentUserId}/articles`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setPosts(response.data);
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);
@@ -44,7 +51,10 @@ const ProfilePost = () => {
   
     try {
       const response = await axios.post('http://localhost:3000/v1/article', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+         },
       });
       console.log('Bài viết đã được tạo thành công:', response.data);
       setPosts((prevPosts) => [response.data.post, ...prevPosts]); 
@@ -56,7 +66,13 @@ const ProfilePost = () => {
 
   const handleLikePost = async (postId: string) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/like`, { userId: currentUserId });
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/like`, { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       if (response.status === 200) {
         setPosts((prevPosts) =>
           prevPosts.map((post) => {
@@ -78,7 +94,13 @@ const ProfilePost = () => {
 
   const handleAddComment = async (postId: string, newComment: Comment) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments`, newComment);
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments`, newComment,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post._id === postId
@@ -93,7 +115,13 @@ const ProfilePost = () => {
 
   const handleAddReply = async (postId: string, commentId: string, newReply: Comment) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply`, newReply);
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply`, newReply,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setPosts((prevPosts) =>
         prevPosts.map((post) => {
           if (post._id === postId) {
@@ -115,7 +143,13 @@ const ProfilePost = () => {
 
   const handleReportPost = async (postId: string, reason: string) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/report`, { userId: currentUserId, reason });
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/report`, { userId: currentUserId, reason },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       console.log('Báo cáo thành công:', response.data);
     } catch (error) {
       console.error('Lỗi khi báo cáo bài viết:', error);
@@ -126,6 +160,11 @@ const ProfilePost = () => {
     try {
       const response = await axios.post(`http://localhost:3000/v1/article/${postId}/save`, {
         userId: currentUserId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       if (response.status === 200) {
         alert('Lưu bài viết thành công!');
@@ -138,7 +177,13 @@ const ProfilePost = () => {
 
   const handleDeletePost = async (postId: string) => {
     try {
-      const response = await axios.delete(`http://localhost:3000/v1/article/${postId}`);
+      const response = await axios.delete(`http://localhost:3000/v1/article/${postId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       if (response.status === 200) {
         setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId)); // Loại bỏ bài viết đã xóa ra khỏi danh sách bài viết hiện tại
         alert('Xóa bài viết thành công!');
@@ -153,6 +198,11 @@ const ProfilePost = () => {
       const response = await axios.put(`http://localhost:3000/v1/article/${postId}/edit`, {
         content: updatedContent,
         scope: updatedScope
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       if (response.status === 200) {
         setPosts((prevPosts) =>
@@ -171,7 +221,13 @@ const ProfilePost = () => {
   const handleLikeComment = async (postId: string, commentId: string) => {
     try {
       
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/like`, { userId: currentUserId });
+      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/comments/${commentId}/like`, { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       if (response.status === 200) {
         setPosts((prevPosts) =>
           prevPosts.map((post) => {
@@ -201,7 +257,12 @@ const ProfilePost = () => {
     try {
       const response = await axios.post(
         `http://localhost:3000/v1/article/${postId}/comments/${commentId}/reply/${replyId}/like`,
-        { userId: currentUserId }
+        { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
   
       if (response.status === 200) {
@@ -242,6 +303,11 @@ const ProfilePost = () => {
         content: shareContent,
         scope: shareScope,
         userId: currentUserId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       console.log('Bài viết đã được chia sẻ thành công:', response.data);
       // Cập nhật danh sách bài viết sau khi chia sẻ

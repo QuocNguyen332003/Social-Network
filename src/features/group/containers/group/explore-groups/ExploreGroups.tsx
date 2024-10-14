@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Group } from '../../../../../interface/interface';
 
 const ExploreGroups: React.FC = () => {
+  const token = localStorage.getItem('token');
   const [notJoinedGroups, setNotJoinedGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -17,7 +18,13 @@ const ExploreGroups: React.FC = () => {
       try {
         setLoading(true);
         const userId = localStorage.getItem('userId');
-        const response = await axios.get(`http://localhost:3000/v1/group/${userId}/not-joined-groups`);
+        const response = await axios.get(`http://localhost:3000/v1/group/${userId}/not-joined-groups`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
+        );
   
         // Đảm bảo gán đúng giá trị từ dữ liệu trả về
         const { groups } = response.data;
@@ -50,7 +57,13 @@ const ExploreGroups: React.FC = () => {
     if (!selectedGroup) return;
     try {
       const userId = localStorage.getItem('userId');
-      await axios.post(`http://localhost:3000/v1/group/${selectedGroup._id}/join`, { userId });
+      await axios.post(`http://localhost:3000/v1/group/${selectedGroup._id}/join`, { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       alert(`Đã gửi yêu cầu tham gia nhóm thành công!`);
 
       // Cập nhật lại trạng thái nhóm thành `pending`
@@ -70,7 +83,13 @@ const ExploreGroups: React.FC = () => {
   const handleRevokeRequest = async (groupId: string) => {
     try {
       const userId = localStorage.getItem('userId');
-      await axios.post(`http://localhost:3000/v1/group/${groupId}/revoke-request`, { userId });
+      await axios.post(`http://localhost:3000/v1/group/${groupId}/revoke-request`, { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
 
       // Cập nhật lại trạng thái nhóm thành `not_joined`
       setNotJoinedGroups((prevGroups) =>

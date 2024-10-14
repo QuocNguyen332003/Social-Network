@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {useEffect, useState } from "react"
 import axios from "axios";
 import { CardConversationAPI, Content } from "./interfaceMessage";
@@ -5,6 +6,7 @@ import { CardConversationAPI, Content } from "./interfaceMessage";
 
 
 export const useChatList = () => {
+    const token = localStorage.getItem('token');
     const currentUserId = localStorage.getItem('userId') || '';
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -39,7 +41,13 @@ export const useChatList = () => {
     };
     const putReadMessage = async (_idConversation: string) => {
       try {
-        const response = await axios.put(`http://localhost:3000/v1/messages/read-message/${_idConversation}/${currentUserId}`);
+        const response = await axios.put(`http://localhost:3000/v1/messages/read-message/${_idConversation}/${currentUserId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
+        );
       } catch (error) {
         console.error('Lỗi khi lấy bài viết:', error);
         setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
@@ -50,7 +58,13 @@ export const useChatList = () => {
 
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/v1/messages/${currentUserId}`);
+        const response = await axios.get(`http://localhost:3000/v1/messages/${currentUserId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
+        );
         setData(response.data);
         setFilterData(response.data);
       } catch (error) {

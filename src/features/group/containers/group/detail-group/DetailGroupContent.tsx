@@ -8,7 +8,7 @@ import { Group } from '../../../../../interface/interface';
 
 const DetailGroupContent: React.FC = () => {
   const location = useLocation();
-
+  const token = localStorage.getItem('token');
   // State lưu trữ dữ liệu nhóm và vai trò người dùng
   const [group, setGroup] = useState<Group | undefined>(location.state?.group);
   const [role, setRole] = useState<'owner' | 'admin' | 'member' | 'none'>(location.state?.role || 'none');
@@ -18,8 +18,11 @@ const DetailGroupContent: React.FC = () => {
   const fetchUserRole = async (groupId: string, userId: string) => {
     try {
       const response = await axios.get(`http://localhost:3000/v1/group/${groupId}/role`, {
+        headers: {
+          Authorization: `Bearer ${token}` // Thêm token vào headers
+        },
         params: { userId },
-      });
+      },);
       setRole(response.data.role); // Cập nhật lại vai trò người dùng
     } catch (error) {
       console.error('Lỗi khi lấy vai trò của người dùng trong nhóm:', error);

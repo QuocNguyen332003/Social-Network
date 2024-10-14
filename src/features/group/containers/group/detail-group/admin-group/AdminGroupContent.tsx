@@ -22,6 +22,7 @@ import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 
 const AdminGroupContent: React.FC = () => {
+  const token = localStorage.getItem('token');
   const { group, role } = useOutletContext<{ group: Group; role: string }>(); // Nhận `role` từ context
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
   const [openPendingDialog, setOpenPendingDialog] = useState(false);
@@ -38,7 +39,13 @@ const AdminGroupContent: React.FC = () => {
 
   const fetchAvailableMembers = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/available-members`);
+      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/available-members`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setAvailableMembers(response.data.availableMembers);
     } catch (error) {
       console.error('Error fetching available members:', error);
@@ -47,7 +54,13 @@ const AdminGroupContent: React.FC = () => {
 
   const fetchAcceptedAdmins = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/accepted-admins`);
+      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/accepted-admins`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setAcceptedAdmins(response.data.acceptedAdministrators);
     } catch (error) {
       console.error('Error fetching accepted administrators:', error);
@@ -56,7 +69,13 @@ const AdminGroupContent: React.FC = () => {
 
   const fetchPendingInvites = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/pending-invites`);
+      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/pending-invites`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setPendingInvites(response.data.pendingInvites);
     } catch (error) {
       console.error('Error fetching pending invites:', error);
@@ -81,7 +100,13 @@ const AdminGroupContent: React.FC = () => {
 
   const handleCancelInvite = async (userId: string) => {
     try {
-      await axios.post(`http://localhost:3000/v1/group/${group._id}/cancel-invite`, { userId, currentUserId });
+      await axios.post(`http://localhost:3000/v1/group/${group._id}/cancel-invite`, { userId, currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setPendingInvites((prev) => prev.filter((invite) => invite.idUser._id !== userId));
       toast.success('Đã huỷ lời mời cho quản trị viên');
       fetchAvailableMembers(); // Cập nhật danh sách thành viên
@@ -92,7 +117,13 @@ const AdminGroupContent: React.FC = () => {
 
   const handleRemoveAdmin = async (userId: string) => {
     try {
-      await axios.post(`http://localhost:3000/v1/group/${group._id}/remove-admin`, { userId });
+      await axios.post(`http://localhost:3000/v1/group/${group._id}/remove-admin`, { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setAcceptedAdmins((prev) => prev.filter((admin) => admin.idUser._id !== userId));
       toast.success('Đã xóa quản trị viên.');
       fetchAvailableMembers(); // Cập nhật danh sách thành viên
@@ -110,6 +141,11 @@ const AdminGroupContent: React.FC = () => {
       await axios.post(`http://localhost:3000/v1/group/${group._id}/add-admin`, {
         adminId: userId,
         currentUserId: currentUserId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       });
       toast.success(`Đã gửi lời mời quản trị viên.`);
       await fetchAvailableMembers();

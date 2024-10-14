@@ -28,6 +28,7 @@ interface SavedSidebarProps {
 }
 
 const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, setUser }) => {
+  const token = localStorage.getItem('token'); // Lấy token từ localStorage
   const [openDialog, setOpenDialog] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -55,9 +56,13 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
   const handleCreateCollection = async () => {
     if (newCollectionName.trim() && user) {
       try {
-        const response = await axios.post('http://localhost:3000/v1/saved', {
+        const response = await axios.post('http://localhost:3000/v1/saved',  {
           userId: user._id,
           name: newCollectionName
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
         });
 
         const { collection } = response.data;
@@ -82,6 +87,11 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
         await axios.put(`http://localhost:3000/v1/saved/${editingCollection}`, {
           userId: user._id,
           newName: newCollectionName
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
         });
 
         const updatedCollections = user.collections.map(col => {
@@ -118,6 +128,11 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
       try {
         await axios.patch(`http://localhost:3000/v1/saved/${editingCollection}/delete`, {
           userId: user._id
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
         });
 
         const updatedCollections = user.collections.map(col => {
