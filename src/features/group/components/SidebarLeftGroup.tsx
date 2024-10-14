@@ -22,7 +22,8 @@ import {
   Select,
   MenuItem,
   Box,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  CircularProgress
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -412,8 +413,13 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
           <Button onClick={handleCloseCreateGroupDialog} variant="outlined" sx={{ borderRadius: '8px', px: 3 }}>
             Hủy
           </Button>
-          <Button variant="contained" onClick={handleCreateGroup} sx={{ backgroundColor: '#1976d2', borderRadius: '8px', px: 3 }}>
-            Tạo nhóm
+          <Button
+            variant="contained"
+            onClick={handleCreateGroup}
+            sx={{ backgroundColor: '#1976d2', borderRadius: '8px', px: 3 }}
+            disabled={loading} // Vô hiệu hóa nút khi loading
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Tạo nhóm'} {/* Hiển thị loading spinner */}
           </Button>
         </DialogActions>
       </Dialog>

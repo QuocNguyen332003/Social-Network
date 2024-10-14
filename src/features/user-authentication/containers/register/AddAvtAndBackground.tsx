@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
  
 import React, { useRef, useState } from "react";
-import { Avatar, Box, Button, Grid, IconButton, Typography } from "@mui/material";
+import { Avatar, Box, Button, CircularProgress, Grid, IconButton, Typography } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import axios from "axios";
@@ -11,10 +12,11 @@ import "react-toastify/dist/ReactToastify.css";
 const AddAvtAndBackground: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [isAvt, setIsAvt] = useState<boolean>(true);
+  const avtFileInputRef = useRef<HTMLInputElement | null>(null);
+  const bgFileInputRef = useRef<HTMLInputElement | null>(null);
   const [avt, setAvt] = useState<string>("");
   const [background, setBackground] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false); // State để kiểm tra trạng thái loading
 
   // Lấy dữ liệu từ URL
   const searchParams = new URLSearchParams(location.search);
@@ -28,35 +30,22 @@ const AddAvtAndBackground: React.FC = () => {
   const birthday = searchParams.get("birthday");
   const hobbies = searchParams.get("hobbies");
 
-  const openFile = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvtChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
     if (file) {
-      const fileUrl = URL.createObjectURL(file);
-      if (isAvt) {
-        setAvt(fileUrl);
-      } else {
-        setBackground(fileUrl);
-      }
+      setAvt(URL.createObjectURL(file));
     }
   };
 
-  const handlePressChangeBackground = () => {
-    openFile();
-    setIsAvt(false);
-  };
-
-  const handlePressChangeAvt = () => {
-    openFile();
-    setIsAvt(true);
+  const handleBgChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files && event.target.files[0];
+    if (file) {
+      setBackground(URL.createObjectURL(file));
+    }
   };
 
   const registerUser = async () => {
+    setLoading(true); // Bật trạng thái loading
     try {
       const formData = new FormData();
       formData.append("firstName", firstName as string);
@@ -68,51 +57,38 @@ const AddAvtAndBackground: React.FC = () => {
       formData.append("gender", gender as string);
       formData.append("birthday", birthday as string);
       formData.append("hobbies", hobbies as string);
-  
-      // Thêm avatar và background nếu có
-      if (fileInputRef.current && fileInputRef.current.files) {
-        const files = fileInputRef.current.files;
-        if (files.length > 0) {
-          if (isAvt) {
-            formData.append("avt", files[0]);
-          } else {
-            formData.append("backGround", files[0]);
-          }
-        }
+
+      // Thêm avatar và background vào form data
+      if (avtFileInputRef.current?.files?.[0]) {
+        formData.append("avt", avtFileInputRef.current.files[0]);
       }
-  
+      if (bgFileInputRef.current?.files?.[0]) {
+        formData.append("backGround", bgFileInputRef.current.files[0]);
+      }
+
       // Gửi yêu cầu API đăng ký
       const response = await axios.post("http://localhost:3000/v1/auth/register", formData, {
         headers: {
           "Content-Type": "multipart/form-data"
         },
       });
-      console.log(response.data)
-      // Kiểm tra phản hồi từ API
+
       if (response.data.success) {
-        // Đăng ký thành công
-        toast.success("Tạo tài khoản thành công!"); // Hiển thị thông báo thành công
-        setTimeout(() => {
-          navigate("/login"); // Chuyển về trang đăng nhập sau 3 giây
-        }, 1000);
+        toast.success("Tạo tài khoản thành công!");
+        setTimeout(() => navigate("/login"), 1000);
       } else {
-        // Đăng ký thất bại với message từ server
         toast.error("Đăng ký thất bại: " + response.data.message);
       }
     } catch (error: any) {
-      // Xử lý lỗi từ phía server
-      if (error.response && error.response.status === 400) {
-        toast.error("Lỗi: " + error.response.data.message); // Lỗi như email đã tồn tại
-      } else {
-        toast.error("Có lỗi xảy ra. Vui lòng thử lại sau.");
-      }
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại sau.");
+    } finally {
+      setLoading(false); // Tắt trạng thái loading sau khi xử lý xong
     }
   };
-  
 
   return (
     <Grid container sx={{ backgroundColor: "#e9e9e9", height: "98vh" }}>
-      <ToastContainer /> {/* Toast container để hiển thị thông báo */}
+      <ToastContainer />
       <Grid xs={2.5}></Grid>
       <Grid xs={7}>
         <Box sx={{ display: "flex", alignItems: "center", backgroundColor: "#fff", borderBottom: "1px solid #e9e9e9" }}>
@@ -146,7 +122,7 @@ const AddAvtAndBackground: React.FC = () => {
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
             }}
-            onClick={handlePressChangeBackground}
+            onClick={() => bgFileInputRef.current?.click()}
           >
             <AddAPhotoIcon />
             <Typography variant="body1" color="black">
@@ -154,15 +130,12 @@ const AddAvtAndBackground: React.FC = () => {
             </Typography>
           </IconButton>
           <Box sx={{ position: "absolute", bottom: "20px", left: "16px", display: "flex", alignItems: "center" }}>
-            <IconButton sx={{ padding: 0 }} onClick={handlePressChangeAvt}>
+            <IconButton sx={{ padding: 0 }} onClick={() => avtFileInputRef.current?.click()}>
               <Avatar
                 src={avt}
-                sx={{ width: "150px", height: "150px", border: "4px solid white", display: "flex", flexDirection: "column" }}
+                sx={{ width: "150px", height: "150px", border: "4px solid white" }}
               >
                 <AddAPhotoIcon />
-                <Typography variant="body1" color="black">
-                  Thêm ảnh
-                </Typography>
               </Avatar>
             </IconButton>
             <Box sx={{ marginLeft: "16px", marginTop: "10px" }}>
@@ -174,7 +147,8 @@ const AddAvtAndBackground: React.FC = () => {
               </Typography>
             </Box>
           </Box>
-          <input type="file" ref={fileInputRef} style={{ display: "none" }} accept="image/*" onChange={handleFileChange} />
+          <input type="file" ref={avtFileInputRef} style={{ display: "none" }} accept="image/*" onChange={handleAvtChange} />
+          <input type="file" ref={bgFileInputRef} style={{ display: "none" }} accept="image/*" onChange={handleBgChange} />
         </Box>
         <Box sx={{ display: "flex", padding: "20px 20vw", backgroundColor: "#fff" }}>
           <Button
@@ -183,8 +157,9 @@ const AddAvtAndBackground: React.FC = () => {
             variant="contained"
             sx={{ margin: "0px 10px", mt: 3, mb: 2, bgcolor: "#1976d2", ":hover": { bgcolor: "#1565c0" } }}
             onClick={registerUser}
+            disabled={loading} // Disable nút khi đang loading
           >
-            Xác nhận
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Xác nhận"} {/* Hiển thị loading spinner */}
           </Button>
         </Box>
       </Grid>
