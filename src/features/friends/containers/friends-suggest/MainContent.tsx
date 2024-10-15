@@ -1,12 +1,12 @@
 import { Box, Typography } from "@mui/material";
 import FriendsCard from "../../components/FriendsCard";
 import { BoxButtonSuggest } from "../../components/BoxButton";
-import { useRequestFriend } from "./useRequestFriend";
+import { useSuggestFriend } from "./useSuggestFriend";
 import { useDialogRequestFriend } from "./useDialogRequestFriend";
 import ConfirmDialog from "../../components/ConfirmDialog";
 
 function App() {  
-  const {data, SendAddFriend} = useRequestFriend();
+  const {data, SendAddFriend} = useSuggestFriend();
   const {showDialog,message, setShowDialog, SetValueDialog} = useDialogRequestFriend();
 
   const PressAddFiend = (userID: string, name: string) => {
@@ -34,7 +34,7 @@ function App() {
         avt={item.avt} 
         name={item.name} 
         message={item.aboutMe}>
-          <BoxButtonSuggest FuncButton={[() => {PressAddFiend(item.userID, item.name)}]}/>
+          <BoxButtonSuggest FuncButton={[() => {PressAddFiend(item.idUser, item.name)}]}/>
         </FriendsCard>)}
       <ConfirmDialog
         title = {"Thông Báo"}

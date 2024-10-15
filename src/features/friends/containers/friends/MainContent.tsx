@@ -29,7 +29,7 @@ function App() {
       <FriendsCard avt={item.avt} 
               name={item.name} 
               message={item.aboutMe}
-              > <BoxButtonAllFriends FuncButton={[()=> {askDeleteFriend(item.userID, item.name)}, () => {viewPersonalPage(item.userID)}]}/>
+              > <BoxButtonAllFriends FuncButton={[()=> {askDeleteFriend(item.idUser, item.name)}, () => {viewPersonalPage(item.idUser)}]}/>
       </FriendsCard>
       )}
       <ConfirmDialog

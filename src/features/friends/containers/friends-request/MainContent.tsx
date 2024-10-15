@@ -9,13 +9,13 @@ function App() {
   const {data, AcceptsFriend, RefuseFriend} = useRequestFriend();
   const {showDialog,message, setShowDialog, SetValueDialog} = useDialogRequestFriend();
 
-  const PressAcceptsFriend = (userID: string, name: string) => {
-    AcceptsFriend(userID);
+  const PressAcceptsFriend = (_id: string | null, name: string) => {
+    AcceptsFriend(_id);
     SetValueDialog(`Bạn và ${name} đã trở thành bạn bè`);
   }
 
-  const PressRefuseFriend = (userID: string, name: string) => {
-      RefuseFriend(userID);
+  const PressRefuseFriend = (_id: string | null, name: string) => {
+      RefuseFriend(_id);
       SetValueDialog(`Bạn đã từ chối lời mời của ${name}`);
   }
   return (
@@ -39,8 +39,8 @@ function App() {
         avt={item.avt} 
         name={item.name} 
         message={item.aboutMe}>
-          <BoxButtonRequest FuncButton={[() => {PressRefuseFriend(item.userID, item.name)}, 
-                                        ()=> {PressAcceptsFriend(item.userID, item.name)}]}/>
+          <BoxButtonRequest FuncButton={[() => {PressRefuseFriend(item._id?item._id:null, item.name)}, 
+                                        ()=> {PressAcceptsFriend(item._id?item._id:null, item.name)}]}/>
         </FriendsCard>)}
       <ConfirmDialog
         title = {"Thông Báo"}

@@ -3,20 +3,21 @@ import FriendProps from "../../components/FriendProps";
 import axios from "axios";
 
 
-export const useRequestFriend = () => {
+export const useSuggestFriend = () => {
     const [data, setData] = useState<FriendProps[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
     const currentUserId = localStorage.getItem('userId') || '';
     const [page, setPage] = useState<number>(1);
-    useEffect(()=> {
-      getAllFriendRequest();
-    }, [])
 
-    const getAllFriendRequest = async () => {
+    useEffect(()=> {
+      getSuggestFriend();
+    }, []);
+
+    const getSuggestFriend = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/v1/friends/${currentUserId}/request?page=${page}`, 
+        const response = await axios.get(`http://localhost:3000/v1/friends/${currentUserId}/suggest?page=${page}`, 
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -31,31 +32,23 @@ export const useRequestFriend = () => {
         setIsLoading(false); 
       }
     }
-    const AcceptsFriend = (_id: string | null) => {
-        answerFriendRequest(_id, 'accepted');
-        const updatedData = data.filter(friend => friend._id !== _id);
-        setData(updatedData)
-    }
 
-    const RefuseFriend = (_id: string | null) => {
-        answerFriendRequest(_id, 'rejected');
-        const updatedData = data.filter(friend => friend._id !== _id);
-        setData(updatedData)
+    const SendAddFriend = (userID: string) => {
+        const updatedData = data.filter(friend => friend.idUser !== userID);
+        setData(updatedData);
+        addFriend(userID);
     }
-
-    const answerFriendRequest = async (_id: string | null, status: string) => {
+    const addFriend = async (userID: string) => {
       try {
-        if (_id !== null){
-          const response = await axios.put(`http://localhost:3000/v1/friends/${_id}/answer?status=${status}`,
-            {}, 
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          console.log(response.data);
-        }
+        const response = await axios.post(`http://localhost:3000/v1/friends/${currentUserId}/add-friend?receiverId=${userID}`, 
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response);
       } catch (error) {
         console.error('Lỗi khi lấy bài viết:', error);
         setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
@@ -63,11 +56,10 @@ export const useRequestFriend = () => {
         setIsLoading(false); 
       }
     }
-
     return {
-        data, isLoading, error,
+        data,
+        SendAddFriend,
         setPage,
-        AcceptsFriend,
-        RefuseFriend
+        isLoading, error,
     }
 }
