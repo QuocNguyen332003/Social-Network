@@ -55,7 +55,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
           return (
             <Box key={index} sx={{ marginBottom: 2, padding: 2, borderRadius: 2, backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
               <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
-                {comment?._iduser?.displayName}
+                {typeof comment._iduser !== 'string' ? comment._iduser.displayName : 'Anonymous'}
               </Typography>
               <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
                 {comment.content}

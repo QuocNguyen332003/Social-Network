@@ -14,9 +14,9 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
   const [emojiDialogOpen, setEmojiDialogOpen] = useState(false); // Hộp thoại emoji
   const [displayName, setDisplayName] = useState(''); // Tên hiển thị người dùng
 
-  // Cập nhật tên hiển thị người dùng từ localStorage
+  // Cập nhật tên hiển thị người dùng từ sessionStorage
   useEffect(() => {
-    const userDisplayName = localStorage.getItem('displayName');
+    const userDisplayName = sessionStorage.getItem('displayName');
     if (userDisplayName) {
       setDisplayName(userDisplayName);
     }

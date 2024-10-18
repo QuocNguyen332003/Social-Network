@@ -7,13 +7,13 @@ import axios from 'axios'; // Thêm axios để gọi API
 import { Group, Article } from '../../../../../../interface/interface.ts';
 
 const ApprovaGroupContent: React.FC = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const { group } = useOutletContext<{ group: Group }>();
   const [pendingPosts, setPendingPosts] = useState<Article[]>([]); 
   const [approvedPosts, setApprovedPosts] = useState<string[]>([]); 
   const [rejectedPosts, setRejectedPosts] = useState<string[]>([]); 
   const [loading, setLoading] = useState(true); 
-  const currentUserId = localStorage.getItem('userId') || ''; 
+  const currentUserId = sessionStorage.getItem('userId') || ''; 
   // Gọi API để lấy danh sách bài viết đang chờ duyệt khi component được render lần đầu
   useEffect(() => {
     const fetchPendingArticles = async () => {

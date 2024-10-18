@@ -9,7 +9,7 @@ export type ChatListProps = {
 }
 
 const ChatList = ({data, changeChat} : ChatListProps) => {
-  const currentUserId = localStorage.getItem('userId') || '';
+  const currentUserId = sessionStorage.getItem('userId') || '';
   const [currMessage, setCurrMessage] = useState<string|null>(null);
   const clickChatList = (userID: string, _idConversation: string) => {
     changeChat(userID, _idConversation);

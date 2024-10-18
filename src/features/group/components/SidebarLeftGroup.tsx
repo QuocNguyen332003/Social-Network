@@ -40,7 +40,7 @@ import axios from 'axios'; // Thêm axios để gọi API
 
 const SidebarLeftGroup = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
   const [selectedTab, setSelectedTab] = useState('');
   const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
   const [hobbiesOptions] = useState(['Sports', 'Music', 'Travel', 'Reading', 'Movies']);
@@ -48,7 +48,7 @@ const SidebarLeftGroup = () => {
   const [error, setError] = useState('');
   const [newRule, setNewRule] = useState(''); // Dùng để nhập quy định mới
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorages
 
   const initialGroupData: Omit<Group, '_id'> = {
     warningLevel: 0,

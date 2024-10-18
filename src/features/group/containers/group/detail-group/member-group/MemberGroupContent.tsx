@@ -22,12 +22,12 @@ import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 
 const MemberGroupContent: React.FC = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const { group, role } = useOutletContext<{ group: Group; role: string }>(); // Nhận role từ context
   const [members, setMembers] = useState<{ idUser: { _id: string; displayName: string }; joinDate: Date; _id: string }[]>([]); // State để lưu danh sách thành viên
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // State để hiển thị hộp thoại xác nhận
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null); // Lưu ID thành viên được chọn để xóa
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorage
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
 
   // Gọi API để lấy danh sách thành viên của nhóm
   useEffect(() => {

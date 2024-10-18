@@ -10,7 +10,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const InviteGroupContent: React.FC = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const { group } = useOutletContext<{ group: Group }>(); // Nhận group từ Outlet context
   const [users, setUsers] = useState<User[]>([]); // State chứa danh sách người dùng
   const [sortCriteria, setSortCriteria] = useState<string>('name'); // Tiêu chí sắp xếp

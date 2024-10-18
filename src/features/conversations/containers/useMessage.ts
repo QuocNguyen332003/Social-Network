@@ -4,8 +4,8 @@ import { Content, ConversationAPI, DataUser } from "./interfaceMessage";
 import axios from "axios";
 
 export const useMessage = (friendID: string) => {
-  const token = localStorage.getItem('token');
-    const currentUserId = localStorage.getItem('userId') || '';
+  const token = sessionStorage.getItem('token');
+    const currentUserId = sessionStorage.getItem('userId') || '';
     const [conversation, setConversation] = useState<ConversationAPI | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -100,8 +100,8 @@ export const useMessage = (friendID: string) => {
     const createNewChat = (dataFriend: DataUser) => {
         setIdFriend(dataFriend.userID);
         setNewChat(true);
-        const currentUserAvt = JSON.parse(localStorage.getItem('avt') || '[]');
-        const currentUserName = localStorage.getItem('displayName') || '';
+        const currentUserAvt = JSON.parse(sessionStorage.getItem('avt') || '[]');
+        const currentUserName = sessionStorage.getItem('displayName') || '';
         const userData : DataUser = {
             userID: currentUserId,
             avt: currentUserAvt,

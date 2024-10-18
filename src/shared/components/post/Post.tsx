@@ -57,7 +57,7 @@ const Post = ({
   currentUserId,
   onSharePost
 }: PostComponentProps) => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const navigate = useNavigate(); 
   const [showComments, setShowComments] = useState(false);
   const [, setLikedComments] = useState<{ [key: string]: boolean }>({});

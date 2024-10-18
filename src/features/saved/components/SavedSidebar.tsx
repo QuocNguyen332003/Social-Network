@@ -28,7 +28,7 @@ interface SavedSidebarProps {
 }
 
 const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, setUser }) => {
-  const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
   const [openDialog, setOpenDialog] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

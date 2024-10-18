@@ -7,7 +7,7 @@ type HeaderMessageProps = {
 }
 
 const HeaderMessages = ({dataConversation}: HeaderMessageProps) => {
-  const currentUserId = localStorage.getItem('userId') || '';
+  const currentUserId = sessionStorage.getItem('userId') || '';
   const [friend, setFriend] = useState<DataUser | null>(null);
 
 useEffect(() => {

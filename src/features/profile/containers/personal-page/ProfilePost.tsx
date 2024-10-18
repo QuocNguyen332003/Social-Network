@@ -6,11 +6,11 @@ import Post from '../../../../shared/components/post/Post';
 import { Article, Comment } from '../../../../interface/interface';
 
 const ProfilePost = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
   const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
   const [error, setError] = useState<string | null>(null); // State cho lỗi
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorage
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
 
   // Gọi API để lấy danh sách bài viết khi component render lần đầu
   useEffect(() => {

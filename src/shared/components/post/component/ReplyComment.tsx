@@ -40,14 +40,14 @@ const ReplyComment: React.FC<ReplyCommentProps> = ({ replies, onLikeReply, onRep
               >
                 {isReplyLiked ? 'Bỏ thích' : 'Thích'} ({replyLikes})
               </Button>
-              <Button
-                size="small"
-                startIcon={<Reply />}
-                sx={{ color: '#757575', textTransform: 'none' }}
-                onClick={() => onReplyToComment(reply._iduser._id)}
-              >
-                Trả lời
-              </Button>
+                <Button
+                  size="small"
+                  startIcon={<Reply />}
+                  sx={{ color: '#757575', textTransform: 'none' }}
+                  onClick={() => typeof reply._iduser !== 'string' ? onReplyToComment(reply._iduser._id) : null}
+                >
+                  Trả lời
+                </Button>
             </Box>
           </Box>
         );

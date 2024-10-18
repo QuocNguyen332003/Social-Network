@@ -8,11 +8,11 @@ import { Group } from '../../../../../interface/interface';
 
 const DetailGroupContent: React.FC = () => {
   const location = useLocation();
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   // State lưu trữ dữ liệu nhóm và vai trò người dùng
   const [group, setGroup] = useState<Group | undefined>(location.state?.group);
   const [role, setRole] = useState<'owner' | 'admin' | 'member' | 'none'>(location.state?.role || 'none');
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorage
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
 
   // Hàm gọi API lấy lại vai trò người dùng
   const fetchUserRole = async (groupId: string, userId: string) => {
@@ -45,17 +45,17 @@ const DetailGroupContent: React.FC = () => {
     }
   }, [group, role, currentUserId]);
 
-  // Cập nhật `localStorage` khi `group` thay đổi để đồng bộ dữ liệu
+  // Cập nhật `sessionStorage` khi `group` thay đổi để đồng bộ dữ liệu
   useEffect(() => {
     if (group) {
-      localStorage.setItem('groupData', JSON.stringify(group));
+      sessionStorage.setItem('groupData', JSON.stringify(group));
     }
   }, [group]);
 
   // Hàm xử lý cập nhật thông tin nhóm khi có thay đổi từ các component con
   const handleUpdateGroup = (updatedGroup: Group) => {
     setGroup(updatedGroup);
-    localStorage.setItem('groupData', JSON.stringify(updatedGroup));
+    sessionStorage.setItem('groupData', JSON.stringify(updatedGroup));
   };
 
   // Hàm xử lý cập nhật quy định và dữ liệu nhóm
@@ -63,7 +63,7 @@ const DetailGroupContent: React.FC = () => {
     setGroup((prevGroup) => {
       if (prevGroup) {
         const updatedGroup = { ...prevGroup, rule: updatedRules };
-        localStorage.setItem('groupData', JSON.stringify(updatedGroup));
+        sessionStorage.setItem('groupData', JSON.stringify(updatedGroup));
         return updatedGroup;
       }
       return prevGroup;

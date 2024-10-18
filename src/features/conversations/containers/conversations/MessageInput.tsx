@@ -9,7 +9,7 @@ interface MessageInputProps{
 }
 
 const MessageInput = ({idConversation, sendMessage}: MessageInputProps) => {
-  const currentUserId = localStorage.getItem('userId') || '';
+  const currentUserId = sessionStorage.getItem('userId') || '';
   const [text, setText] = useState<string>("");
 
   const handlePressSend = () => {

@@ -10,8 +10,8 @@ const NewFeedsContent = () => {
   const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
   const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
   const [error, setError] = useState<string | null>(null); // State cho lỗi
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorage
-  const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
+  const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
 
   // Gọi API lấy danh sách bài viết khi component render lần đầu
   useEffect(() => {

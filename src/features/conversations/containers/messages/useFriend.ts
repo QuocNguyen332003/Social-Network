@@ -8,8 +8,8 @@ export interface UserWithoutChat {
     userName: string;
   }
 const useFriend = () => {
-    const token = localStorage.getItem('token');
-    const currentUserId = localStorage.getItem('userId') || '';
+    const token = sessionStorage.getItem('token');
+    const currentUserId = sessionStorage.getItem('userId') || '';
     const [usersWithoutChat, setUsersWithoutChat] = useState<UserWithoutChat[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 

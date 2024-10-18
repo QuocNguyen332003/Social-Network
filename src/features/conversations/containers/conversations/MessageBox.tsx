@@ -35,7 +35,7 @@ type MessageBoxProps = {
 }
 
 const MessageBox = ({dataConversation} : MessageBoxProps) => {
-  const currentUserId = localStorage.getItem('userId') || '';
+  const currentUserId = sessionStorage.getItem('userId') || '';
 
   const [dataUser, setDataUser] = useState<DataUser | null>(null);
   const [dataFriend, setDataFriend] = useState<DataUser | null>(null);
