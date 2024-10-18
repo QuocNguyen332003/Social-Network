@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { ReactNode } from "react";
 
 type FriendsCardProps = {
-  avt: string;
+  avt: string[];
   name: string;
   message: string;
   children?: ReactNode;
@@ -27,7 +27,7 @@ function FriendsCard({ avt, name, message, children }: FriendsCardProps) {
       }}
       >
          <img
-            src= {avt}
+            src= {avt[avt.length - 1]}
             alt="Ảnh đại diện"
             style={{width: '130px', height: '130px', borderRadius: 50, marginLeft: '20px', objectFit: 'cover' }}
           /> 

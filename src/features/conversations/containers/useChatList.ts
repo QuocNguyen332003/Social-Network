@@ -36,12 +36,29 @@ export const useChatList = () => {
             : conversation
         )
       );
-
+      setFilterData(prevData =>
+        prevData.map(conversation =>
+          conversation._id === _idConversation
+            ? {
+              ...conversation,
+              content: {
+                message: conversation.content?.message || {type: 'text' , data: "" },
+                userId: conversation.content?.userId || "",
+                sendDate: conversation.content?.sendDate || new Date(),
+                viewDate: conversation.content? 
+                  (currentUserId.toString() !== conversation.content.userId.toString()? new Date() : conversation.content.viewDate):
+                  null
+              }
+            }
+            : conversation
+        )
+      );
       putReadMessage(_idConversation);
     };
     const putReadMessage = async (_idConversation: string) => {
       try {
-        const response = await axios.put(`http://localhost:3000/v1/messages/read-message/${_idConversation}/${currentUserId}`,
+        const response = await axios.put(`http://localhost:3000/v1/messages/read-message/${_idConversation}/${currentUserId}`, 
+          {},
           {
             headers: {
               Authorization: `Bearer ${token}`, // Thêm token vào header
