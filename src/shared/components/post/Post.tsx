@@ -1,4 +1,3 @@
- 
 import React, { useState } from 'react';
 import {
   Box,
@@ -81,9 +80,6 @@ const Post = ({
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false); 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
-  
-
-
   const isLiked = post.interact.emoticons.some(emoticon => emoticon._iduser === currentUserId && emoticon.typeEmoticons === 'like');
 
   const handleLikeClick = () => {
@@ -285,15 +281,20 @@ const Post = ({
     }
   };
 
+  // New handle for avatar click
+  const handleAvatarClick = () => {
+    navigate(`/profile/${post?.createdBy?._id}`);
+  };
+
   return (
     <Paper sx={{ padding: 2, marginBottom: 3, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
-        <Box display="flex" alignItems="center">
-        <Avatar 
-          alt={typeof post.createdBy === 'string' ? post.createdBy : 'Anonymous'} 
-          src={typeof post.createdBy?.avt === 'string' ? post.createdBy.avt : '/static/images/avatar/default.jpg'} 
-          sx={{ width: 48, height: 48 }} 
-        />
+        <Box display="flex" alignItems="center" onClick={handleAvatarClick} sx={{ cursor: 'pointer' }}>
+          <Avatar 
+            alt={post?.createdBy?.displayName || 'Anonymous'} 
+            src={post?.createdBy?.avt?.length ? post?.createdBy?.avt[post?.createdBy?.avt.length - 1] : '/static/images/avatar/default.jpg'} 
+            sx={{ width: 48, height: 48 }} 
+          />
           <Box sx={{ marginLeft: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#333' }}>
               {post?.createdBy?.displayName}
@@ -454,11 +455,7 @@ const Post = ({
         </>
       )}
 
-
-
-
       <Divider sx={{ marginY: 2 }} />
-
 
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginTop: 2, width: '100%' }}>
         <Button
@@ -503,7 +500,6 @@ const Post = ({
           Chia sẻ
         </Button>
       </Box>
-
 
       <Collapse in={showComments} timeout="auto" unmountOnExit>
         <Box sx={{ marginTop: 2, backgroundColor: '#f5f5f5', padding: 2, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>

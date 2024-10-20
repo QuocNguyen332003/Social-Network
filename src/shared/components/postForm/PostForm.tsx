@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Paper, IconButton, Button, InputBase, Avatar, MenuItem, Select, FormControl, Typography, Input, Dialog, DialogActions, DialogContent, DialogTitle, SelectChangeEvent } from '@mui/material';
 import { InsertPhoto, LocalOffer, EmojiEmotions, Close } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 interface PostFormProps {
   onSubmit: (newPost: string, images: File[], visibility: string, hashTags: string[]) => void;
@@ -13,14 +15,37 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
   const [hashTags, setHashTags] = useState<string[]>([]); // Hashtag đã chọn
   const [emojiDialogOpen, setEmojiDialogOpen] = useState(false); // Hộp thoại emoji
   const [displayName, setDisplayName] = useState(''); // Tên hiển thị người dùng
+  const [avatar, setAvatar] = useState(''); // Avatar người dùng
+  const userId = sessionStorage.getItem('userId');
+  const token = sessionStorage.getItem('token');
+  const navigate = useNavigate(); // For navigation
 
-  // Cập nhật tên hiển thị người dùng từ sessionStorage
+  // Cập nhật tên hiển thị và avatar người dùng từ API
   useEffect(() => {
-    const userDisplayName = sessionStorage.getItem('displayName');
-    if (userDisplayName) {
-      setDisplayName(userDisplayName);
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/v1/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        });
+        const userData = response.data;
+        setDisplayName(userData.displayName || `${userData.firstName} ${userData.lastName}`);
+        setAvatar(userData.avt[userData.avt.length - 1]); // Lấy avatar cuối cùng
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    if (userId) {
+      fetchUserData();
     }
-  }, []);
+  }, [userId, token]);
+
+  // Hàm điều hướng tới trang cá nhân
+  const handleAvatarClick = () => {
+    navigate(`/profile/${userId}`);
+  };
 
   // Hàm thêm hashtag mới
   const handleAddHashTag = () => {
@@ -46,14 +71,11 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
 
   // Sử dụng `SelectChangeEvent` cho hàm `handleVisibilityChange`
   const handleVisibilityChange = (event: SelectChangeEvent<string>) => {
-    console.log('Thay đổi visibility:', event.target.value); // Log kiểm tra
     setVisibility(event.target.value as string);
   };
 
   // Hàm xử lý khi người dùng nhấn nút Đăng bài
   const handlePostSubmit = () => {
-    console.log('Giá trị visibility hiện tại khi nhấn nút Đăng:', visibility); // Kiểm tra giá trị visibility khi đăng bài
-    console.log('Dữ liệu bài viết đang gửi:', { newPost, selectedImages, visibility, hashTags });
     if (newPost.trim() || selectedImages.length > 0) {
       onSubmit(newPost, selectedImages, visibility, hashTags);
       setNewPost('');
@@ -78,16 +100,20 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
   return (
     <Paper sx={{ padding: 2, marginBottom: 2, borderRadius: '8px' }}>
       <Box display="flex" alignItems="center" mb={2}>
-        <Avatar alt="User Avatar" src="https://via.placeholder.com/150" sx={{ width: 48, height: 48, marginRight: 2 }} />
+        {/* Avatar wrapped in Box to handle click */}
+        <Box onClick={handleAvatarClick} sx={{ cursor: 'pointer' }}>
+          <Avatar
+            alt={displayName || 'Anonymous'}
+            src={avatar || '/static/images/avatar/default.jpg'}
+            sx={{ width: 48, height: 48, marginRight: 2 }}
+          />
+        </Box>
         <Box>
           <Typography variant="subtitle1" fontWeight="bold">{displayName}</Typography>
           <FormControl sx={{ minWidth: 120 }}>
-          <Select
+            <Select
               value={visibility}
-              onChange={(event) => {
-                console.log('Sự kiện onChange đã kích hoạt:', event.target.value); // Log kiểm tra sự kiện có được kích hoạt
-                handleVisibilityChange(event as SelectChangeEvent<string>);
-              }} // Sử dụng `SelectChangeEvent` thay vì `ChangeEvent`
+              onChange={handleVisibilityChange}
               displayEmpty
               inputProps={{ 'aria-label': 'Phạm vi bài viết' }}
               sx={{ fontSize: '14px' }}

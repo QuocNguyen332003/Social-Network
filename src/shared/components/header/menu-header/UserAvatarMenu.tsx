@@ -1,14 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IconButton, Avatar, Menu, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Import axios để gọi API
 import { toast } from 'react-toastify'; // Optional: Sử dụng toast để hiển thị thông báo
 
-const userID = "u123";
-
 const UserAvatarMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>(''); // State to store avatar URL
+  const [displayName, setDisplayName] = useState(''); // State to store user name
+  const userId = sessionStorage.getItem('userId'); // Retrieve userId from session
+  const token = sessionStorage.getItem('token'); // Retrieve token from session
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/v1/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        });
+        const userData = response.data;
+        setDisplayName(userData.displayName || `${userData.firstName} ${userData.lastName}`);
+        setAvatarUrl(userData.avt[userData.avt.length - 1]); // Lấy avatar cuối cùng trong mảng
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        toast.error('Lỗi khi lấy dữ liệu người dùng.');
+      }
+    };
+
+    if (userId) {
+      fetchUserData();
+    }
+  }, [userId, token]);
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -37,19 +61,15 @@ const UserAvatarMenu = () => {
         },
       });
 
-      // Xóa token khỏi sessionStorage (nếu bạn sử dụng sessionStorage để lưu token)
+      // Xóa token khỏi sessionStorage
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('userId');
       sessionStorage.removeItem('avt');
       sessionStorage.removeItem('displayName');
-      
-      // Hiển thị thông báo thành công
-      toast.success('Đăng xuất thành công!');
 
-      // Điều hướng về trang đăng nhập sau khi đăng xuất
+      toast.success('Đăng xuất thành công!');
       navigate('/login');
     } catch (error) {
-      // Xử lý lỗi nếu đăng xuất thất bại
       console.error('Lỗi khi đăng xuất:', error);
       toast.error('Đăng xuất thất bại. Vui lòng thử lại.');
     }
@@ -59,8 +79,8 @@ const UserAvatarMenu = () => {
     <>
       <IconButton aria-label="user-menu" onClick={handleAvatarClick}>
         <Avatar
-          alt="User Avatar"
-          src="/static/images/avatar/1.jpg"
+          alt={displayName || 'User Avatar'}
+          src={avatarUrl || '/static/images/avatar/default.jpg'} // Hiển thị avatar cuối cùng trong mảng
           sx={{
             width: 40,
             height: 40,
@@ -95,9 +115,8 @@ const UserAvatarMenu = () => {
           },
         }}
       >
-        <MenuItem onClick={() => handleMenuClick(`/profile/${userID}`)}>Trang Cá Nhân</MenuItem>
+        <MenuItem onClick={() => handleMenuClick(`/profile/u123`)}>Trang Cá Nhân</MenuItem>
         <MenuItem onClick={() => handleMenuClick('/settings')}>Cài đặt</MenuItem>
-        {/* Thêm hàm handleLogout cho chức năng đăng xuất */}
         <MenuItem onClick={handleLogout}>Log out</MenuItem>
       </Menu>
     </>

@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { IconButton, Menu, MenuItem, Badge, List, ListItem, ListItemAvatar, ListItemText, Avatar, Divider, Typography, Box, Button } from '@mui/material';
 import { Notifications, MoreVert } from '@mui/icons-material'; 
 import { Notification } from '../../../../interface/interface'; 
+import io from 'socket.io-client'; // Import socket.io-client
+
+const socket = io('http://localhost:3000');
 
 const NotificationMenu = () => {
   const [anchorNotification, setAnchorNotification] = useState<null | HTMLElement>(null);
@@ -14,6 +17,33 @@ const NotificationMenu = () => {
   const currentUserId = sessionStorage.getItem('userId') || ''; 
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
 
+  useEffect(() => {
+    socket.on('like_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('like_comment_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('share_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+
+
+    return () => {
+      socket.off('like_notification');
+      socket.off('share_notification');
+      socket.off('like_comment_notification');
+    };
+  }, [currentUserId]);
   // Fetch notifications from backend API
   useEffect(() => {
     const fetchNotifications = async () => {
