@@ -32,15 +32,29 @@ export const useAllFriend = () => {
         setIsLoading(false); 
       }
     }
-    const deleteFriend = (userID: string | null) => {
-        if (userID != null){
-            const updatedData = data.filter(friend => friend.idUser !== userID);
-            setData(updatedData)
+    const deleteFriend = async (userID: string | null) => {
+      try {
+        const response = await axios.put(`http://localhost:3000/v1/friends/${currentUserId}/unfriend/?friendId=${userID}`, 
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        if (response.data){
+          setData((prevData) => prevData.filter((friend) => friend.idUser !== userID));
         }
+      } catch (error) {
+        console.error('Lỗi khi lấy bài viết:', error);
+        setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
+      } finally {
+        setIsLoading(false); 
+      }
     }
 
     const viewPersonalPage = (userID: string) => {
-        navigate(`/profile/${userID}`)
+        navigate(`/profile?id=${userID}`)
     }
 
     return {
