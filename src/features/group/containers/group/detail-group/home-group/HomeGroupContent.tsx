@@ -9,12 +9,12 @@ import { useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 
 const HomeGroupContent = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const { group } = useOutletContext<{ group: Group, setGroup: (group: Group) => void }>();
   const [posts, setPosts] = useState<Article[]>([]); 
   const [isLoading, setIsLoading] = useState(false); 
   const [error, setError] = useState<string | null>(null); 
-  const currentUserId = localStorage.getItem('userId') || ''; 
+  const currentUserId = sessionStorage.getItem('userId') || ''; 
   useEffect(() => {
     fetchPosts();
   }, []);

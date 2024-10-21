@@ -42,8 +42,8 @@ interface GroupHeaderProps {
 const hobbiesOptions = ['Sports', 'Music', 'Travel', 'Technology', 'Reading', 'Art', 'Cooking', '223'];
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup }) => {
-  const token = localStorage.getItem('token'); // Lấy token từ localStorage
-  const currentUserId = localStorage.getItem('userId') || '';
+  const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
+  const currentUserId = sessionStorage.getItem('userId') || '';
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
   const [editedGroup, setEditedGroup] = useState<Group>(group);

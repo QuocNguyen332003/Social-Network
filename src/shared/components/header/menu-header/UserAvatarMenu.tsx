@@ -26,7 +26,7 @@ const UserAvatarMenu = () => {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) {
         toast.error('Token không tồn tại. Vui lòng đăng nhập lại.');
         return navigate('/login');
@@ -38,11 +38,11 @@ const UserAvatarMenu = () => {
         },
       });
 
-      // Xóa token khỏi localStorage (nếu bạn sử dụng localStorage để lưu token)
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('avt');
-      localStorage.removeItem('displayName');
+      // Xóa token khỏi sessionStorage (nếu bạn sử dụng sessionStorage để lưu token)
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('userId');
+      sessionStorage.removeItem('avt');
+      sessionStorage.removeItem('displayName');
       
       // Hiển thị thông báo thành công
       toast.success('Đăng xuất thành công!');

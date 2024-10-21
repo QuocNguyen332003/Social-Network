@@ -9,8 +9,8 @@ import { Article, Comment } from '../../../../interface/interface';
 const DetailArticles = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
-  const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorages
+  const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
   // Lấy dữ liệu bài viết từ state được truyền qua navigate
   const article = location.state?.article as Article;
 

@@ -1,58 +1,42 @@
 import React, { useState } from 'react';
-import {
-  Button,
-  TextField,
-  Grid,
-  Box,
-  Typography,
-  MenuItem,
-} from '@mui/material';
+import { Button, TextField, Grid, Box, Typography, MenuItem } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const InfoPersonal: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Lấy dữ liệu từ query string (URL)
-  const searchParams = new URLSearchParams(location.search);
-  const firstName = searchParams.get('firstName');
-  const lastName = searchParams.get('lastName');
-  const email = searchParams.get('email');
-  const password = searchParams.get('password');
-  
-  // State cho các trường mới
+
+  // Get data from previous form
+  const { firstName, lastName, email, password } = location.state || {};
+
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [gender, setGender] = useState('');
   const [birthday, setBirthday] = useState('');
+  const [cccdFile, setCccdFile] = useState<File | null>(null); // State for CCCD file
+
+  const handleCccdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      setCccdFile(file); // Store CCCD file
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Điều hướng và truyền dữ liệu qua URL (query string)
-    navigate(`/register/choose-interest?firstName=${firstName}&lastName=${lastName}&email=${email}&password=${password}&phoneNumber=${phoneNumber}&address=${address}&gender=${gender}&birthday=${birthday}`);
+    // Navigate to the next form, passing the state object including CCCD
+    navigate('/register/choose-interest', {
+      state: { firstName, lastName, email, password, phoneNumber, address, gender, birthday, cccdFile }
+    });
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <img
-        src="./src/assets/images/QQ Social.png"
-        alt="Logo"
-        style={{ marginBottom: 16, maxWidth: '50%' }}
-      />
-      <Typography
-        component="h1"
-        variant="h5"
-        sx={{ fontWeight: 800, fontSize: 40 }}
-      >
-        Đăng ký
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Typography component="h1" variant="h5" sx={{ fontWeight: 800, fontSize: 40 }}>
+        Thông tin cá nhân
       </Typography>
+
       <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -96,9 +80,7 @@ const InfoPersonal: React.FC = () => {
             </TextField>
           </Grid>
           <Grid item xs={12}>
-            <Typography>
-              Ngày sinh: 
-            </Typography>
+            <Typography>Ngày sinh:</Typography>
             <TextField
               required
               fullWidth
@@ -110,13 +92,12 @@ const InfoPersonal: React.FC = () => {
               autoComplete="birthday"
             />
           </Grid>
+          <Grid item xs={12}>
+            <Typography>Tải lên CCCD:</Typography>
+            <input type="file" accept="image/*" onChange={handleCccdChange} />
+          </Grid>
         </Grid>
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2, bgcolor: '#1976d2', ':hover': { bgcolor: '#1565c0' } }}
-        >
+        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
           Xác nhận
         </Button>
       </Box>

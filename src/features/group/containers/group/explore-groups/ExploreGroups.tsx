@@ -6,7 +6,7 @@ import axios from 'axios';
 import { Group } from '../../../../../interface/interface';
 
 const ExploreGroups: React.FC = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const [notJoinedGroups, setNotJoinedGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -17,7 +17,7 @@ const ExploreGroups: React.FC = () => {
     const fetchNotJoinedGroups = async () => {
       try {
         setLoading(true);
-        const userId = localStorage.getItem('userId');
+        const userId = sessionStorage.getItem('userId');
         const response = await axios.get(`http://localhost:3000/v1/group/${userId}/not-joined-groups`,
           {
             headers: {
@@ -56,7 +56,7 @@ const ExploreGroups: React.FC = () => {
   const handleConfirmJoinGroup = async () => {
     if (!selectedGroup) return;
     try {
-      const userId = localStorage.getItem('userId');
+      const userId = sessionStorage.getItem('userId');
       await axios.post(`http://localhost:3000/v1/group/${selectedGroup._id}/join`, { userId },
         {
           headers: {
@@ -82,7 +82,7 @@ const ExploreGroups: React.FC = () => {
   // Xử lý khi nhấn "Thu hồi yêu cầu"
   const handleRevokeRequest = async (groupId: string) => {
     try {
-      const userId = localStorage.getItem('userId');
+      const userId = sessionStorage.getItem('userId');
       await axios.post(`http://localhost:3000/v1/group/${groupId}/revoke-request`, { userId },
         {
           headers: {

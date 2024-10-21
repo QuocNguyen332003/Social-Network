@@ -7,13 +7,13 @@ import axios from 'axios';
 import { Group } from '../../../../../interface/interface';
 
 const YourGroups: React.FC = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const navigate = useNavigate();
   const [joinedGroups, setJoinedGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [userRoles, setUserRoles] = useState<{ [groupId: string]: string }>({}); // Lưu trữ role của từng nhóm
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorage
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
 
   // Trạng thái cho menu sắp xếp
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

@@ -52,6 +52,11 @@ export interface User {
     joinDate: string | number | Date;
     follow: string[];
     follower: UserDataDisplay[];
+  
+  
+  
+  
+    senderId: User; // Thay đổi từ string sang User
 }
   
   // Conversation Interface
@@ -82,8 +87,8 @@ export interface AddFriends {
   // Notification Interface
 export interface Notification {
     _id: string;
-    senderId: string;
-    receiverId: string;
+    senderId: User;
+    receiverId: User;
     message: string;
     status: 'read' | 'unread';
     readAt?:  Date | null;
@@ -121,7 +126,7 @@ export interface Emoticon {
   
   export interface Comment {
     _id: string;
-    _iduser: User | string;
+    _iduser: User | string; // Chấp nhận cả User hoặc string (userId)
     content: string;
     img: string[];
     replyComment: Array<Comment>; // Đệ quy: bình luận có thể có các bình luận con

@@ -5,11 +5,11 @@ import { Article, Comment } from '../../../../../interface/interface.ts';
 import axios from 'axios';
 
 const NewFeedGroup: React.FC = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const [posts, setPosts] = useState<Article[]>([]);
   const [, setIsLoading] = useState(false); // State cho trạng thái loading
   const [, setError] = useState<string | null>(null); // State cho lỗi
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorages
 
   // Gọi API lấy danh sách bài viết khi component render lần đầu
   useEffect(() => {

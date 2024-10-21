@@ -25,7 +25,7 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
   user,
   setUser,
 }) => {
-  const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
   const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
 

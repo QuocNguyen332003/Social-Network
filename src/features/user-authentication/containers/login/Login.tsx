@@ -30,11 +30,11 @@ const Login: React.FC = () => {
     try {
       const response = await axios.post('http://localhost:3000/v1/auth/login', { email, password });
 
-      // Lưu token vào localStorage hoặc sessionStorage
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userId', response.data.user._id); 
-      localStorage.setItem('avt', JSON.stringify(response.data.user.avt));
-      localStorage.setItem('displayName', response.data.user.displayName); 
+      // Lưu token vào sessionStorage hoặc sessionStorage
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('userId', response.data.user._id); 
+      sessionStorage.setItem('avt', JSON.stringify(response.data.user.avt));
+      sessionStorage.setItem('displayName', response.data.user.displayName); 
       
       // Điều hướng người dùng tới trang chính (ví dụ: /new-feeds)
       navigate('/new-feeds');

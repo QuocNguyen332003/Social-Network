@@ -11,7 +11,7 @@ import { toast, ToastContainer } from 'react-toastify';
 
 const PersonalManagementContent = () => {
   // Get the group and setGroup function from OutletContext (passed from parent)
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const { group, role: parentRole } = useOutletContext<{ group: Group, role: 'owner' | 'admin' | 'member' | 'none' }>(); // Nhận role từ OutletContext
   const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
   const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
@@ -21,7 +21,7 @@ const PersonalManagementContent = () => {
   const [currentRole, setCurrentRole] = useState<'member' | 'admin' | 'owner' | 'none'>('none'); // Vai trò hiện tại của người dùng
   const [openInviteDialog, setOpenInviteDialog] = useState(false); // State để mở và đóng Dialog
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // State để mở/đóng Dialog xác nhận
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorages
   useEffect(() => {
     // Thiết lập vai trò từ parent ngay khi component được render
     if (parentRole) {

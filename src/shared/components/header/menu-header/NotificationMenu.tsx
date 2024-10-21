@@ -1,3 +1,4 @@
+ 
 import React, { useState, useEffect } from 'react';
 import { IconButton, Menu, MenuItem, Badge, List, ListItem, ListItemAvatar, ListItemText, Avatar, Divider, Typography, Box, Button } from '@mui/material';
 import { Notifications, MoreVert } from '@mui/icons-material'; 
@@ -10,14 +11,20 @@ const NotificationMenu = () => {
   const [showAll, setShowAll] = useState(false); 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); 
   const [selectedNotification, setSelectedNotification] = useState<string | null>(null); 
-  const currentUserId = localStorage.getItem('userId') || ''; 
+  const currentUserId = sessionStorage.getItem('userId') || ''; 
+  const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
 
   // Fetch notifications from backend API
   useEffect(() => {
     const fetchNotifications = async () => {
       if (currentUserId) {
         try {
-          const response = await fetch(`http://localhost:3000/v1/notifications?userId=${currentUserId}`);
+          const response = await fetch(`http://localhost:3000/v1/notifications?userId=${currentUserId}`,          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+          );
           const data = await response.json();
 
           if (data && Array.isArray(data.data)) {
@@ -42,6 +49,7 @@ const NotificationMenu = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           status: 'read',
@@ -72,6 +80,7 @@ const NotificationMenu = () => {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
+               Authorization: `Bearer ${token}`
           },
         });
 
@@ -198,7 +207,7 @@ const NotificationMenu = () => {
                   }
                 >
                   <ListItemAvatar>
-                    <Avatar alt="Sender" src={`path_to_sender_avatar/${notification.senderId}.jpg`} />
+                    <Avatar alt={notification.senderId?.displayName} src={notification.senderId?.avt?.[0] || ''} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={notification.message}

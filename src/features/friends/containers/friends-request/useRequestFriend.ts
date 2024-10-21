@@ -7,8 +7,8 @@ export const useRequestFriend = () => {
     const [data, setData] = useState<FriendProps[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
-    const currentUserId = localStorage.getItem('userId') || '';
+    const token = sessionStorage.getItem('token');
+    const currentUserId = sessionStorage.getItem('userId') || '';
     const [page, setPage] = useState<number>(1);
     useEffect(()=> {
       getAllFriendRequest();

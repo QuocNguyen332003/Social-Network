@@ -1,9 +1,8 @@
- 
 import React, { useEffect } from 'react';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import { Box, Typography, TextField, Button, Avatar } from '@mui/material';
 import { formatDistanceToNow } from 'date-fns';
 import { ThumbUpAlt, Reply } from '@mui/icons-material';
-import { Comment as CommentType } from '../../../../interface/interface';
+import { Comment as CommentType, User } from '../../../../interface/interface'; // Ensure User type is imported
 import ReplyComment from './ReplyComment'; // Import ReplyComment component
 import { useState } from 'react';
 
@@ -15,7 +14,7 @@ interface CommentSectionProps {
   replyTexts: { [key: string]: string };
   replyInputs: { [key: string]: boolean };
   handleSubmitReply: (commentId: string) => void;
-  onLikeReply: (commentId: string, replyId: string) => void; // Thêm hàm xử lý like reply
+  onLikeReply: (commentId: string, replyId: string) => void;
   currentUserId: string;
 }
 
@@ -45,18 +44,41 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       setCommentLikes(initialLikes); // Cập nhật state `commentLikes`
     }
   }, [comments, currentUserId]);
-  
+
+  // Type guard to check if _iduser is a User object
+  const isUserObject = (user: string | User): user is User => {
+    return (user as User).displayName !== undefined;
+  };
+
   return (
     <Box sx={{ marginTop: 2 }}>
       {comments.length > 0 ? (
         comments.map((comment, index) => {
           const totalLikes = comment.emoticons.filter((emoticon) => emoticon.typeEmoticons === 'like').length;
           const isLiked = commentLikes[comment._id] || false;
+
+          // Use the type guard to check if _iduser is an object and access avatar/displayName
+          let avatarUrl = '/default-avatar.png';
+          if (isUserObject(comment._iduser)) {
+            // Check if the user has an avatar array and use the last image
+            avatarUrl = comment._iduser.avt.length > 0 
+              ? comment._iduser.avt[comment._iduser.avt.length - 1] // Get the last avatar
+              : '/default-avatar.png'; // Default avatar if none
+          }
+          const displayName = isUserObject(comment._iduser) ? comment._iduser.displayName : 'Anonymous';
+
           return (
             <Box key={index} sx={{ marginBottom: 2, padding: 2, borderRadius: 2, backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-              <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
-                {comment?._iduser?.displayName}
-              </Typography>
+              <Box display="flex" alignItems="center" sx={{ marginBottom: 1 }}>
+                <Avatar 
+                  alt={displayName} 
+                  src={avatarUrl} 
+                  sx={{ width: 32, height: 32, marginRight: 2 }} 
+                />
+                <Typography variant="body2" fontWeight="bold" sx={{ color: '#424242' }}>
+                  {displayName}
+                </Typography>
+              </Box>
               <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
                 {comment.content}
               </Typography>

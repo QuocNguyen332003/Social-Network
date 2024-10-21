@@ -8,7 +8,7 @@ interface ShareItemCardProps {
 }
 
 const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const [article, setArticle] = useState<Article | null>(null); 
 
   useEffect(() => {

@@ -9,7 +9,7 @@ interface MessageCardProps {
   }
 
 const MessageCard = ({currMessage, dataCard, onClick}: MessageCardProps) => {
-  const currentUserId = localStorage.getItem('userId') || '';
+  const currentUserId = sessionStorage.getItem('userId') || '';
 
   if (!dataCard || dataCard.content === null) {
     return null;

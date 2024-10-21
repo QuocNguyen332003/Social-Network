@@ -10,8 +10,8 @@ const SavedItems = () => {
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
-  const currentUserId = localStorage.getItem('userId') || '';
-  const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  const currentUserId = sessionStorage.getItem('userId') || '';
+  const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
 
   useEffect(() => {
     const fetchUserData = async () => {

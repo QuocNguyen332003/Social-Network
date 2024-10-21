@@ -22,14 +22,14 @@ import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 
 const AdminGroupContent: React.FC = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const { group, role } = useOutletContext<{ group: Group; role: string }>(); // Nhận `role` từ context
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
   const [openPendingDialog, setOpenPendingDialog] = useState(false);
   const [availableMembers, setAvailableMembers] = useState<User[]>([]);
   const [pendingInvites, setPendingInvites] = useState<User[]>([]);
   const [acceptedAdmins, setAcceptedAdmins] = useState<User[]>([]);
-  const currentUserId = localStorage.getItem('userId') || ''; // Lấy userId từ localStorages
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorages
 
   useEffect(() => {
     fetchAvailableMembers();
