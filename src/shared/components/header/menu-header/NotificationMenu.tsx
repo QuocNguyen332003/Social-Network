@@ -18,7 +18,7 @@ const NotificationMenu = () => {
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
 
   useEffect(() => {
-    socket.on('like_notification', (notification) => {
+    socket.on('like_article_notification', (notification) => {
       if (notification.receiverId === currentUserId) {
         setNotifications((prevNotifications) => [notification, ...prevNotifications]);
         setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
@@ -30,7 +30,31 @@ const NotificationMenu = () => {
         setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
       }
     });
+    socket.on('like_reply_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('new_comment_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('new_reply_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
     socket.on('share_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('article_reported', (notification) => {
       if (notification.receiverId === currentUserId) {
         setNotifications((prevNotifications) => [notification, ...prevNotifications]);
         setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
@@ -42,6 +66,10 @@ const NotificationMenu = () => {
       socket.off('like_notification');
       socket.off('share_notification');
       socket.off('like_comment_notification');
+      socket.off('like_reply_notification');
+      socket.off('new_comment_notification');
+      socket.off('new_reply_notification');
+      socket.off('article_reported');
     };
   }, [currentUserId]);
   // Fetch notifications from backend API

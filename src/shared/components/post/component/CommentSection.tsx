@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { Box, Typography, TextField, Button, Avatar } from '@mui/material';
 import { formatDistanceToNow } from 'date-fns';
 import { ThumbUpAlt, Reply } from '@mui/icons-material';
-import { Comment as CommentType, User } from '../../../../interface/interface'; // Ensure User type is imported
-import ReplyComment from './ReplyComment'; // Import ReplyComment component
+import { Comment as CommentType, User } from '../../../../interface/interface';
+import ReplyComment from './ReplyComment';
 import { useState } from 'react';
 
 interface CommentSectionProps {
@@ -54,16 +54,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     <Box sx={{ marginTop: 2 }}>
       {comments.length > 0 ? (
         comments.map((comment, index) => {
-          const totalLikes = comment.emoticons.filter((emoticon) => emoticon.typeEmoticons === 'like').length;
+          // Tính tổng số lượt thích của bình luận  
           const isLiked = commentLikes[comment._id] || false;
 
-          // Use the type guard to check if _iduser is an object and access avatar/displayName
+          // Sử dụng type guard để kiểm tra và lấy avatar/displayName
           let avatarUrl = '/default-avatar.png';
           if (isUserObject(comment._iduser)) {
-            // Check if the user has an avatar array and use the last image
             avatarUrl = comment._iduser.avt.length > 0 
-              ? comment._iduser.avt[comment._iduser.avt.length - 1] // Get the last avatar
-              : '/default-avatar.png'; // Default avatar if none
+              ? comment._iduser.avt[comment._iduser.avt.length - 1] // Lấy ảnh cuối cùng trong mảng avatar
+              : '/default-avatar.png'; // Sử dụng ảnh mặc định nếu không có avatar
           }
           const displayName = isUserObject(comment._iduser) ? comment._iduser.displayName : 'Anonymous';
 
@@ -88,19 +87,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 
               <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
                 <Button
-                    size="small"
-                    startIcon={<ThumbUpAlt />}
-                    sx={{ color: isLiked ? '#2e7d32' : '#757575', textTransform: 'none' }}
-                    onClick={() => {
-                      // Thay đổi trạng thái like của bình luận
-                      onLikeComment(comment._id);
-                      setCommentLikes((prevLikes) => ({
-                        ...prevLikes,
-                        [comment._id]: !prevLikes[comment._id],
-                      }));
-                    }}
-                  >
-                  {isLiked ? 'Bỏ thích' : 'Thích'} ({totalLikes})
+                  size="small"
+                  startIcon={<ThumbUpAlt />}
+                  sx={{ color: isLiked ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                  onClick={() => {
+                    // Thay đổi trạng thái like của bình luận
+                    onLikeComment(comment._id);
+                    setCommentLikes((prevLikes) => ({
+                      ...prevLikes,
+                      [comment._id]: !prevLikes[comment._id],
+                    }));
+                  }}
+                >
+                  {isLiked ? 'Bỏ thích' : 'Thích'} ({comment.totalLikes})
                 </Button>
                 <Button
                   size="small"
@@ -129,12 +128,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                 </Box>
               )}
 
-              {/* Sử dụng ReplyComment cho phần hiển thị reply */}
+              {/* Hiển thị các câu trả lời của bình luận */}
               <ReplyComment
                 replies={comment.replyComment}
                 onLikeReply={(replyId) => onLikeReply(comment._id, replyId)}
                 onReplyToComment={onReplyToComment}
-                currentUserId={currentUserId} // Truyền currentUserId
+                currentUserId={currentUserId}
               />
             </Box>
           );

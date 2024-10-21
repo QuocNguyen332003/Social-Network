@@ -116,6 +116,7 @@ export interface Emoticon {
     _id: string;
     _iduser: User | string; // Chấp nhận cả User hoặc string (userId)
     content: string;
+    totalLikes: number;
     img: string[];
     replyComment: Array<Comment>; // Đệ quy: bình luận có thể có các bình luận con
     emoticons: Array<Emoticon>;
@@ -155,6 +156,7 @@ export interface Article {
     _destroy: Date | null;
 
     //Dưới đây là những thứ không nằm trong database (thêm để tránh bị lỗi)
+    totalLikes: 0,
     totalComments: number; // 
 }
   // Group Interface

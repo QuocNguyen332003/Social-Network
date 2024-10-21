@@ -127,6 +127,7 @@ const Post = ({
         emoticons: [],
         createdAt: new Date(),
         updatedAt: new Date(),
+        totalLikes: 0
       };
       onAddReply(post._id, commentId, reply);
 
@@ -158,6 +159,7 @@ const Post = ({
         emoticons: [],
         createdAt: new Date(),
         updatedAt: new Date(),
+        totalLikes: 0
       };
       onAddComment(post._id, comment);
       setNewComment('');
@@ -470,7 +472,7 @@ const Post = ({
           }}
           onClick={handleLikeClick}
         >
-          {post.interact.emoticons.length} {isLiked ? 'Bỏ thích' : 'Yêu thích'}
+          {post.totalLikes} {isLiked ? 'Bỏ thích' : 'Yêu thích'}
         </Button>
         <Button 
           startIcon={<Comment />} 
