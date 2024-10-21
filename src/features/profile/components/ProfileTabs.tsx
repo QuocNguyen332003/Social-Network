@@ -20,7 +20,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ userID }) => {
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
 
     const pathMap = ['', 'personal-collection'];
-    navigate(`/profile/${userID}/${pathMap[newValue]}`);
+    navigate(`/profile/${pathMap[newValue]}?id=${userID}`);
   };
 
   return (

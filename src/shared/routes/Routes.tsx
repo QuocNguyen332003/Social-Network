@@ -206,7 +206,7 @@ const Routes = () => {
       ],
     },
     {
-      path: '/profile/:userID',
+      path: '/profile',
       element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
       children: [
         {
@@ -226,7 +226,7 @@ const Routes = () => {
       ],
     },
     {
-      path: '/edit-profile/:userID',
+      path: '/edit-profile',
       element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
       children: [
         {
