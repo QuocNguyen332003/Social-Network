@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // User Interface
+
+interface UserDataDisplay {
+  _id: string;
+  avt: string[];
+  name: string;
+}
 export interface User {
     _id: string;
     account: {
@@ -44,7 +50,8 @@ export interface User {
     idUser: any;
     state: any;
     joinDate: string | number | Date;
-
+    follow: string[];
+    follower: UserDataDisplay[];
 }
   
   // Conversation Interface
