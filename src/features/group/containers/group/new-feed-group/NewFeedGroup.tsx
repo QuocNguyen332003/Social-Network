@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
 import Post from '../../../../../shared/components/post/Post.tsx';
@@ -137,12 +138,8 @@ const NewFeedGroup: React.FC = () => {
           Authorization: `Bearer ${token}`, // Thêm token vào header
         },
       });
-      if (response.status === 200) {
-        alert('Lưu bài viết thành công!');
-      }
     } catch (error) {
       console.error('Lỗi khi lưu bài viết:', error);
-      alert('Đã xảy ra lỗi khi lưu bài viết!');
     }
   };
 
@@ -157,11 +154,9 @@ const NewFeedGroup: React.FC = () => {
       );
       if (response.status === 200) {
         setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId)); // Loại bỏ bài viết đã xóa ra khỏi danh sách bài viết hiện tại
-        alert('Xóa bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi xóa bài viết:', error);
-      alert('Đã xảy ra lỗi khi xóa bài viết!');
     }
   };
   
@@ -182,11 +177,9 @@ const NewFeedGroup: React.FC = () => {
             post._id === postId ? { ...post, content: updatedContent, scope: updatedScope } : post
           )
         );
-        alert('Chỉnh sửa bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi chỉnh sửa bài viết:', error);
-      alert('Đã xảy ra lỗi khi chỉnh sửa bài viết!');
     }
   };
   

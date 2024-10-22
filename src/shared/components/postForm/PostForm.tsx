@@ -213,7 +213,7 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
         {/* Nút đăng bài */}
         <Button
           variant="contained"
-          sx={{ bgcolor: '#0D47A1', borderRadius: '16px', padding: '6px 24px' }}
+          sx={{ bgcolor: '#1976d2', borderRadius: '16px', padding: '6px 24px' }}
           onClick={handlePostSubmit}
         >
           Đăng

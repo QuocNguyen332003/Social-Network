@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
  
 import React, { useState, useEffect } from 'react';
 import {
@@ -27,11 +28,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Group } from '../../../interface/interface';
 import axios from 'axios';
 
-const friends = [
-  { id: '1', name: 'Alice', avatar: '/static/images/avatar/1.jpg' },
-  { id: '2', name: 'Bob', avatar: '/static/images/avatar/2.jpg' },
-  { id: '3', name: 'Charlie', avatar: '/static/images/avatar/3.jpg' },
-];
 
 interface GroupHeaderProps {
   group: Group;
@@ -51,9 +47,9 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
   const [newHobby, setNewHobby] = useState<string>('');
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [friendsNotInGroup, setFriendsNotInGroup] = useState<any[]>([]); // Danh sách bạn bè chưa tham gia nhóm
   const [avtPreview, setAvtPreview] = useState<string | undefined>(group.avt);
   const [backGroundPreview, setBackGroundPreview] = useState<string | undefined>(group.backGround);
-
   useEffect(() => {
     if (group) {
       setEditedGroup(group);
@@ -63,10 +59,25 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
     }
   }, [group]);
 
+  const handleOpenInviteDialog = async () => {
+    try {
+      // Gọi API để lấy danh sách bạn bè chưa tham gia nhóm
+      const response = await axios.get(`http://localhost:3000/v1/group/friends-not-in-group/${currentUserId}/${group._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setFriendsNotInGroup(response.data); // Lưu danh sách bạn bè chưa tham gia nhóm vào state
+      setOpenInviteDialog(true); // Mở dialog mời bạn bè
+    } catch (error) {
+      console.error('Lỗi khi lấy danh sách bạn bè chưa tham gia nhóm:', error);
+    }
+  };
+
+
+
   const handleOpenEditDialog = () => setOpenEditDialog(true);
   const handleCloseEditDialog = () => setOpenEditDialog(false);
-
-  const handleOpenInviteDialog = () => setOpenInviteDialog(true);
   const handleCloseInviteDialog = () => setOpenInviteDialog(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -136,15 +147,34 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
     }
   };
   
-
-  const handleSendInvitations = () => {
-    console.log('Inviting friends:', selectedFriends);
-    handleCloseInviteDialog();
+  const handleSendInvitations = async () => {
+    if (selectedFriends.length === 0) {
+      alert('Vui lòng chọn ít nhất một người bạn để mời.');
+      return;
+    }
+    console.log(selectedFriends)
+    try {
+      // Gọi API gửi lời mời tham gia nhóm
+      await axios.post(
+        `http://localhost:3000/v1/group/invite-member`,
+        {
+          groupId: group._id,
+          invitedFriends: selectedFriends, // Gửi selectedFriends
+          userId: currentUserId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      handleCloseInviteDialog();
+    } catch (error) {
+      console.error('Lỗi khi gửi lời mời:', error);
+    }
   };
+  
 
-  const filteredFriends = friends.filter((friend) =>
-    friend.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <Box
@@ -374,10 +404,10 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
           </Box>
 
           <List sx={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {filteredFriends.length > 0 ? (
-              filteredFriends.map((friend) => (
+            {friendsNotInGroup.length > 0 ? (
+              friendsNotInGroup.map((friend) => (
                 <ListItem
-                  key={friend.id}
+                  key={friend._id}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -390,13 +420,13 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
                     <ListItemAvatar>
                       <Avatar src={friend.avatar} />
                     </ListItemAvatar>
-                    <ListItemText primary={friend.name} />
+                    <ListItemText primary={friend.displayName} />
                   </Box>
                   <Checkbox
-                    checked={selectedFriends.includes(friend.id)}
-                    onChange={() => handleSelectFriend(friend.id)}
+                    checked={selectedFriends.includes(friend._id)}
+                    onChange={() => handleSelectFriend(friend._id)}
                     sx={{
-                      color: selectedFriends.includes(friend.id) ? '#1976d2' : 'gray',
+                      color: selectedFriends.includes(friend._id) ? '#1976d2' : 'gray',
                       '&.Mui-checked': {
                         color: '#1976d2',
                       },

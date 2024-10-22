@@ -52,17 +52,13 @@ const ApprovaGroupContent: React.FC = () => {
       if (response.status === 200) {
         setApprovedPosts((prevApproved) => [...prevApproved, postId]);
         setRejectedPosts((prevRejected) => prevRejected.filter(id => id !== postId)); // Xóa khỏi danh sách từ chối nếu có
-        alert('✅ Bài viết đã được duyệt thành công!');
-      } else {
-        alert(`❗ Đã xảy ra lỗi: ${response.data.message || 'Không thể duyệt bài viết'}`);
-      }
+      } 
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data.message || error.message;
-        alert(`❗ Lỗi khi duyệt bài viết: ${errorMessage}`);
+        console.log(`❗ Lỗi khi duyệt bài viết: ${errorMessage}`);
       } else {
         console.error('Lỗi hệ thống:', error);
-        alert('❗ Đã xảy ra lỗi hệ thống khi duyệt bài viết!');
       }
     }
   };
@@ -84,17 +80,13 @@ const ApprovaGroupContent: React.FC = () => {
       if (response.status === 200) {
         setRejectedPosts((prevRejected) => [...prevRejected, postId]);
         setApprovedPosts((prevApproved) => prevApproved.filter((id) => id !== postId)); // Xóa khỏi danh sách đã duyệt nếu có
-        alert('Bài viết đã bị từ chối!');
-      } else {
-        alert(`❗ Đã xảy ra lỗi: ${response.data.message || 'Không thể từ chối bài viết'}`);
-      }
+      } 
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data.message || error.message;
-        alert(`❗ Lỗi khi từ chối bài viết: ${errorMessage}`);
+        console.log(`❗ Lỗi khi từ chối bài viết: ${errorMessage}`);
       } else {
         console.error('Lỗi hệ thống:', error);
-        alert('❗ Đã xảy ra lỗi hệ thống khi từ chối bài viết!');
       }
     }
   };

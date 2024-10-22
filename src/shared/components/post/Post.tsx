@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -26,6 +26,7 @@ import CommentSection from './component/CommentSection.tsx';
 import axios from 'axios';
 import ShareItemCard from './component/ShareItemCard'; 
 import { v4 as uuidv4 } from 'uuid';
+import { io } from 'socket.io-client';
 
 interface PostComponentProps {
   post: Article;
@@ -71,7 +72,9 @@ const Post = ({
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [selectedReportReason, setSelectedReportReason] = useState<string>('');
   const [reportTarget, setReportTarget] = useState<{ postId: string; commentId?: string } | null>(null);
-
+  const [totalLikes, setTotalLikes] = useState(post.totalLikes); 
+  const [totalComments, setTotalComments] = useState(post.totalComments);
+  const [comments, setComments] = useState<CommentType[]>(post.interact.comment); // State lưu trữ các bình luận
   // New state for share dialog
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareContent, setShareContent] = useState('');
@@ -82,6 +85,90 @@ const Post = ({
   
   const isLiked = post.interact.emoticons.some(emoticon => emoticon._iduser === currentUserId && emoticon.typeEmoticons === 'like');
 
+  useEffect(() => {
+    const socket = io('http://localhost:3000'); // Kết nối tới server Socket.IO
+
+    // Lắng nghe sự kiện update_article_likes
+      socket.on('update_article_likes', (data) => {
+        if (data.postId === post._id) {
+          setTotalLikes(data.totalLikes); // Cập nhật số lượt thích theo thời gian thực
+        }
+      });
+
+      // Lắng nghe sự kiện comment_activity
+      socket.on('new_comment', (data) => {
+        if (data.postId === post._id) {
+          setComments((prevComments) => [...prevComments, data.comment]); // Thêm bình luận mới
+          setTotalComments(data.totalComments); // Cập nhật số lượng bình luận theo thời gian thực
+        }
+      });
+
+      socket.on('update_comment_likes', (data) => {
+        const { commentId, totalLikes, action, userId } = data;
+    
+        setComments((prevComments) =>
+          prevComments.map((comment) => {
+            if (comment._id === commentId) {
+              // Cập nhật số likes và trạng thái like/unlike cho comment
+              const updatedEmoticons = action === 'like'
+                ? [...comment.emoticons, { _iduser: userId, typeEmoticons: 'like' }]
+                : comment.emoticons.filter((emoticon) => emoticon._iduser !== userId);
+    
+              return { ...comment, totalLikes: totalLikes, emoticons: updatedEmoticons };
+            }
+            return comment;
+          })
+        );
+      });
+
+      socket.on('update_reply_likes', (data) => {
+        const { commentId, replyId, totalLikes, action, userId } = data;
+    
+        setComments((prevComments) =>
+          prevComments.map((comment) => {
+            if (comment._id === commentId) {
+              // Cập nhật reply tương ứng
+              const updatedReplyComments = comment.replyComment.map((reply) => {
+                if (reply._id === replyId) {
+                  const updatedEmoticons = action === 'like'
+                    ? [...reply.emoticons, { _iduser: userId, typeEmoticons: 'like' }]
+                    : reply.emoticons.filter((emoticon) => emoticon._iduser !== userId);
+    
+                  return { ...reply, totalLikes: totalLikes, emoticons: updatedEmoticons };
+                }
+                return reply;
+              });
+    
+              return { ...comment, replyComment: updatedReplyComments };
+            }
+            return comment;
+          })
+        );
+      });
+
+      socket.on('new_reply', (data) => {
+        if (data.postId === post._id) {
+          setComments((prevComments) => {
+            return prevComments.map((comment) => {
+              if (comment._id === data.commentId) {
+                return {
+                  ...comment,
+                  replyComment: [...comment.replyComment, data.reply]
+                };
+              }
+              return comment;
+            });
+          });
+    
+          setTotalComments(data.totalComments); // Cập nhật số lượng bình luận theo thời gian thực
+        }
+      });
+
+    return () => {
+      socket.disconnect(); // Ngắt kết nối khi component bị unmount
+    };
+  }, [post._id]);
+  
   const handleLikeClick = () => {
     onLikePost(post._id); 
   };
@@ -472,7 +559,7 @@ const Post = ({
           }}
           onClick={handleLikeClick}
         >
-          {post.totalLikes} {isLiked ? 'Bỏ thích' : 'Yêu thích'}
+          {totalLikes} {isLiked ? 'Bỏ thích' : 'Yêu thích'}
         </Button>
         <Button 
           startIcon={<Comment />} 
@@ -486,7 +573,7 @@ const Post = ({
           }} 
           onClick={handleToggleComments}
         >
-          {post?.totalComments} Bình luận
+          {totalComments} Bình luận
         </Button>
         <Button 
           startIcon={<Share />} 
@@ -521,7 +608,7 @@ const Post = ({
           </Box>
 
           <CommentSection
-            comments={post.interact.comment}
+            comments={comments}
             onLikeComment={handleLikeComment}
             onReplyToComment={handleReplyToComment}
             handleReplyChange={handleReplyChange}

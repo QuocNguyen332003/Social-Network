@@ -61,15 +61,37 @@ const NotificationMenu = () => {
       }
     });
 
+    socket.on('user_accepted_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+
+    socket.on('invite_become_admin', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+
+    socket.on('new_group_invite_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
 
     return () => {
-      socket.off('like_notification');
-      socket.off('share_notification');
-      socket.off('like_comment_notification');
-      socket.off('like_reply_notification');
-      socket.off('new_comment_notification');
-      socket.off('new_reply_notification');
-      socket.off('article_reported');
+      socket.off('like_notification'); // rồi nè
+      socket.off('share_notification'); // rồi
+      socket.off('like_comment_notification'); // rồi
+      socket.off('like_reply_notification'); // rồi
+      socket.off('new_comment_notification'); // rồi nè
+      socket.off('new_reply_notification'); // rồi
+      socket.off('article_reported'); // rồi
+      socket.off('user_accepted_notification'); // chưa
+      socket.off('new_group_invite_notification'); // chưa
     };
   }, [currentUserId]);
   // Fetch notifications from backend API

@@ -36,18 +36,19 @@ const MemberGroupContent: React.FC = () => {
         const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/members`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Thêm token vào header
+              Authorization: `Bearer ${token}`,
             },
           }
-        ); // Gọi API để lấy thành viên
-        setMembers(response.data.members); // Lưu danh sách thành viên vào state
+        ); 
+        setMembers(response.data.members); 
       } catch (error) {
         console.error('Error fetching members:', error);
       }
     };
 
     fetchMembers();
-  }, [group._id]);
+    
+  }, [group._id, token]);
 
   // Xác nhận trước khi xóa thành viên
   const handleOpenConfirmDialog = (userId: string) => {

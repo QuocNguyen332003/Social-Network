@@ -64,7 +64,6 @@ const ExploreGroups: React.FC = () => {
           },
         }
       );
-      alert(`Đã gửi yêu cầu tham gia nhóm thành công!`);
 
       // Cập nhật lại trạng thái nhóm thành `pending`
       setNotJoinedGroups((prevGroups) =>
@@ -98,7 +97,6 @@ const ExploreGroups: React.FC = () => {
         )
       );
 
-      alert(`Yêu cầu tham gia nhóm đã được thu hồi.`);
     } catch (error) {
       console.error('Lỗi khi thu hồi yêu cầu tham gia nhóm:', error);
     }

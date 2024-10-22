@@ -78,18 +78,36 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                   {displayName}
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
-                {comment.content}
-              </Typography>
-              <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
+              <Box
+                sx={{
+                  backgroundColor: '#f5f5f5', // Màu xám nhạt
+                  padding: '8px',              // Khoảng cách nội dung tới viền
+                  borderRadius: '8px',          // Bo góc
+                  marginTop: 1                 // Khoảng cách trên
+                }}
+              >
+                <Typography variant="body2" sx={{ color: '#616161' }}>
+                  {comment.content}
+                </Typography>
+              </Box>
+              <Typography
+                variant="caption" // Bạn có thể đổi thành "overline" nếu muốn nhỏ hơn
+                sx={{ 
+                  color: '#757575', 
+                  marginTop: 1, 
+                  fontSize: '0.75rem',  // Kích thước nhỏ hơn
+                  opacity: 0.6          // Hiệu ứng mờ
+                }}
+              >
                 {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
               </Typography>
+
 
               <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
                 <Button
                   size="small"
                   startIcon={<ThumbUpAlt />}
-                  sx={{ color: isLiked ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                  sx={{ color: '#1976d2', textTransform: 'none' }}
                   onClick={() => {
                     // Thay đổi trạng thái like của bình luận
                     onLikeComment(comment._id);
@@ -104,7 +122,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                 <Button
                   size="small"
                   startIcon={<Reply />}
-                  sx={{ color: '#757575', textTransform: 'none' }}
+                  sx={{ color: '#1976d2', textTransform: 'none' }}
                   onClick={() => onReplyToComment(comment._id)}
                 >
                   Trả lời
