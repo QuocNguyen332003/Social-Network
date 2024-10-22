@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -25,14 +25,22 @@ interface SavedSidebarProps {
   user: User | null;
   onSelectCollection: (collectionId: string | null) => void;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  defaultCollectionId: string | null; // Nhận thêm prop defaultCollectionId
 }
 
-const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, setUser }) => {
+const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, setUser, defaultCollectionId }) => {
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
   const [openDialog, setOpenDialog] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editingCollection, setEditingCollection] = useState<string | null>(null);
+
+  // Tự động chọn bộ sưu tập mặc định khi component mount
+  useEffect(() => {
+    if (defaultCollectionId) {
+      onSelectCollection(defaultCollectionId);
+    }
+  }, [defaultCollectionId, onSelectCollection]);
 
   const handleOpenDialog = (collectionId: string | null = null) => {
     if (collectionId) {

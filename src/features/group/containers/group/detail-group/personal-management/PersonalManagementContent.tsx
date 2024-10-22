@@ -172,11 +172,10 @@ const PersonalManagementContent = () => {
         },
       });
       if (response.status === 200) {
-        alert('Lưu bài viết thành công!');
+        console.log('Lưu bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi lưu bài viết:', error);
-      alert('Đã xảy ra lỗi khi lưu bài viết!');
     }
   };
 
@@ -216,11 +215,9 @@ const PersonalManagementContent = () => {
             post._id === postId ? { ...post, content: updatedContent, scope: updatedScope } : post
           )
         );
-        alert('Chỉnh sửa bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi chỉnh sửa bài viết:', error);
-      alert('Đã xảy ra lỗi khi chỉnh sửa bài viết!');
     }
   };
   

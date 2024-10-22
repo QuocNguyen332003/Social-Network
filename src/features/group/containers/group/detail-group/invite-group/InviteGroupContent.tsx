@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Avatar, Button, List, ListItem, ListItemAvatar, ListItemText, Typography, Divider, TextField, Select, MenuItem, InputLabel, FormControl
+  Box, Avatar, Button, List, ListItem, ListItemAvatar, ListItemText, Typography, Select, MenuItem, InputLabel, FormControl
 } from '@mui/material';
 import { useOutletContext } from 'react-router-dom';
 import { Group, User } from '../../../../../../interface/interface.ts';
@@ -61,7 +61,7 @@ const InviteGroupContent: React.FC = () => {
           }
         );
         setProcessedRequests((prev) => ({ ...prev, [userId]: 'accepted' }));
-        toast.success(`Đã chấp nhận yêu cầu tham gia nhóm của người dùng ID: ${userId}!`);
+        toast.success(`Đã phê duyệt thành công yêu cầu tham gia nhóm`);
     } catch (error: any) {
         console.error('Error accepting invite:', error);
         toast.error(error.response?.data.message || 'Có lỗi xảy ra khi chấp nhận yêu cầu.');
@@ -80,7 +80,7 @@ const InviteGroupContent: React.FC = () => {
         }
       );
       setProcessedRequests((prev) => ({ ...prev, [userId]: 'rejected' }));
-      toast.success(`Đã từ chối yêu cầu tham gia nhóm của người dùng ID: ${userId}.`);
+      toast.success(`Đã từ chối yêu cầu tham gia nhóm`);
     } catch (error) {
       console.error('Error rejecting invite:', error);
       toast.error('Có lỗi xảy ra khi từ chối yêu cầu.');

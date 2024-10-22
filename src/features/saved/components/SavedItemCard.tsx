@@ -114,19 +114,19 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
             mr: { sm: 2 },
           }}
         >
-          {article.listPhoto.length > 0 && (
-            <img
-              src={article.listPhoto[0]}
+          <img
+              src={article.listPhoto && article.listPhoto.length > 0 ? article.listPhoto[0] : 'src/assets/images/unknow.png'}
               alt={article.content}
               style={{
                 width: '100%',
                 display: 'block',
                 borderRadius: '8px',
-                maxHeight: '100px',
-                objectFit: 'cover',
+                maxWidth: '150px', 
+                maxHeight: '150px',
+                objectFit: 'contain',
+                aspectRatio: '1/1',
               }}
-            />
-          )}
+            />   
         </Box>
         <Box
           sx={{

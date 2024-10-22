@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
  
 import { useState, useEffect } from 'react';
@@ -93,7 +94,6 @@ const HomeGroupContent = () => {
   
       if (response.status === 201) {
         console.log('Bài viết đã được tạo thành công:', response.data);
-        alert('Bài viết của bạn đã được đăng thành công!'); 
       } else {
         console.warn(`Có lỗi xảy ra: ${response.status} - ${response.statusText}`);
       }
@@ -210,12 +210,8 @@ const HomeGroupContent = () => {
           Authorization: `Bearer ${token}`, // Thêm token vào header
         },
       });
-      if (response.status === 200) {
-        alert('Lưu bài viết thành công!');
-      }
     } catch (error) {
       console.error('Lỗi khi lưu bài viết:', error);
-      alert('Đã xảy ra lỗi khi lưu bài viết!');
     }
   };
 
@@ -230,11 +226,9 @@ const HomeGroupContent = () => {
       );
       if (response.status === 200) {
         setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId)); // Loại bỏ bài viết đã xóa ra khỏi danh sách bài viết hiện tại
-        alert('Xóa bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi xóa bài viết:', error);
-      alert('Đã xảy ra lỗi khi xóa bài viết!');
     }
   };
 
@@ -255,11 +249,9 @@ const HomeGroupContent = () => {
             post._id === postId ? { ...post, content: updatedContent, scope: updatedScope } : post
           )
         );
-        alert('Chỉnh sửa bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi chỉnh sửa bài viết:', error);
-      alert('Đã xảy ra lỗi khi chỉnh sửa bài viết!');
     }
   };
   

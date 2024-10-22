@@ -12,7 +12,6 @@ const NewFeedsContent = () => {
   const [error, setError] = useState<string | null>(null); // State cho lỗi
   const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
-
   // Gọi API lấy danh sách bài viết khi component render lần đầu
   useEffect(() => {
     fetchPosts();
@@ -56,6 +55,7 @@ const NewFeedsContent = () => {
       });
       console.log('Bài viết đã được tạo thành công:', response.data);
       setPosts((prevPosts) => [response.data.post, ...prevPosts]); 
+      
     } catch (error) {
       console.error('Lỗi khi gửi bài viết:', error);
     }

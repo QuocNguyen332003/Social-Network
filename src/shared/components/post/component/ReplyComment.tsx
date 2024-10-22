@@ -15,7 +15,6 @@ const ReplyComment: React.FC<ReplyCommentProps> = ({ replies, onLikeReply, onRep
   return (
     <Box sx={{ marginTop: 2, paddingLeft: 2, borderLeft: '2px solid #bdbdbd' }}>
       {replies.map((reply, replyIndex) => {
-        const replyLikes = Array.isArray(reply.emoticons) ? reply.emoticons.filter((emoticon) => emoticon.typeEmoticons === 'like').length : 0;
         const isReplyLiked = Array.isArray(reply.emoticons) && reply.emoticons.some((emoticon) => emoticon._iduser === currentUserId);
 
         // Get the avatar from the _iduser object if it's present and is an array
@@ -37,26 +36,42 @@ const ReplyComment: React.FC<ReplyCommentProps> = ({ replies, onLikeReply, onRep
                 {displayName}
               </Typography>
             </Box>
-            <Typography variant="body2" sx={{ color: '#616161', marginTop: 1 }}>
-              {reply.content}
+            <Box
+                sx={{
+                  backgroundColor: '#f5f5f5', // Màu xám nhạt
+                  padding: '8px',              // Khoảng cách nội dung tới viền
+                  borderRadius: '8px',          // Bo góc
+                  marginTop: 1                 // Khoảng cách trên
+                }}
+              >
+                <Typography variant="body2" sx={{ color: '#616161' }}>
+                {reply.content}
+                </Typography>
+              </Box>
+            <Typography
+                variant="caption" // Bạn có thể đổi thành "overline" nếu muốn nhỏ hơn
+                sx={{ 
+                  color: '#757575', 
+                  marginTop: 1, 
+                  fontSize: '0.75rem',  // Kích thước nhỏ hơn
+                  opacity: 0.6          // Hiệu ứng mờ
+                }}
+              >
+                 {reply.createdAt ? formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true }) : 'Invalid date'}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#757575', marginTop: 1 }}>
-              {reply.createdAt ? formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true }) : 'Invalid date'}
-            </Typography>
-
             <Box display="flex" alignItems="center" sx={{ marginTop: 1 }}>
               <Button
                 size="small"
                 startIcon={<ThumbUpAlt />}
-                sx={{ color: isReplyLiked ? '#2e7d32' : '#757575', textTransform: 'none' }}
+                sx={{ color: '#1976d2', textTransform: 'none' }}
                 onClick={() => onLikeReply(reply._id)}
               >
-                {isReplyLiked ? 'Bỏ thích' : 'Thích'} ({replyLikes})
+                {isReplyLiked ? 'Bỏ thích' : 'Thích'} ({reply.totalLikes})
               </Button>
               <Button
                 size="small"
                 startIcon={<Reply />}
-                sx={{ color: '#757575', textTransform: 'none' }}
+                sx={{ color: '#1976d2', textTransform: 'none' }}
                 onClick={() => typeof reply._iduser !== 'string' ? onReplyToComment(reply._iduser._id) : null}
               >
                 Trả lời
