@@ -1,17 +1,64 @@
 import {useEffect, useState } from "react"
 import { User } from "../../../interface/interface";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 export const useProfile = () => {
+    const location = useLocation();
     const [myUser, setMyUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const token = localStorage.getItem('token');
+    const currentUserId = localStorage.getItem('userId') || '';
+    const [isOwner, setIsOwner] = useState<boolean>(false);
+    const [idUserView, setIdUserView] = useState<string | null>(null);
 
     useEffect(()=> {
-      const url = window.location.pathname;
-      const parts = url.split("/"); // ["", "profile", "u123"]
-      const userId = parts[2]; // "u123"
-      
-      const dataUser = user.find((item) => item._id === userId) ?? null;
-      setMyUser(dataUser);
+      const updateUserIdFromUrl = () => {
+        const params = new URLSearchParams(location.search);
+        const userId = params.get("id");
+        setIdUserView(userId);
+      };
+    
+      updateUserIdFromUrl();
+    
+      window.addEventListener("popstate", updateUserIdFromUrl);
+    
+      return () => {
+        window.removeEventListener("popstate", updateUserIdFromUrl);
+      };
     }, []);
+    useEffect(() => {
+      if (idUserView) {
+        getUserById(idUserView);
+      }
+    }, [idUserView]);
+
+    useEffect(() => {
+      if (myUser && myUser._id && myUser._id.toString() === currentUserId.toString()) {
+        setIsOwner(true);
+      } else {
+        setIsOwner(false);
+      }
+    }, [myUser, currentUserId]);
+
+    const getUserById = async (userId: string) => {
+      try {
+        const response = await axios.get(`http://localhost:3000/v1/user/${userId}`, 
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setMyUser(response.data);
+      } catch (error) {
+        console.error('Lỗi khi lấy bài viết:', error);
+        setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
+      } finally {
+        setIsLoading(false); 
+      }
+    }
 
     const changeAvt = (newAvt: string) => {
       if (myUser != null){
@@ -139,8 +186,9 @@ export const useProfile = () => {
         setMyUser(updateUser);
       }
     }
+    
     return {
-        myUser,
+        myUser, setMyUser,
         changeAvt,
         changeBackground,
         changeName,
@@ -152,304 +200,9 @@ export const useProfile = () => {
         changeAddress,
         changeBirthday,
         changeGender,
-
+        isLoading,
+        error,
+        isOwner,
+        idUserView,
     }
 }
-
-const user: User[] = [
-  {
-    _id: "u123",
-    account: {
-      warningLevel: 0,
-      email: "user123@example.com",
-      password: "hashed_password"
-    },
-    firstName: "John",
-    lastName: "Doe",
-    displayName: "JohnDoe123",
-    userName: "john_doe_123",
-    friends: [
-      {
-        userId: "u456",
-        addDate: "2024-09-15"
-      },
-      {
-        userId: "u789",
-        addDate: "2024-08-30"
-      }
-    ],
-    avt: ["/src/assets/data-test/avt1.png"],
-    backGround: ["/src/assets/data-test/avt3.jpg"],
-    status: "Online",
-    createDate: "2024-01-01",
-    details: {
-      phoneNumber: "123-456-7890",
-      address: "123 Main St, Springfield",
-      gender: true,
-      birthDate: new Date("1990-06-15")
-    },
-    collections: [
-      {
-        _id: "col123",
-        name: "My Collection",
-        items: ["item1", "item2", "item3"],
-        createdAt: new Date("2024-02-01"),
-        updatedAt: new Date("2024-08-01"),
-        _destroy: new Date("2024-12-31")
-      }
-    ],
-    groups: ["group1", "group2"],
-    hobbies: ["reading", "coding", "traveling"],
-    listArticle: ["article1", "article2", "article3"],
-    aboutMe: 'Hello',
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-09-01"),
-    _destroy: new Date("2025-01-01")
-  },
-  {
-    _id: "user001",
-    account: {
-      warningLevel: 0,
-      email: "user123@example.com",
-      password: "hashed_password"
-    },
-    firstName: "Nguyễn Văn",
-    lastName: "A",
-    displayName: "JohnDoe123",
-    userName: "@VanA",
-    friends: [
-      {
-        userId: "u456",
-        addDate: "2024-09-15"
-      },
-      {
-        userId: "u789",
-        addDate: "2024-08-30"
-      }
-    ],
-    avt: ["/src/assets/data-test/avt1.png"],
-    backGround: ["/src/assets/data-test/avt3.jpg"],
-    status: "Online",
-    createDate: "2024-01-01",
-    details: {
-      phoneNumber: "123-456-7890",
-      address: "123 Main St, Springfield",
-      gender: true,
-      birthDate: new Date("1990-06-15")
-    },
-    collections: [
-      {
-        _id: "col123",
-        name: "My Collection",
-        items: ["item1", "item2", "item3"],
-        createdAt: new Date("2024-02-01"),
-        updatedAt: new Date("2024-08-01"),
-        _destroy: new Date("2024-12-31")
-      }
-    ],
-    groups: ["group1", "group2"],
-    hobbies: ["reading", "coding", "traveling"],
-    listArticle: ["article1", "article2", "article3"],
-    aboutMe: 'Hello',
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-09-01"),
-    _destroy: new Date("2025-01-01")
-  },
-  {
-    _id: "user002",
-    account: {
-      warningLevel: 0,
-      email: "user123@example.com",
-      password: "hashed_password"
-    },
-    firstName: "Trần",
-    lastName: "Thị B",
-    displayName: "JohnDoe123",
-    userName: "john_doe_123",
-    friends: [
-      {
-        userId: "u456",
-        addDate: "2024-09-15"
-      },
-      {
-        userId: "u789",
-        addDate: "2024-08-30"
-      }
-    ],
-    avt: ["/src/assets/data-test/avt1.png"],
-    backGround: ["/src/assets/data-test/avt3.jpg"],
-    status: "Online",
-    createDate: "2024-01-01",
-    details: {
-      phoneNumber: "123-456-7890",
-      address: "123 Main St, Springfield",
-      gender: true,
-      birthDate: new Date("1990-06-15")
-    },
-    collections: [
-      {
-        _id: "col123",
-        name: "My Collection",
-        items: ["item1", "item2", "item3"],
-        createdAt: new Date("2024-02-01"),
-        updatedAt: new Date("2024-08-01"),
-        _destroy: new Date("2024-12-31")
-      }
-    ],
-    groups: ["group1", "group2"],
-    hobbies: ["reading", "coding", "traveling"],
-    listArticle: ["article1", "article2", "article3"],
-    aboutMe: 'Hello',
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-09-01"),
-    _destroy: new Date("2025-01-01")
-  },
-  {
-    _id: "user003",
-    account: {
-      warningLevel: 0,
-      email: "user123@example.com",
-      password: "hashed_password"
-    },
-    firstName: "Lê",
-    lastName: "Quốc C",
-    displayName: "JohnDoe123",
-    userName: "john_doe_123",
-    friends: [
-      {
-        userId: "u456",
-        addDate: "2024-09-15"
-      },
-      {
-        userId: "u789",
-        addDate: "2024-08-30"
-      }
-    ],
-    avt: ["/src/assets/data-test/avt1.png"],
-    backGround: ["/src/assets/data-test/avt3.jpg"],
-    status: "Online",
-    createDate: "2024-01-01",
-    details: {
-      phoneNumber: "123-456-7890",
-      address: "123 Main St, Springfield",
-      gender: true,
-      birthDate: new Date("1990-06-15")
-    },
-    collections: [
-      {
-        _id: "col123",
-        name: "My Collection",
-        items: ["item1", "item2", "item3"],
-        createdAt: new Date("2024-02-01"),
-        updatedAt: new Date("2024-08-01"),
-        _destroy: new Date("2024-12-31")
-      }
-    ],
-    groups: ["group1", "group2"],
-    hobbies: ["reading", "coding", "traveling"],
-    listArticle: ["article1", "article2", "article3"],
-    aboutMe: 'Hello',
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-09-01"),
-    _destroy: new Date("2025-01-01")
-  },
-  {
-    _id: "user004",
-    account: {
-      warningLevel: 0,
-      email: "user123@example.com",
-      password: "hashed_password"
-    },
-    firstName: "Phạm Văn",
-    lastName: "D",
-    displayName: "JohnDoe123",
-    userName: "john_doe_123",
-    friends: [
-      {
-        userId: "u456",
-        addDate: "2024-09-15"
-      },
-      {
-        userId: "u789",
-        addDate: "2024-08-30"
-      }
-    ],
-    avt: ["/src/assets/data-test/avt1.png"],
-    backGround: ["/src/assets/data-test/avt3.jpg"],
-    status: "Online",
-    createDate: "2024-01-01",
-    details: {
-      phoneNumber: "123-456-7890",
-      address: "123 Main St, Springfield",
-      gender: true,
-      birthDate: new Date("1990-06-15")
-    },
-    collections: [
-      {
-        _id: "col123",
-        name: "My Collection",
-        items: ["item1", "item2", "item3"],
-        createdAt: new Date("2024-02-01"),
-        updatedAt: new Date("2024-08-01"),
-        _destroy: new Date("2024-12-31")
-      }
-    ],
-    groups: ["group1", "group2"],
-    hobbies: ["reading", "coding", "traveling"],
-    listArticle: ["article1", "article2", "article3"],
-    aboutMe: 'Hello',
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-09-01"),
-    _destroy: new Date("2025-01-01")
-  },
-  {
-    _id: "user005",
-    account: {
-      warningLevel: 0,
-      email: "user123@example.com",
-      password: "hashed_password"
-    },
-    firstName: "Đặng Minh",
-    lastName: "E",
-    displayName: "JohnDoe123",
-    userName: "john_doe_123",
-    friends: [
-      {
-        userId: "u456",
-        addDate: "2024-09-15"
-      },
-      {
-        userId: "u789",
-        addDate: "2024-08-30"
-      }
-    ],
-    avt: ["/src/assets/data-test/avt1.png"],
-    backGround: ["/src/assets/data-test/avt3.jpg"],
-    status: "Online",
-    createDate: "2024-01-01",
-    details: {
-      phoneNumber: "123-456-7890",
-      address: "123 Main St, Springfield",
-      gender: true,
-      birthDate: new Date("1990-06-15")
-    },
-    collections: [
-      {
-        _id: "col123",
-        name: "My Collection",
-        items: ["item1", "item2", "item3"],
-        createdAt: new Date("2024-02-01"),
-        updatedAt: new Date("2024-08-01"),
-        _destroy: new Date("2024-12-31")
-      }
-    ],
-    groups: ["group1", "group2"],
-    hobbies: ["reading", "coding", "traveling"],
-    listArticle: ["article1", "article2", "article3"],
-    aboutMe: 'Hello',
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-09-01"),
-    _destroy: new Date("2025-01-01")
-  },
-]
-  

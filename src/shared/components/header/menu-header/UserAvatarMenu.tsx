@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Import axios để gọi API
 import { toast } from 'react-toastify'; // Optional: Sử dụng toast để hiển thị thông báo
 
+
 const UserAvatarMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [avatarUrl, setAvatarUrl] = useState<string>(''); // State to store avatar URL
@@ -11,6 +12,7 @@ const UserAvatarMenu = () => {
   const userId = sessionStorage.getItem('userId'); // Retrieve userId from session
   const token = sessionStorage.getItem('token'); // Retrieve token from session
   const navigate = useNavigate();
+  const currentUserId = localStorage.getItem('userId') || '';
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,6 +47,7 @@ const UserAvatarMenu = () => {
   const handleMenuClick = (path: string) => {
     handleCloseAvatarMenu();
     navigate(path);
+    navigate(0);
   };
 
   const handleLogout = async () => {
@@ -115,7 +118,7 @@ const UserAvatarMenu = () => {
           },
         }}
       >
-        <MenuItem onClick={() => handleMenuClick(`/profile/u123`)}>Trang Cá Nhân</MenuItem>
+        <MenuItem onClick={() => handleMenuClick(`/profile?id=${currentUserId}`)}>Trang Cá Nhân</MenuItem>
         <MenuItem onClick={() => handleMenuClick('/settings')}>Cài đặt</MenuItem>
         <MenuItem onClick={handleLogout}>Log out</MenuItem>
       </Menu>

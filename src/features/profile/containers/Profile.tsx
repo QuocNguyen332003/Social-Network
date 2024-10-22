@@ -9,7 +9,7 @@ import { useProfile } from './useProfile';
 
 
 const Profile = () => {
-  const {myUser} = useProfile();
+  const {myUser, isOwner} = useProfile();
   
   if (myUser == null) {
     return <></>;
@@ -33,7 +33,7 @@ const Profile = () => {
             padding: '0 20px'
           }}
         >
-          <ProfileHeader myUser={myUser} />
+          <ProfileHeader myUser={myUser} isOwner={isOwner} />
           <ProfileTabs userID={myUser._id}/>
           <Outlet/>  
         </Grid>

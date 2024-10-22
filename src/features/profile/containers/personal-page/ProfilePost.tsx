@@ -1,34 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import axios from 'axios';
 import PostForm from '../../../../shared/components/postForm/PostForm';
 import Post from '../../../../shared/components/post/Post';
 import { Article, Comment } from '../../../../interface/interface';
+import { useLocation } from 'react-router-dom';
+
 
 const ProfilePost = () => {
+  const location = useLocation();
   const token = sessionStorage.getItem('token');
   const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
   const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
   const [error, setError] = useState<string | null>(null); // State cho lỗi
-  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
-
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ localStorage
+  const [idUserView, setIdUserView] = useState<string | null>(null);
   // Gọi API để lấy danh sách bài viết khi component render lần đầu
   useEffect(() => {
-    fetchPosts();
+    const params = new URLSearchParams(location.search);
+    const userId = params.get("id");
+    setIdUserView(userId);
+    fetchPosts(userId);
   }, []);
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (userId: string | null) => {
     setIsLoading(true);
     setError(null); // Reset lỗi trước khi gọi API
     try {
-      const response = await axios.get(`http://localhost:3000/v1/article/user/${currentUserId}/articles`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
-        }
-      );
-      setPosts(response.data);
+      if (userId !== null){
+        const response = await axios.get(`http://localhost:3000/v1/article/user/${userId}/articles`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Thêm token vào header
+            },
+          }
+        );
+        setPosts(response.data);
+      }
+      else{
+        setError('Người dùng không có id!');
+      }
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);
       setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
@@ -319,7 +330,9 @@ const ProfilePost = () => {
 
   return (
     <Box sx={{ padding: 2, height: '85vh' }}>
-      <PostForm onSubmit={handlePostSubmit} />
+      {(idUserView !== null && idUserView === currentUserId) && (
+        <PostForm onSubmit={handlePostSubmit} />
+      )}
       {isLoading ? (
         <p>Đang tải...</p>
       ) : error ? (
