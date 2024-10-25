@@ -374,15 +374,14 @@ const Post = ({
   const handleAvatarClick = () => {
     navigate(`/profile/${post?.createdBy?._id}`);
   };
-  console.log(post?.createdBy?.avt[post?.createdBy?.avt.length - 1])
-  console.log(post?.createdBy?.avt?.length)
+
   return (
     <Paper sx={{ padding: 2, marginBottom: 3, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
         <Box display="flex" alignItems="center" onClick={handleAvatarClick} sx={{ cursor: 'pointer' }}>
           <Avatar 
             alt={post?.createdBy?.displayName || 'Anonymous'} 
-            src={post?.createdBy?.avt[post?.createdBy?.avt.length - 1]} 
+            src={post?.createdBy?.avt?.length ? post?.createdBy?.avt[post?.createdBy?.avt.length - 1] : '/static/images/avatar/default.jpg'} 
             sx={{ width: 48, height: 48 }} 
           />
           <Box sx={{ marginLeft: 2 }}>

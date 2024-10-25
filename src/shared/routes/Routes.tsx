@@ -207,7 +207,7 @@ const Routes = () => {
     },
     {
       path: '/profile',
-      element: <ProtectedRoute />, // Bảo vệ route bằng ProtectedRoute
+      element: <ProtectedRoute />, 
       children: [
         {
           path: '',
