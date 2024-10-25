@@ -13,7 +13,7 @@ const ProfilePost = () => {
   const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
   const [isLoading, setIsLoading] = useState(false); // State cho trạng thái loading
   const [error, setError] = useState<string | null>(null); // State cho lỗi
-  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ localStorage
+  const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
   const [idUserView, setIdUserView] = useState<string | null>(null);
   // Gọi API để lấy danh sách bài viết khi component render lần đầu
   useEffect(() => {

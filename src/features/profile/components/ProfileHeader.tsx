@@ -21,7 +21,7 @@ const ProfileHeader = ({myUser, isOwner}: DataUser) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
+  console.log(myUser)
   const {relationship, follow, handleFriend} = useProfileHeader(myUser._id);
   const {openDialog, first, handleClickOpenDialog, handleCloseDialog} = useDialogFollow();
 
@@ -80,7 +80,7 @@ const ProfileHeader = ({myUser, isOwner}: DataUser) => {
           flexDirection: 'column', textTransform: 'none',  margin: '0px 20px'
         }}
         onClick={() => {handleClickOpenDialog(1)}}>
-          <Typography sx={{color: 'black'}}>{myUser.follower.length}</Typography>
+          <Typography sx={{color: 'black'}}>{myUser.follower.length }</Typography>
           <Typography sx={{color: 'black'}}>Người theo dõi</Typography>
         </Button>
         <Button variant="text" sx={{

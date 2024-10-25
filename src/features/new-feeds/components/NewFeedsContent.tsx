@@ -298,7 +298,7 @@ const NewFeedsContent = () => {
           Authorization: `Bearer ${token}`, // Thêm token vào header
         },
       });
-      console.log('Bài viết đã được chia sẻ thành công:', response.data);
+      console.log('Bài viết đã được chia sẻ thành công:', response.data.post);
       // Cập nhật danh sách bài viết sau khi chia sẻ
       setPosts((prevPosts) => [response.data.post, ...prevPosts]);
     } catch (error) {

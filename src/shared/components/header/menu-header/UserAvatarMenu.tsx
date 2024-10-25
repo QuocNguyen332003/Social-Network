@@ -12,7 +12,6 @@ const UserAvatarMenu = () => {
   const userId = sessionStorage.getItem('userId'); // Retrieve userId from session
   const token = sessionStorage.getItem('token'); // Retrieve token from session
   const navigate = useNavigate();
-  const currentUserId = localStorage.getItem('userId') || '';
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -118,7 +117,7 @@ const UserAvatarMenu = () => {
           },
         }}
       >
-        <MenuItem onClick={() => handleMenuClick(`/profile?id=${currentUserId}`)}>Trang Cá Nhân</MenuItem>
+        <MenuItem onClick={() => handleMenuClick(`/profile?id=${userId}`)}>Trang Cá Nhân</MenuItem>
         <MenuItem onClick={() => handleMenuClick('/settings')}>Cài đặt</MenuItem>
         <MenuItem onClick={handleLogout}>Log out</MenuItem>
       </Menu>

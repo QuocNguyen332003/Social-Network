@@ -12,8 +12,8 @@ const useProfileHeader = (friendId: string) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
-    const currentUserId = localStorage.getItem('userId') || '';
+    const token = sessionStorage.getItem('token');
+    const currentUserId = sessionStorage.getItem('userId') || '';
     const [relationship, setRelationShip] = useState<RelationShipProps>({isFollow: false, isFriend: 'no', _id: null})
     
     const navigate = useNavigate()

@@ -19,6 +19,7 @@ const NotificationMenu = () => {
 
   useEffect(() => {
     socket.on('like_article_notification', (notification) => {
+      console.log('Received notification:', notification);
       if (notification.receiverId === currentUserId) {
         setNotifications((prevNotifications) => [notification, ...prevNotifications]);
         setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
@@ -83,15 +84,16 @@ const NotificationMenu = () => {
     });
 
     return () => {
-      socket.off('like_notification'); // rồi nè
-      socket.off('share_notification'); // rồi
-      socket.off('like_comment_notification'); // rồi
-      socket.off('like_reply_notification'); // rồi
-      socket.off('new_comment_notification'); // rồi nè
-      socket.off('new_reply_notification'); // rồi
-      socket.off('article_reported'); // rồi
-      socket.off('user_accepted_notification'); // chưa
-      socket.off('new_group_invite_notification'); // chưa
+      socket.off('like_article_notification'); // rồi nè (fix)
+      socket.off('like_comment_notification'); // rồi (Fix)
+      socket.off('like_reply_notification'); // rồi (fix)
+      socket.off('new_comment_notification'); // rồi nè (fix)
+      socket.off('new_reply_notification'); // rồi (fix)
+      socket.off('share_notification'); // rồi (fix)
+      socket.off('article_reported'); // rồi  (fix)
+      socket.off('user_accepted_notification'); // chưa (fix)
+      socket.off('invite_become_admin'); // chưa (fix)
+      socket.off('new_group_invite_notification'); // chưa (fix)
     };
   }, [currentUserId]);
   // Fetch notifications from backend API
