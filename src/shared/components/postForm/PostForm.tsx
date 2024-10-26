@@ -44,7 +44,7 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
 
   // Hàm điều hướng tới trang cá nhân
   const handleAvatarClick = () => {
-    navigate(`/profile/${userId}`);
+    navigate(`/profile?id=${userId}`);
   };
 
   // Hàm thêm hashtag mới

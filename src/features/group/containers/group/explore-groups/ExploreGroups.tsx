@@ -103,7 +103,7 @@ const ExploreGroups: React.FC = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', padding: 2, overflowX: 'hidden', boxSizing: 'border-box' }}>
+    <Box sx={{ width: '100%', padding: 2, overflowX: 'hidden', boxSizing: 'border-box', height: '130vh' }}>
       <Box sx={{ marginBottom: 4 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.2rem', flexGrow: 1 }}>

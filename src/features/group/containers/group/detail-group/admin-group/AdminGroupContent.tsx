@@ -226,7 +226,9 @@ const AdminGroupContent: React.FC = () => {
               availableMembers.map((member, index) => (
                 <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
                   <ListItemAvatar>
-                    <Avatar src={member.idUser?.avt?.[0] || '/path/to/default/avatar.jpg'} />
+                    <Avatar
+                       src={member?.avt[member?.avt.length - 1] ||  '/static/images/avatar/default.jpg'} >
+                    </Avatar>
                   </ListItemAvatar>
                   <ListItemText
                     primary={

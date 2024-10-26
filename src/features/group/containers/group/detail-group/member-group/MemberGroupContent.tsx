@@ -24,7 +24,9 @@ import { toast } from 'react-toastify';
 const MemberGroupContent: React.FC = () => {
   const token = sessionStorage.getItem('token');
   const { group, role } = useOutletContext<{ group: Group; role: string }>(); // Nhận role từ context
-  const [members, setMembers] = useState<{ idUser: { _id: string; displayName: string }; joinDate: Date; _id: string }[]>([]); // State để lưu danh sách thành viên
+  const [members, setMembers] = useState<{ idUser: {
+    [x: string]: any; _id: string; displayName: string 
+}; joinDate: Date; _id: string }[]>([]); // State để lưu danh sách thành viên
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // State để hiển thị hộp thoại xác nhận
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null); // Lưu ID thành viên được chọn để xóa
   const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
@@ -102,7 +104,9 @@ const MemberGroupContent: React.FC = () => {
             <React.Fragment key={index}>
               <ListItem sx={{ paddingLeft: 0, borderBottom: '1px solid #e0e0e0' }}>
                 <ListItemAvatar>
-                  <Avatar src={`/static/images/avatar/${index + 1}.jpg`} />
+                  <Avatar 
+                    src={member?.idUser?.avt[member?.idUser?.avt.length - 1] ||  '/static/images/avatar/default.jpg'} 
+                  />
                 </ListItemAvatar>
                 <ListItemText
                   primary={

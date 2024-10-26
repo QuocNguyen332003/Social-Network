@@ -131,7 +131,8 @@ const ApprovaGroupContent: React.FC = () => {
               >
                 <ListItem sx={{ paddingLeft: 0 }}>
                   <ListItemAvatar>
-                    <Avatar src={`/static/images/avatar/${index + 1}.jpg`} sx={{ width: 50, height: 50 }} />
+                    <Avatar src={post?.createdBy?.avt?.length ? post?.createdBy?.avt[post?.createdBy?.avt.length - 1] : '/static/images/avatar/default.jpg'} 
+                    sx={{ width: 50, height: 50 }} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={

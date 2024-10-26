@@ -21,7 +21,7 @@ const MainContent: React.FC<MainContentProps> = ({ user, setUser, articles, sele
     : articles;
 
   return (
-    <Box sx={{ padding: 2, color: 'black', height: '100vh', overflowY: 'auto' }}>
+    <Box sx={{ padding: 2, color: 'black', height: '100vh', overflowY: 'auto', backgroundColor: '#e9e9e9', }}>
       <Typography variant="h6" gutterBottom>
         {selectedCollectionId ? `Bài viết trong bộ sưu tập` : `Tất cả các mục đã lưu`}
       </Typography>

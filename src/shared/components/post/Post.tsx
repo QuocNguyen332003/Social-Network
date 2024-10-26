@@ -312,6 +312,7 @@ const Post = ({
   };
 
   const handleShareDialogClose = () => {
+    console.log(post.createdBy.avt); 
     setShareDialogOpen(false);
     setShareContent('');
     setShareScope('public');
@@ -372,7 +373,7 @@ const Post = ({
 
   // New handle for avatar click
   const handleAvatarClick = () => {
-    navigate(`/profile/${post?.createdBy?._id}`);
+    navigate(`/profile?id=${post?.createdBy?._id}`);
   };
 
   return (

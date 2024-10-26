@@ -1,5 +1,5 @@
  
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Box } from '@mui/material';
 import axios from 'axios';
 import PostForm from '../../../shared/components/postForm/PostForm';
@@ -12,27 +12,58 @@ const NewFeedsContent = () => {
   const [error, setError] = useState<string | null>(null); // State cho lỗi
   const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
-  // Gọi API lấy danh sách bài viết khi component render lần đầu
+  const [page, setPage] = useState(1); // Quản lý trang hiện tại để phân trang
+  const [hasMore, setHasMore] = useState(true); // Kiểm tra còn bài viết để tải không
+
+  const observer = useRef<IntersectionObserver | null>(null);
+
+  // Hàm dùng Intersection Observer để xác định khi nào cuộn tới bài viết cuối
+  const lastPostRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoading) return;
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage((prevPage) => prevPage + 1); // Tăng trang mỗi khi cuộn đến cuối
+      }
+    });
+
+    if (node) observer.current.observe(node);
+  }, [isLoading, hasMore]);
+
+  // Gọi API lấy danh sách bài viết mỗi khi `page` thay đổi
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [page]);
+
   const fetchPosts = async () => {
     setIsLoading(true);
-    setError(null); // Reset lỗi trước khi gọi API
+    setError(null);
     try {
-      const response = await axios.get(`http://localhost:3000/v1/article?userId=${currentUserId}`, {
+      const response = await axios.get(`http://localhost:3000/v1/article?userId=${currentUserId}&limit=10&page=${page}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Thêm token vào header
+          Authorization: `Bearer ${token}`,
         },
       });
-      setPosts(response.data);
+      const { articles: newPosts = [], hasMore: moreAvailable = false } = response.data;
+      
+      // Kiểm tra nếu `newPosts` không trùng với các bài viết hiện tại
+      setPosts((prevPosts: Article[]) => {
+        const uniqueNewPosts = newPosts.filter((newPost: Article) => 
+          !prevPosts.some((post: Article) => post._id === newPost._id)
+        );
+        return [...prevPosts, ...uniqueNewPosts];
+      });
+      setHasMore(moreAvailable);
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);
       setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
+  
+
   // Xử lý khi gửi bài viết mới
   const handlePostSubmit = async (newPost: string, images: File[], visibility: string, hashTags: string[]) => {
     const formData = new FormData();
@@ -288,54 +319,84 @@ const NewFeedsContent = () => {
 
   const handleSharePost = async (postId: string, shareContent: string, shareScope: string) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/share`, {
-        content: shareContent,
-        scope: shareScope,
-        userId: currentUserId,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Thêm token vào header
+      const response = await axios.post(
+        `http://localhost:3000/v1/article/${postId}/share`, 
+        {
+          content: shareContent,
+          scope: shareScope,
+          userId: currentUserId,
         },
-      });
-      console.log('Bài viết đã được chia sẻ thành công:', response.data.post);
-      // Cập nhật danh sách bài viết sau khi chia sẻ
-      setPosts((prevPosts) => [response.data.post, ...prevPosts]);
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      const sharedPost = response.data.post;
+      if (sharedPost) {
+        setPosts((prevPosts) => [sharedPost, ...prevPosts]);
+      } else {
+      }
     } catch (error) {
-      console.error('Lỗi khi chia sẻ bài viết:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Lỗi khi chia sẻ bài viết:', error.response?.data || error.message);
+      } else {
+        console.error('Đã xảy ra lỗi không xác định:', error);
+      }
     }
   };
   
   
   
+  
   return (
-    <Box sx={{ padding: 2, height: '85vh' }}>
+    <Box sx={{ padding: 2 }}>
       <PostForm onSubmit={handlePostSubmit} />
-      {isLoading ? (
-        <p>Đang tải...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : posts.length > 0 ? (
-        posts.map((post, index) => (
-          <Post
-            key={index}
-            post={post}
-            onLikeComment={handleLikeComment}
-            onAddComment={handleAddComment}
-            onLikeReplyComment={handleLikeReplyComment}
-            onAddReply={handleAddReply}
-            onLikePost={handleLikePost}
-            onDeletePost={handleDeletePost}
-            onReportPost={handleReportPost}
-            onSavePost={handleSavePost} // Truyền hàm `onReportPost` vào Post component
-            onEditPost={handleEditPost}
-            currentUserId={currentUserId}
-            onSharePost={handleSharePost}
-          />
-        ))
-      ) : (
-        <p>Không có bài viết nào.</p>
-      )}
+      {posts.map((post, index) => {
+        // Đặt ref vào phần tử cuối cùng để kích hoạt tải thêm
+        if (posts.length === index + 1) {
+          return (
+            <div ref={lastPostRef} key={post._id}>
+              <Post
+                post={post}
+                onLikeComment={handleLikeComment}
+                onAddComment={handleAddComment}
+                onLikeReplyComment={handleLikeReplyComment}
+                onAddReply={handleAddReply}
+                onLikePost={handleLikePost}
+                onDeletePost={handleDeletePost}
+                onReportPost={handleReportPost}
+                onSavePost={handleSavePost}
+                onEditPost={handleEditPost}
+                currentUserId={currentUserId}
+                onSharePost={handleSharePost}
+              />
+            </div>
+          );
+        } else {
+          return (
+            <Post
+              key={post._id}
+              post={post}
+              onLikeComment={handleLikeComment}
+              onAddComment={handleAddComment}
+              onLikeReplyComment={handleLikeReplyComment}
+              onAddReply={handleAddReply}
+              onLikePost={handleLikePost}
+              onDeletePost={handleDeletePost}
+              onReportPost={handleReportPost}
+              onSavePost={handleSavePost}
+              onEditPost={handleEditPost}
+              currentUserId={currentUserId}
+              onSharePost={handleSharePost}
+            />
+          );
+        }
+      })}
+      {isLoading && <p>Đang tải...</p>}
+      {error && <p>{error}</p>}
+      {!hasMore && <p></p>}
     </Box>
   );
 };

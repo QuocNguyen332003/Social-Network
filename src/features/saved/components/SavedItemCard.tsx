@@ -100,10 +100,9 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
           alignItems: 'center',
-          backgroundColor: '#f5f5f5',
-          color: '#333',
           cursor: 'pointer',
           minHeight: '120px',
+          borderRadius: 3
         }}
         onClick={handleViewPost}
       >
@@ -139,7 +138,7 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
             {article.content.length > 80 ? `${article.content.slice(0, 80)}...` : article.content}
           </Typography>
           <Typography variant="caption" color="#666">
-            Đã lưu vào {article.scope}
+            Phạm vị bài viết:  {article.scope}
           </Typography>
         </Box>
         <Button

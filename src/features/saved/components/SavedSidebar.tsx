@@ -165,7 +165,7 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
   };
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: { xs: 2, sm: 3 }, gap: 2, backgroundColor: '#fafafa', fontFamily: 'Arial, sans-serif' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: { xs: 2, sm: 3 }, gap: 2, fontFamily: 'Arial, sans-serif' }}>
       <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1e88e5', fontSize: { xs: '1.2rem', sm: '1.4rem' }, marginBottom: 1 }}>
         Bộ Sưu Tập Của Tôi
       </Typography>
