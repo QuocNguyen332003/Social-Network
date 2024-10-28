@@ -12,8 +12,6 @@ import Profile from '../../features/profile/containers/Profile';
 import ProfileEdit from '../../features/profile/containers/edit-profile/ProfileEdit';
 import SavedItems from '../../features/saved/containers/saved/SavedItems';
 import CollectionsMain from '../../features/collections/containers/CollectionsMain';
-import Collections from '../../features/collections/containers/collection/Collection';
-import DetailArticle from '../../features/collections/containers/article-collection/DetailArticle'
 import DetailArticles from '../../features/new-feeds/containers/detail-article/DetailArticles';
 import NewFeedsContent from '../../features/new-feeds/components/NewFeedsContent'
 import MyFriendsRequest from '../../features/friends/containers/my-friend-request/MyFriendsRequest';
@@ -245,12 +243,8 @@ const Routes = () => {
           children: [
             {
               path: '',
-              element: <Collections />,
-            },
-            {
-              path: 'article',
-              element: <DetailArticle />,
-            },
+              element: <CollectionsMain />,
+            }
           ],
         },
       ],

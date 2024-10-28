@@ -1,19 +1,20 @@
 import React from 'react';
 import { Box, Typography, Paper, Button, IconButton } from '@mui/material';
 import { MoreHoriz } from '@mui/icons-material';
-import AlbumItem from './AlbumItem';
 import { useNavigate } from 'react-router-dom';
+import { Article, Collection } from '../../../interface/interface';
 
 
 
-interface ArticleCardCardProps {
-  item: AlbumItem;
+interface ArticleCardProps {
+  article: Article;
+  collection: Collection;
 }
 
-const ArticleCard: React.FC<ArticleCardCardProps> = ({ item }) => {
+const ArticleCard: React.FC<ArticleCardProps> = ({ article, collection }) => {
   const navigate = useNavigate();
-  const handleAddToCollection = () => {
-    navigate('/collections/article');
+  const handleViewArticle = () => {
+    navigate(`/new-feeds/${article._id}`);
   };
 
   return (
@@ -30,8 +31,8 @@ const ArticleCard: React.FC<ArticleCardCardProps> = ({ item }) => {
       >
         <Box sx={{ width: { xs: '100%', sm: '15%' }, mb: { xs: 2, sm: 0 }, mr: { sm: 2 } }}>
           <img
-            src={item.media}
-            alt={item.content}
+            src={article.listPhoto[article.listPhoto.length - 1]}
+            alt={"Ảnh bài viết"}
             style={{ width: '100px', display: 'block', borderRadius: 10 }}
           />
         </Box>
@@ -39,20 +40,20 @@ const ArticleCard: React.FC<ArticleCardCardProps> = ({ item }) => {
               paddingRight: '20px', display:'flex', flexDirection: 'column'
           }}>
           <Typography variant="body1" fontWeight="bold" color="#000">
-            {item.content}
+            {article.content}
           </Typography>
           <Typography variant="caption" color="#666">
-            {item.type} · Đã lưu vào {item.collection}
+            Đã lưu vào {collection.name}
           </Typography>
           <Typography variant="caption" color="#999">
-            Đã lưu từ bài viết của {item.savedBy}
+            Đã lưu từ bài viết của {article.idHandler}
           </Typography>
         </Box>
         <Button
           variant="contained"
           color="primary"
           sx={{ mr: 2, display: { xs: 'none', sm: 'inline-flex' } }}
-          onClick={handleAddToCollection} // Hiển thị popup khi bấm
+          onClick={handleViewArticle} // Hiển thị popup khi bấm
         >
           Xem bài viết
         </Button>

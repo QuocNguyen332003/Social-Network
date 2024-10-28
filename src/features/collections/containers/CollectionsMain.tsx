@@ -1,29 +1,28 @@
-import { Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import  Header  from '../../../shared/components/header/Header';
 import  SidebarLeft  from '../../../shared/components/sidebarLeft/SidebarLeft';
 import SidebarRightCollections from '../components/SidebarRightCollection';
-import { Outlet } from 'react-router-dom';
-import { useState } from 'react';
-import { CollectionContext } from '../useCollection';
+import CollectionsScreen from './collection/Collection';
+import useCollectionMain from './useCollectionMain';
 
 const CollectionsMain = () => {
-  const [currCollection, setCurrCollection] = useState<number>(0);  
-
+  const {collections, articles, currCollection, setCurrCollections} = useCollectionMain();
   return (
-    <CollectionContext.Provider value={{ currCollection, setCurrCollection }}>
+    <Box>
       <Header />
       <Grid container>
         <Grid item xs={2.5}>
           <SidebarLeft />
         </Grid>
         <Grid item xs={7} sx={{ backgroundColor: '#e9e9e9' }}>
-          <Outlet />
+          <CollectionsScreen articles={articles} collections={collections} 
+          currCollection={currCollection} setCurrCollections={setCurrCollections}/>
         </Grid>
         <Grid item xs={2.5}>
-          <SidebarRightCollections currCollection={currCollection} setCurrCollection={setCurrCollection} />
+          <SidebarRightCollections collections={collections} setCurrCollections={setCurrCollections}/>
         </Grid>
       </Grid>
-    </CollectionContext.Provider>
+    </Box>
   );
 };
 

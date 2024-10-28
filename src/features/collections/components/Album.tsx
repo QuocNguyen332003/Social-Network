@@ -2,18 +2,22 @@ import { Box, Button, Grid, IconButton, Typography } from "@mui/material"
 import ArticleCard from "./ArticleCard"
 import { useState } from "react";
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
-import AlbumItem from "./AlbumItem";
+import { Article, Collection } from "../../../interface/interface";
 
 interface AlbumProps {
     title: string;
-    collections: {label: string; data: AlbumItem[]}[];
-    currCollection: number;
-    setCurrCollection: (index: number) => void;
+    article: Article[];
+    collections: Collection[];
+    currCollection: Collection | null;
+    setCurrCollections: (value: Collection | null) => void; 
 }
-const Album = ({title, collections, currCollection, setCurrCollection}: AlbumProps) => {
+const Album = ({title, article, collections, currCollection, setCurrCollections}: AlbumProps) => {
     const maxCard = 5;
     const [showAll, setShowAll] = useState(false);
-    const displayedItems = showAll ? collections[currCollection].data : collections[currCollection].data.slice(0, maxCard);
+    const displayedItems = showAll ? article : article.slice(0, maxCard);
+    if (currCollection === null && !currCollection){
+      return <Typography>Loading...</Typography>
+    }
     return (
         <Box id ="album"
           sx={{ 
@@ -28,14 +32,14 @@ const Album = ({title, collections, currCollection, setCurrCollection}: AlbumPro
             </Typography>
             <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
                 <Box sx={{display: 'flex'}}>
-                {collections.map((item, index)=> (
-                    <IconButton sx={{borderRadius: 0}} onClick={()=> {setCurrCollection(index)}}>
+                {collections.map((item)=> (
+                    <IconButton sx={{borderRadius: 0}} onClick={()=> {setCurrCollections(item)}}>
                         <Typography variant="body1" 
                         sx={[{fontWeight: 'bold',
                         padding: '10px 0', margin: '0 10px',
-                        }, index === currCollection? {borderBottom: '2px solid black'}:{}]}
+                        }, item._id === currCollection._id? {borderBottom: '2px solid black'}:{}]}
                         >
-                        {item.label}
+                        {item.name}
                         </Typography>
                     </IconButton>
                 ))}
@@ -45,13 +49,18 @@ const Album = ({title, collections, currCollection, setCurrCollection}: AlbumPro
                     Collapse
                 </Button>}
             </Box>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{
+              minHeight: 200, maxHeight: 400,
+              overflowY: 'scroll',
+              scrollbarWidth: 'none', // Ẩn thanh cuộn trên Firefox
+              '&::-webkit-scrollbar': { display: 'none' } // Ẩn thanh cuộn trên Chrome, Safari
+            }}>
                 {displayedItems.map((item, index) => (
                   <Grid item xs={12} key={index}>
-                    <ArticleCard item={item}/>
+                    <ArticleCard article={item} collection={currCollection}/>
                   </Grid>
                 ))}
-                {!showAll && collections[currCollection].data.length > maxCard && (
+                {!showAll && article.length > maxCard && (
                 <Grid item xs={12} sx={{display: 'flex', justifyContent: 'center'}}>
                     <Button onClick={()=> {setShowAll(true)}}
                       sx={{

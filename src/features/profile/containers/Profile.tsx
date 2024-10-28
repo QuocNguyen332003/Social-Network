@@ -7,9 +7,8 @@ import SidebarRight from '../../../shared/components/sidebarRight/SidebarRight';
 import { Outlet } from 'react-router-dom';
 import { useProfile } from './useProfile';
 
-
 const Profile = () => {
-  const {myUser, isOwner} = useProfile();
+  const {myUser, addNewFollower, deleteFollower, isOwner} = useProfile();
   
   if (myUser == null) {
     return <></>;
@@ -33,7 +32,7 @@ const Profile = () => {
             padding: '0 20px'
           }}
         >
-          <ProfileHeader myUser={myUser} isOwner={isOwner} />
+          <ProfileHeader myUser={myUser} isOwner={isOwner} addNewFollower={addNewFollower} deleteFollower={deleteFollower} />
           <ProfileTabs userID={myUser._id}/>
           <Outlet/>  
         </Grid>

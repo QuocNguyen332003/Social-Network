@@ -12,6 +12,7 @@ const UserAvatarMenu = () => {
   const userId = sessionStorage.getItem('userId'); // Retrieve userId from session
   const token = sessionStorage.getItem('token'); // Retrieve token from session
   const navigate = useNavigate();
+  const currentUserId = sessionStorage.getItem('userId') || '';
 
   useEffect(() => {
     const fetchUserData = async () => {
