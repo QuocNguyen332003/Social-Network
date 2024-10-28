@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { IconButton, Menu, MenuItem, Badge, List, ListItem, ListItemAvatar, ListItemText, Avatar, Divider, Typography, Box, Button } from '@mui/material';
 import { Notifications, MoreVert } from '@mui/icons-material'; 
 import { Notification } from '../../../../interface/interface'; 
+import io from 'socket.io-client'; // Import socket.io-client
+
+const socket = io('http://localhost:3000');
 
 const NotificationMenu = () => {
   const [anchorNotification, setAnchorNotification] = useState<null | HTMLElement>(null);
@@ -14,6 +17,85 @@ const NotificationMenu = () => {
   const currentUserId = sessionStorage.getItem('userId') || ''; 
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
 
+  useEffect(() => {
+    socket.on('like_article_notification', (notification) => {
+      console.log('Received notification:', notification);
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('like_comment_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('like_reply_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('new_comment_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('new_reply_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('share_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('article_reported', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+
+    socket.on('user_accepted_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+
+    socket.on('invite_become_admin', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+
+    socket.on('new_group_invite_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+
+    return () => {
+      socket.off('like_article_notification'); // rồi nè (fix)
+      socket.off('like_comment_notification'); // rồi (Fix)
+      socket.off('like_reply_notification'); // rồi (fix)
+      socket.off('new_comment_notification'); // rồi nè (fix)
+      socket.off('new_reply_notification'); // rồi (fix)
+      socket.off('share_notification'); // rồi (fix)
+      socket.off('article_reported'); // rồi  (fix)
+      socket.off('user_accepted_notification'); // chưa (fix)
+      socket.off('invite_become_admin'); // chưa (fix)
+      socket.off('new_group_invite_notification'); // chưa (fix)
+    };
+  }, [currentUserId]);
   // Fetch notifications from backend API
   useEffect(() => {
     const fetchNotifications = async () => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -25,14 +25,22 @@ interface SavedSidebarProps {
   user: User | null;
   onSelectCollection: (collectionId: string | null) => void;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  defaultCollectionId: string | null; // Nhận thêm prop defaultCollectionId
 }
 
-const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, setUser }) => {
+const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, setUser, defaultCollectionId }) => {
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
   const [openDialog, setOpenDialog] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editingCollection, setEditingCollection] = useState<string | null>(null);
+
+  // Tự động chọn bộ sưu tập mặc định khi component mount
+  useEffect(() => {
+    if (defaultCollectionId) {
+      onSelectCollection(defaultCollectionId);
+    }
+  }, [defaultCollectionId, onSelectCollection]);
 
   const handleOpenDialog = (collectionId: string | null = null) => {
     if (collectionId) {
@@ -157,7 +165,7 @@ const SavedSidebar: React.FC<SavedSidebarProps> = ({ user, onSelectCollection, s
   };
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: { xs: 2, sm: 3 }, gap: 2, backgroundColor: '#fafafa', fontFamily: 'Arial, sans-serif' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: { xs: 2, sm: 3 }, gap: 2, fontFamily: 'Arial, sans-serif' }}>
       <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1e88e5', fontSize: { xs: '1.2rem', sm: '1.4rem' }, marginBottom: 1 }}>
         Bộ Sưu Tập Của Tôi
       </Typography>

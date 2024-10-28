@@ -100,10 +100,9 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
           alignItems: 'center',
-          backgroundColor: '#f5f5f5',
-          color: '#333',
           cursor: 'pointer',
           minHeight: '120px',
+          borderRadius: 3
         }}
         onClick={handleViewPost}
       >
@@ -114,19 +113,19 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
             mr: { sm: 2 },
           }}
         >
-          {article.listPhoto.length > 0 && (
-            <img
-              src={article.listPhoto[0]}
+          <img
+              src={article.listPhoto && article.listPhoto.length > 0 ? article.listPhoto[0] : 'src/assets/images/unknow.png'}
               alt={article.content}
               style={{
                 width: '100%',
                 display: 'block',
                 borderRadius: '8px',
-                maxHeight: '100px',
-                objectFit: 'cover',
+                maxWidth: '150px', 
+                maxHeight: '150px',
+                objectFit: 'contain',
+                aspectRatio: '1/1',
               }}
-            />
-          )}
+            />   
         </Box>
         <Box
           sx={{
@@ -139,7 +138,7 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
             {article.content.length > 80 ? `${article.content.slice(0, 80)}...` : article.content}
           </Typography>
           <Typography variant="caption" color="#666">
-            Đã lưu vào {article.scope}
+            Phạm vị bài viết:  {article.scope}
           </Typography>
         </Box>
         <Button

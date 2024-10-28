@@ -64,7 +64,6 @@ const ExploreGroups: React.FC = () => {
           },
         }
       );
-      alert(`Đã gửi yêu cầu tham gia nhóm thành công!`);
 
       // Cập nhật lại trạng thái nhóm thành `pending`
       setNotJoinedGroups((prevGroups) =>
@@ -98,14 +97,13 @@ const ExploreGroups: React.FC = () => {
         )
       );
 
-      alert(`Yêu cầu tham gia nhóm đã được thu hồi.`);
     } catch (error) {
       console.error('Lỗi khi thu hồi yêu cầu tham gia nhóm:', error);
     }
   };
 
   return (
-    <Box sx={{ width: '100%', padding: 2, overflowX: 'hidden', boxSizing: 'border-box' }}>
+    <Box sx={{ width: '100%', padding: 2, overflowX: 'hidden', boxSizing: 'border-box', height: '130vh' }}>
       <Box sx={{ marginBottom: 4 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.2rem', flexGrow: 1 }}>

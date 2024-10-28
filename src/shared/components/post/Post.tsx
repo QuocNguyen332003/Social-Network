@@ -1,5 +1,4 @@
- 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -27,6 +26,7 @@ import CommentSection from './component/CommentSection.tsx';
 import axios from 'axios';
 import ShareItemCard from './component/ShareItemCard'; 
 import { v4 as uuidv4 } from 'uuid';
+import { io } from 'socket.io-client';
 
 interface PostComponentProps {
   post: Article;
@@ -72,7 +72,9 @@ const Post = ({
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [selectedReportReason, setSelectedReportReason] = useState<string>('');
   const [reportTarget, setReportTarget] = useState<{ postId: string; commentId?: string } | null>(null);
-
+  const [totalLikes, setTotalLikes] = useState(post.totalLikes); 
+  const [totalComments, setTotalComments] = useState(post.totalComments);
+  const [comments, setComments] = useState<CommentType[]>(post.interact.comment); // State lưu trữ các bình luận
   // New state for share dialog
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareContent, setShareContent] = useState('');
@@ -81,11 +83,92 @@ const Post = ({
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false); 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
-  
-
-
   const isLiked = post.interact.emoticons.some(emoticon => emoticon._iduser === currentUserId && emoticon.typeEmoticons === 'like');
 
+  useEffect(() => {
+    const socket = io('http://localhost:3000'); // Kết nối tới server Socket.IO
+
+    // Lắng nghe sự kiện update_article_likes
+      socket.on('update_article_likes', (data) => {
+        if (data.postId === post._id) {
+          setTotalLikes(data.totalLikes); // Cập nhật số lượt thích theo thời gian thực
+        }
+      });
+
+      // Lắng nghe sự kiện comment_activity
+      socket.on('new_comment', (data) => {
+        if (data.postId === post._id) {
+          setComments((prevComments) => [...prevComments, data.comment]); // Thêm bình luận mới
+          setTotalComments(data.totalComments); // Cập nhật số lượng bình luận theo thời gian thực
+        }
+      });
+
+      socket.on('update_comment_likes', (data) => {
+        const { commentId, totalLikes, action, userId } = data;
+    
+        setComments((prevComments) =>
+          prevComments.map((comment) => {
+            if (comment._id === commentId) {
+              // Cập nhật số likes và trạng thái like/unlike cho comment
+              const updatedEmoticons = action === 'like'
+                ? [...comment.emoticons, { _iduser: userId, typeEmoticons: 'like' }]
+                : comment.emoticons.filter((emoticon) => emoticon._iduser !== userId);
+    
+              return { ...comment, totalLikes: totalLikes, emoticons: updatedEmoticons };
+            }
+            return comment;
+          })
+        );
+      });
+
+      socket.on('update_reply_likes', (data) => {
+        const { commentId, replyId, totalLikes, action, userId } = data;
+    
+        setComments((prevComments) =>
+          prevComments.map((comment) => {
+            if (comment._id === commentId) {
+              // Cập nhật reply tương ứng
+              const updatedReplyComments = comment.replyComment.map((reply) => {
+                if (reply._id === replyId) {
+                  const updatedEmoticons = action === 'like'
+                    ? [...reply.emoticons, { _iduser: userId, typeEmoticons: 'like' }]
+                    : reply.emoticons.filter((emoticon) => emoticon._iduser !== userId);
+    
+                  return { ...reply, totalLikes: totalLikes, emoticons: updatedEmoticons };
+                }
+                return reply;
+              });
+    
+              return { ...comment, replyComment: updatedReplyComments };
+            }
+            return comment;
+          })
+        );
+      });
+
+      socket.on('new_reply', (data) => {
+        if (data.postId === post._id) {
+          setComments((prevComments) => {
+            return prevComments.map((comment) => {
+              if (comment._id === data.commentId) {
+                return {
+                  ...comment,
+                  replyComment: [...comment.replyComment, data.reply]
+                };
+              }
+              return comment;
+            });
+          });
+    
+          setTotalComments(data.totalComments); // Cập nhật số lượng bình luận theo thời gian thực
+        }
+      });
+
+    return () => {
+      socket.disconnect(); // Ngắt kết nối khi component bị unmount
+    };
+  }, [post._id]);
+  
   const handleLikeClick = () => {
     onLikePost(post._id); 
   };
@@ -131,6 +214,7 @@ const Post = ({
         emoticons: [],
         createdAt: new Date(),
         updatedAt: new Date(),
+        totalLikes: 0
       };
       onAddReply(post._id, commentId, reply);
 
@@ -162,6 +246,7 @@ const Post = ({
         emoticons: [],
         createdAt: new Date(),
         updatedAt: new Date(),
+        totalLikes: 0
       };
       onAddComment(post._id, comment);
       setNewComment('');
@@ -227,6 +312,7 @@ const Post = ({
   };
 
   const handleShareDialogClose = () => {
+    console.log(post.createdBy.avt); 
     setShareDialogOpen(false);
     setShareContent('');
     setShareScope('public');
@@ -285,15 +371,20 @@ const Post = ({
     }
   };
 
+  // New handle for avatar click
+  const handleAvatarClick = () => {
+    navigate(`/profile?id=${post?.createdBy?._id}`);
+  };
+
   return (
     <Paper sx={{ padding: 2, marginBottom: 3, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
-        <Box display="flex" alignItems="center">
-        <Avatar 
-          alt={typeof post.createdBy === 'string' ? post.createdBy : 'Anonymous'} 
-          src={typeof post.createdBy?.avt === 'string' ? post.createdBy.avt : '/static/images/avatar/default.jpg'} 
-          sx={{ width: 48, height: 48 }} 
-        />
+        <Box display="flex" alignItems="center" onClick={handleAvatarClick} sx={{ cursor: 'pointer' }}>
+          <Avatar 
+            alt={post?.createdBy?.displayName || 'Anonymous'} 
+            src={post?.createdBy?.avt?.length ? post?.createdBy?.avt[post?.createdBy?.avt.length - 1] : '/static/images/avatar/default.jpg'} 
+            sx={{ width: 48, height: 48 }} 
+          />
           <Box sx={{ marginLeft: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#333' }}>
               {post?.createdBy?.displayName}
@@ -454,11 +545,7 @@ const Post = ({
         </>
       )}
 
-
-
-
       <Divider sx={{ marginY: 2 }} />
-
 
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginTop: 2, width: '100%' }}>
         <Button
@@ -473,7 +560,7 @@ const Post = ({
           }}
           onClick={handleLikeClick}
         >
-          {post.interact.emoticons.length} {isLiked ? 'Bỏ thích' : 'Yêu thích'}
+          {totalLikes} {isLiked ? 'Bỏ thích' : 'Yêu thích'}
         </Button>
         <Button 
           startIcon={<Comment />} 
@@ -487,7 +574,7 @@ const Post = ({
           }} 
           onClick={handleToggleComments}
         >
-          {post?.totalComments} Bình luận
+          {totalComments} Bình luận
         </Button>
         <Button 
           startIcon={<Share />} 
@@ -503,7 +590,6 @@ const Post = ({
           Chia sẻ
         </Button>
       </Box>
-
 
       <Collapse in={showComments} timeout="auto" unmountOnExit>
         <Box sx={{ marginTop: 2, backgroundColor: '#f5f5f5', padding: 2, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
@@ -523,7 +609,7 @@ const Post = ({
           </Box>
 
           <CommentSection
-            comments={post.interact.comment}
+            comments={comments}
             onLikeComment={handleLikeComment}
             onReplyToComment={handleReplyToComment}
             handleReplyChange={handleReplyChange}

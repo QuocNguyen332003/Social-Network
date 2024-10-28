@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
  
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useRef ,useCallback} from 'react';
 import { Box } from '@mui/material';
 import PostForm from '../../../../../../shared/components/postForm/PostForm';
 import Post from '../../../../../../shared/components/post/Post';
@@ -14,24 +15,42 @@ const HomeGroupContent = () => {
   const [posts, setPosts] = useState<Article[]>([]); 
   const [isLoading, setIsLoading] = useState(false); 
   const [error, setError] = useState<string | null>(null); 
-  const currentUserId = sessionStorage.getItem('userId') || ''; 
+  const [page, setPage] = useState(1); // Trang hiện tại
+  const limit = 10; // Số bài viết trên mỗi trang
+  const [hasMore, setHasMore] = useState(true); // Để kiểm tra có còn dữ liệu để tải thêm không
+
+  const currentUserId = sessionStorage.getItem('userId') || '';
+  const observer = useRef<IntersectionObserver | null>(null);
+
   useEffect(() => {
     fetchPosts();
-  }, []);
-  // Gọi API lấy danh sách bài viết khi component render lần đầu
+  }, [page]);
+
+  // Gọi API lấy danh sách bài viết
   const fetchPosts = async () => {
+    if (!hasMore) return;
+
     setIsLoading(true);
-    setError(null); 
+    setError(null);
     try {
-      // Sử dụng `group._id` để lấy bài viết thuộc nhóm cụ thể và trạng thái 'approved'
-      const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/articles/processed`,
+      const response = await axios.get(
+        `http://localhost:3000/v1/group/${group._id}/articles/processed?page=${page}&limit=${limit}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      setPosts(response.data.articles);
+      const { articles: newPosts = [], hasMore: moreAvailable = false } = response.data;
+
+       
+      setPosts((prevPosts: Article[]) => {
+        const uniqueNewPosts = newPosts.filter((newPost: Article) => 
+          !prevPosts.some((post: Article) => post._id === newPost._id)
+        );
+        return [...prevPosts, ...uniqueNewPosts];
+      });
+      setHasMore(moreAvailable); // Cập nhật hasMore dựa trên kết quả trả về
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);
       setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
@@ -39,6 +58,23 @@ const HomeGroupContent = () => {
       setIsLoading(false);
     }
   };
+
+  // Vô hạn Scroll: xác định bài viết cuối cùng
+  const lastPostRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, hasMore]
+  );
   
   
   const handlePostSubmit = async (
@@ -93,7 +129,6 @@ const HomeGroupContent = () => {
   
       if (response.status === 201) {
         console.log('Bài viết đã được tạo thành công:', response.data);
-        alert('Bài viết của bạn đã được đăng thành công!'); 
       } else {
         console.warn(`Có lỗi xảy ra: ${response.status} - ${response.statusText}`);
       }
@@ -210,12 +245,8 @@ const HomeGroupContent = () => {
           Authorization: `Bearer ${token}`, // Thêm token vào header
         },
       });
-      if (response.status === 200) {
-        alert('Lưu bài viết thành công!');
-      }
     } catch (error) {
       console.error('Lỗi khi lưu bài viết:', error);
-      alert('Đã xảy ra lỗi khi lưu bài viết!');
     }
   };
 
@@ -230,11 +261,9 @@ const HomeGroupContent = () => {
       );
       if (response.status === 200) {
         setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId)); // Loại bỏ bài viết đã xóa ra khỏi danh sách bài viết hiện tại
-        alert('Xóa bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi xóa bài viết:', error);
-      alert('Đã xảy ra lỗi khi xóa bài viết!');
     }
   };
 
@@ -255,11 +284,9 @@ const HomeGroupContent = () => {
             post._id === postId ? { ...post, content: updatedContent, scope: updatedScope } : post
           )
         );
-        alert('Chỉnh sửa bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi chỉnh sửa bài viết:', error);
-      alert('Đã xảy ra lỗi khi chỉnh sửa bài viết!');
     }
   };
   
@@ -363,33 +390,52 @@ const HomeGroupContent = () => {
   };
   
   return (
-    <Box sx={{ padding: 2, height: '85vh' }}>
+    <Box sx={{ padding: 2 }}>
       <PostForm onSubmit={handlePostSubmit} />
-      {isLoading ? (
-        <p>Đang tải...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : posts.length > 0 ? (
-        posts.map((post, index) => (
-          <Post
-            key={index}
-            post={post}
-            onLikeComment={handleLikeComment}
-            onAddComment={handleAddComment}
-            onLikeReplyComment={handleLikeReplyComment}
-            onAddReply={handleAddReply}
-            onLikePost={handleLikePost}
-            onDeletePost={handleDeletePost}
-            onReportPost={handleReportPost}
-            onSavePost={handleSavePost} // Truyền hàm `onReportPost` vào Post component
-            onEditPost={handleEditPost}
-            currentUserId={currentUserId}
-            onSharePost={handleSharePost}
-          />
-        ))
-      ) : (
-        <p>Không có bài viết nào.</p>
-      )}
+      {posts.map((post, index) => {
+        // Đặt ref vào phần tử cuối cùng để kích hoạt tải thêm
+        if (posts.length === index + 1) {
+          return (
+            <div ref={lastPostRef} key={post._id}>
+              <Post
+                post={post}
+                onLikeComment={handleLikeComment}
+                onAddComment={handleAddComment}
+                onLikeReplyComment={handleLikeReplyComment}
+                onAddReply={handleAddReply}
+                onLikePost={handleLikePost}
+                onDeletePost={handleDeletePost}
+                onReportPost={handleReportPost}
+                onSavePost={handleSavePost}
+                onEditPost={handleEditPost}
+                currentUserId={currentUserId}
+                onSharePost={handleSharePost}
+              />
+            </div>
+          );
+        } else {
+          return (
+            <Post
+              key={post._id}
+              post={post}
+              onLikeComment={handleLikeComment}
+              onAddComment={handleAddComment}
+              onLikeReplyComment={handleLikeReplyComment}
+              onAddReply={handleAddReply}
+              onLikePost={handleLikePost}
+              onDeletePost={handleDeletePost}
+              onReportPost={handleReportPost}
+              onSavePost={handleSavePost}
+              onEditPost={handleEditPost}
+              currentUserId={currentUserId}
+              onSharePost={handleSharePost}
+            />
+          );
+        }
+      })}
+      {isLoading && <p>Đang tải...</p>}
+      {error && <p>{error}</p>}
+      {!hasMore && <p></p>}
     </Box>
   );
 };

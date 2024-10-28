@@ -189,7 +189,7 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
     <div
       style={{
         borderRight: '1px solid #e0e0e0',
-        height: '100vh',
+        height: '100%',
         backgroundColor: '#ffffff',
         padding: '16px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',

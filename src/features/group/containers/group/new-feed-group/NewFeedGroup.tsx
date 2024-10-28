@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState, useEffect, useRef, useCallback  } from 'react';
 import { Box, Typography } from '@mui/material';
 import Post from '../../../../../shared/components/post/Post.tsx';
 import { Article, Comment } from '../../../../../interface/interface.ts';
@@ -6,34 +7,69 @@ import axios from 'axios';
 
 const NewFeedGroup: React.FC = () => {
   const token = sessionStorage.getItem('token');
-  const [posts, setPosts] = useState<Article[]>([]);
-  const [, setIsLoading] = useState(false); // State cho trạng thái loading
-  const [, setError] = useState<string | null>(null); // State cho lỗi
   const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorages
 
-  // Gọi API lấy danh sách bài viết khi component render lần đầu
+
+  const [posts, setPosts] = useState<Article[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const observer = useRef<IntersectionObserver | null>(null);
+
+  const lastPostRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoading || !hasMore) return;
+    if (observer.current) observer.current.disconnect();
+  
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    });
+  
+    if (node) observer.current.observe(node);
+  }, [isLoading, hasMore]);
+  
+
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [page]);
+
   const fetchPosts = async () => {
     setIsLoading(true);
-    setError(null); // Reset lỗi trước khi gọi API
+    setError(null);
     try {
-      const response = await axios.get(`http://localhost:3000/v1/group/articles/${currentUserId}`,
+      const response = await axios.get(
+        `http://localhost:3000/v1/group/articles/${currentUserId}?page=${page}&limit=10`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setPosts(response.data);
+  
+      const { articles: newPosts = [] } = response.data;
+  
+      // Kiểm tra và xác định `hasMore`
+      setHasMore(newPosts.length === 10); // Nếu trả về ít hơn 10, không còn bài để tải thêm
+      
+      // Lọc bài viết trùng trước khi thêm
+      setPosts((prevPosts: Article[]) => {
+        const uniqueNewPosts = newPosts.filter((newPost: Article) => 
+          !prevPosts.some((post: Article) => post._id === newPost._id)
+        );
+        return [...prevPosts, ...uniqueNewPosts];
+      });
+  
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);
       setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
+  
+  
+  
 
   const handleLikePost = async (postId: string) => {
     try {
@@ -137,12 +173,8 @@ const NewFeedGroup: React.FC = () => {
           Authorization: `Bearer ${token}`, // Thêm token vào header
         },
       });
-      if (response.status === 200) {
-        alert('Lưu bài viết thành công!');
-      }
     } catch (error) {
       console.error('Lỗi khi lưu bài viết:', error);
-      alert('Đã xảy ra lỗi khi lưu bài viết!');
     }
   };
 
@@ -157,11 +189,9 @@ const NewFeedGroup: React.FC = () => {
       );
       if (response.status === 200) {
         setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId)); // Loại bỏ bài viết đã xóa ra khỏi danh sách bài viết hiện tại
-        alert('Xóa bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi xóa bài viết:', error);
-      alert('Đã xảy ra lỗi khi xóa bài viết!');
     }
   };
   
@@ -182,11 +212,9 @@ const NewFeedGroup: React.FC = () => {
             post._id === postId ? { ...post, content: updatedContent, scope: updatedScope } : post
           )
         );
-        alert('Chỉnh sửa bài viết thành công!');
       }
     } catch (error) {
       console.error('Lỗi khi chỉnh sửa bài viết:', error);
-      alert('Đã xảy ra lỗi khi chỉnh sửa bài viết!');
     }
   };
   
@@ -288,57 +316,77 @@ const NewFeedGroup: React.FC = () => {
       console.error('Lỗi khi chia sẻ bài viết:', error);
     }
   };
+
   return (
     <Box
       sx={{
         padding: 2,
         backgroundColor: '#e9e9e9',
-        height: '100vh',
+        height: '100%', // Đảm bảo phần tử này sẽ mở rộng đủ để có thể cuộn
         overflowY: 'auto',
         scrollbarWidth: 'none',
         '&::-webkit-scrollbar': {
           display: 'none',
         },
         display: 'flex',
-        justifyContent: 'center',  
+        justifyContent: 'center',
       }}
     >
       <Box
         sx={{
-          maxWidth: '800px', // Đặt kích thước tối đa cho bài viết
-          width: '100%',  // Đảm bảo chiếm hết chiều rộng có thể
-          margin: '0 16px', // Tạo khoảng cách hai bên
+          maxWidth: '800px',
+          width: '100%',
+          margin: '0 16px',
         }}
       >
-        {/* Thêm tiêu đề "Hoạt động gần đây" */}
-        <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2, textAlign: 'flex' }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
           Hoạt động gần đây
         </Typography>
 
-        {/* Kiểm tra và hiển thị các bài viết */}
-        {posts.length > 0 ? (
-          posts.map((post, index) => (
+        {posts.map((post, index) => {
+        // Đặt ref vào phần tử cuối cùng để kích hoạt tải thêm
+        if (posts.length === index + 1) {
+          return (
+            <div ref={lastPostRef} key={post._id}>
+              <Post
+                post={post}
+                onLikeComment={handleLikeComment}
+                onAddComment={handleAddComment}
+                onLikeReplyComment={handleLikeReplyComment}
+                onAddReply={handleAddReply}
+                onLikePost={handleLikePost}
+                onDeletePost={handleDeletePost}
+                onReportPost={handleReportPost}
+                onSavePost={handleSavePost}
+                onEditPost={handleEditPost}
+                currentUserId={currentUserId}
+                onSharePost={handleSharePost}
+              />
+            </div>
+          );
+        } else {
+          return (
             <Post
-            key={index}
-            post={post}
-            onLikeComment={handleLikeComment}
-            onAddComment={handleAddComment}
-            onLikeReplyComment={handleLikeReplyComment}
-            onAddReply={handleAddReply}
-            onLikePost={handleLikePost}
-            onDeletePost={handleDeletePost}
-            onReportPost={handleReportPost}
-            onSavePost={handleSavePost} // Truyền hàm `onReportPost` vào Post component
-            onEditPost={handleEditPost}
-            currentUserId={currentUserId}
-            onSharePost={handleSharePost}
-          />
-          ))
-        ) : (
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <p>Chưa có bài viết nào được duyệt.</p>
-          </Box>
-        )}
+              key={post._id}
+              post={post}
+              onLikeComment={handleLikeComment}
+              onAddComment={handleAddComment}
+              onLikeReplyComment={handleLikeReplyComment}
+              onAddReply={handleAddReply}
+              onLikePost={handleLikePost}
+              onDeletePost={handleDeletePost}
+              onReportPost={handleReportPost}
+              onSavePost={handleSavePost}
+              onEditPost={handleEditPost}
+              currentUserId={currentUserId}
+              onSharePost={handleSharePost}
+            />
+          );
+        }
+      })}
+        {isLoading && <p>Đang tải...</p>}
+        {error && <p>{error}</p>}
+        {!hasMore && <p>Hết bài viết.</p>}
       </Box>
     </Box>
   );
