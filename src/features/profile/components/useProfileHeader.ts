@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserDataDisplay } from "../../../interface/interface";
 
 interface RelationShipProps{
     isFollow: boolean;
@@ -8,12 +9,13 @@ interface RelationShipProps{
     _id: string | null;
 }
 
-const useProfileHeader = (friendId: string) => {
+const useProfileHeader = (friendId: string, addNewFollower: (newFollower: UserDataDisplay) => void,
+deleteFollower: (userId: string) => void) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
-    const currentUserId = localStorage.getItem('userId') || '';
+    const token = sessionStorage.getItem('token');
+    const currentUserId = sessionStorage.getItem('userId') || '';
     const [relationship, setRelationShip] = useState<RelationShipProps>({isFollow: false, isFriend: 'no', _id: null})
     
     const navigate = useNavigate()
@@ -65,6 +67,14 @@ const useProfileHeader = (friendId: string) => {
                     isFriend: relationship.isFriend,
                     _id: null
                 })
+                const currentUserName = sessionStorage.getItem('displayName') || '';
+                const currentUserAvt = JSON.parse(sessionStorage.getItem('avt') || '[]');
+                addNewFollower({
+                  _id: currentUserId,
+                  avt: currentUserAvt,
+                  name: currentUserName
+                })
+                  
             }
           } catch (error) {
             console.error('Lỗi khi lấy bài viết:', error);
@@ -89,6 +99,7 @@ const useProfileHeader = (friendId: string) => {
                     isFriend: relationship.isFriend,
                     _id: null
                 })
+                deleteFollower(currentUserId);
             }
           } catch (error) {
             console.error('Lỗi khi lấy bài viết:', error);

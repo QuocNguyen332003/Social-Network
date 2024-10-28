@@ -1,5 +1,5 @@
 import {useEffect, useState } from "react"
-import { User } from "../../../interface/interface";
+import { User, UserDataDisplay } from "../../../interface/interface";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 
@@ -8,8 +8,8 @@ export const useProfile = () => {
     const [myUser, setMyUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
-    const currentUserId = localStorage.getItem('userId') || '';
+    const token = sessionStorage.getItem('token');
+    const currentUserId = sessionStorage.getItem('userId') || '';
     const [isOwner, setIsOwner] = useState<boolean>(false);
     const [idUserView, setIdUserView] = useState<string | null>(null);
 
@@ -28,6 +28,7 @@ export const useProfile = () => {
         window.removeEventListener("popstate", updateUserIdFromUrl);
       };
     }, []);
+    
     useEffect(() => {
       if (idUserView) {
         getUserById(idUserView);
@@ -187,8 +188,33 @@ export const useProfile = () => {
       }
     }
     
+    const addNewFollower = (newFollower: UserDataDisplay) => {
+      setMyUser((prevUser) => {
+        if (prevUser) {
+          return {
+            ...prevUser, 
+            follower: [...prevUser.follower, newFollower],
+          };
+        }
+        return prevUser;
+      });
+      
+    }
+
+    const deleteFollower = (userId: string) => {
+      setMyUser((prevUser) => {
+        if (prevUser) {
+          return {
+            ...prevUser,
+            follower: prevUser.follower.filter(follower => follower._id !== userId),
+          };
+        }
+        return prevUser;
+      });
+    }
+    
     return {
-        myUser, setMyUser,
+        myUser, addNewFollower, deleteFollower,
         changeAvt,
         changeBackground,
         changeName,

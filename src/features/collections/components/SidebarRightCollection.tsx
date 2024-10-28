@@ -1,11 +1,14 @@
-import { Add } from "@mui/icons-material";
-import { Avatar, Box, Button, List, ListItem, ListItemText, Typography } from "@mui/material"
+import { Avatar, Box, List, ListItem, ListItemText, Typography } from "@mui/material"
 import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
-import { CollectionContextType } from "../useCollection";
+import { Collection } from "../../../interface/interface";
 
-const SidebarRightCollections = ({setCurrCollection}: CollectionContextType) => {
-  const collections = ['SG', 'TV & Phim ảnh'];
+interface SidebatCollectionProps {
+  collections: Collection[];
+  setCurrCollections: (value: Collection | null) => void;
+}
+
+const SidebarRightCollections = ({collections, setCurrCollections}: SidebatCollectionProps) => {
   const categorys = [
     { label: 'Hình ảnh', icon: <CropOriginalIcon />, id: 'collection-image' },
     { label: 'Video', icon: <SlowMotionVideoIcon />, id: 'collection-video' },
@@ -73,7 +76,7 @@ const SidebarRightCollections = ({setCurrCollection}: CollectionContextType) => 
           <ListItem
             button
             key={index}
-            onClick={() => {handleScroll("album"); setCurrCollection(index)}}
+            onClick={() => {setCurrCollections(collection)}}
             sx={{
               borderRadius: 2,
               backgroundColor: '#f5f5f5',
@@ -84,15 +87,15 @@ const SidebarRightCollections = ({setCurrCollection}: CollectionContextType) => 
             }}
           >
             <Avatar
-              alt={collection}
-              src={`/static/images/${collection.toLowerCase()}.jpg`}
+              alt={collection.name}
+              src={`/static/images/${collection.name.toLowerCase()}.jpg`}
               sx={{
                 width: { xs: 24, sm: 32 },
                 height: { xs: 24, sm: 32 },
               }}
             />
             <ListItemText
-              primary={collection}
+              primary={collection.name}
               sx={{
                 color: '#424242',
                 fontSize: { xs: '0.9rem', sm: '1rem' },

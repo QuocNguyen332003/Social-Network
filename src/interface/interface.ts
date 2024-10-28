@@ -1,10 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // User Interface
 
-interface UserDataDisplay {
+export interface UserDataDisplay {
   _id: string;
   avt: string[];
   name: string;
+}
+
+export interface Collection {
+  _id: string;
+  name: string;
+  items: string[];
+  createdAt: Date;
+  updatedAt: Date | null;
+  _destroy: Date | null;
 }
 export interface User {
     _id: string;
@@ -29,14 +38,7 @@ export interface User {
     }>;
     status: string;
     avt: string[];
-    collections: Array<{
-      _id: string;
-      name: string;
-      items: string[];
-      createdAt: Date;
-      updatedAt: Date | null;
-      _destroy: Date | null;
-    }>;
+    collections: Array<Collection>;
     groups: string[];
     backGround: string[];
     aboutMe: string,

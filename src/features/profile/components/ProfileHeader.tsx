@@ -2,28 +2,30 @@ import { Box, Typography, Button, Avatar, IconButton, Menu, MenuItem, ListItemIc
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import ShareIcon from '@mui/icons-material/Share';
 import { useNavigate } from 'react-router-dom';
-import { User } from '../../../interface/interface';
+import { User, UserDataDisplay } from '../../../interface/interface';
 import { useState } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import MessageIcon from '@mui/icons-material/Message';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import AddToQueueIcon  from '@mui/icons-material/AddToQueue';
 import useProfileHeader from './useProfileHeader';
-import useDialogFollow from './dialog-follow/useDialog';
+import useDialogFollow from './dialog-follow/useDialogFollow';
 import DialogFollow from './dialog-follow/DialogFollow';
 
 export type DataUser = {
   myUser: User;
   isOwner: boolean;
+  addNewFollower: (newFollower: UserDataDisplay) => void;
+  deleteFollower: (userId: string) => void;
 }
 
-const ProfileHeader = ({myUser, isOwner}: DataUser) => {
+const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUser) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const {relationship, follow, handleFriend} = useProfileHeader(myUser._id);
-  const {openDialog, first, handleClickOpenDialog, handleCloseDialog} = useDialogFollow();
+  const {relationship, follow, handleFriend} = useProfileHeader(myUser._id, addNewFollower, deleteFollower);
+  const {openDialog, first, handleClickOpenDialog, handleCloseDialog, dataFriends, dataFollower} = useDialogFollow(myUser._id);
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -192,7 +194,7 @@ const ProfileHeader = ({myUser, isOwner}: DataUser) => {
       </Box>
       )}
 
-      <DialogFollow open={openDialog} myUser={myUser} handleClose={handleCloseDialog} first={first}/>
+      <DialogFollow open={openDialog} myUser={myUser} handleClose={handleCloseDialog} first={first} dataFriends={dataFriends} dataFollower={dataFollower}/>
     </Box>
   );
 };

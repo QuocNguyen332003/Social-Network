@@ -8,7 +8,7 @@ import { toast } from 'react-toastify'; // Optional: Sử dụng toast để hi�
 const UserAvatarMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
-  const currentUserId = localStorage.getItem('userId') || '';
+  const currentUserId = sessionStorage.getItem('userId') || '';
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

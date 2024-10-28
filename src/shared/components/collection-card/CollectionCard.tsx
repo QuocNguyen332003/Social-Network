@@ -28,7 +28,7 @@ const CollectionCard = ({id, title,type, data}: CollectionCardProps) => {
         padding: '16px', 
         backgroundColor: '#fff',
         borderRadius: 5,
-        margin: '20px 0'
+        margin: '20px 0',
       }}
     >
         <Typography variant="h5" sx={{fontWeight: 'bold'}}>
@@ -53,7 +53,12 @@ const CollectionCard = ({id, title,type, data}: CollectionCardProps) => {
                 Collapse
             </Button>}
         </Box>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{
+            maxHeight: 400, minHeight: 150,
+            overflowY: 'scroll',
+            scrollbarWidth: 'none', // Ẩn thanh cuộn trên Firefox
+            '&::-webkit-scrollbar': { display: 'none' } // Ẩn thanh cuộn trên Chrome, Safari
+        }}>
       {displayedItems.map((item, index) => (
         <Grid item xs={type === "img"? 2: 3} key={index}>
           <IconButton
@@ -72,7 +77,10 @@ const CollectionCard = ({id, title,type, data}: CollectionCardProps) => {
           </IconButton>
         </Grid>
       ))}
-
+      {displayedItems.length <= 0 && 
+      <Grid item xs={12} sx={{marginLeft: '20px'}}>
+          <Typography>Chưa có dữ liệu</Typography>
+        </Grid>}
       {!showAll && data.length > 11 && (
         <Grid item xs={type === "img"? 2: 3} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
           <Button onClick={()=> {setShowAll(true)}}
