@@ -8,8 +8,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MessageIcon from '@mui/icons-material/Message';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import AddToQueueIcon  from '@mui/icons-material/AddToQueue';
-import useProfileHeader from './useProfileHeader';
 import useDialogFollow from './dialog-follow/useDialogFollow';
+import useProfileHeader from './useProfileHeader';
 import DialogFollow from './dialog-follow/DialogFollow';
 
 export type DataUser = {
@@ -23,9 +23,9 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  console.log(myUser)
-  const {relationship, follow, handleFriend} = useProfileHeader(myUser._id);
-  const {openDialog, first, handleClickOpenDialog, handleCloseDialog} = useDialogFollow();
+
+  const {relationship, follow, handleFriend} = useProfileHeader(myUser._id, addNewFollower, deleteFollower);
+  const {openDialog, first, handleClickOpenDialog, handleCloseDialog, dataFriends, dataFollower} = useDialogFollow(myUser._id);
 
   const handleClose = () => {
     setAnchorEl(null);
