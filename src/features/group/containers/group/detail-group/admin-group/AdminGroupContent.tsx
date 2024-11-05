@@ -192,7 +192,7 @@ const AdminGroupContent: React.FC = () => {
             acceptedAdmins.map((admin, index) => (
               <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
                 <ListItemAvatar>
-                  <Avatar src={admin.idUser.avt?.[0] || '/path/to/default/avatar.jpg'} />
+                  <Avatar src={admin.idUser?.avt || '/path/to/default/avatar.jpg'} />
                 </ListItemAvatar>
                 <ListItemText
                   primary={
@@ -227,7 +227,7 @@ const AdminGroupContent: React.FC = () => {
                 <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
                   <ListItemAvatar>
                     <Avatar
-                       src={member?.avt[member?.avt.length - 1] ||  '/static/images/avatar/default.jpg'} >
+                       src={(member?.avt?.length ? member.avt[member.avt.length - 1].link : '/static/images/avatar/default.jpg') as string } >
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
@@ -265,7 +265,9 @@ const AdminGroupContent: React.FC = () => {
               pendingInvites.map((invite, index) => (
                 <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
                   <ListItemAvatar>
-                    <Avatar src={invite.idUser?.avt?.[0] || '/path/to/default/avatar.jpg'} />
+                    <Avatar 
+                    src={invite.idUser?.avt || '/path/to/default/avatar.jpg'}
+                     />
                   </ListItemAvatar>
                   <ListItemText
                     primary={

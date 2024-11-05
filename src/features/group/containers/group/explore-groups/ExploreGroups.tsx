@@ -133,7 +133,7 @@ const ExploreGroups: React.FC = () => {
                   }}
                 >
                   <img
-                    src={group.avt || 'https://via.placeholder.com/180'}
+                    src={(group.avt?.link) as unknown as string}
                     alt={group.groupName}
                     style={{
                       width: '100%',

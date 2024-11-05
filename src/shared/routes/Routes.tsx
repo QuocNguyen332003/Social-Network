@@ -32,7 +32,9 @@ import PersonalManagementContent from '../../features/group/containers/group/det
 import InfoPersonal from '../../features/user-authentication/containers/register/InfoPersonal';
 import InfoAccount from '../../features/user-authentication/containers/register/InfoAccount';
 import AddAvtAndBackground from '../../features/user-authentication/containers/register/AddAvtAndBackground';
+import ForgotTest from '../../features/user-authentication/containers/Forgot-1/ForgotTest';
 import { ProtectedRoute } from './ProtectedRoute';
+
 const Routes = () => {
 
   function MessagesWrapper() {
@@ -75,7 +77,7 @@ const Routes = () => {
     },
     {
       path: '/forgot',
-      element: <Forgot />,
+      element: <ForgotTest />,
     },
 
     // Các route yêu cầu xác thực (protected)

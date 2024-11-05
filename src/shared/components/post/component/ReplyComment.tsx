@@ -21,9 +21,9 @@ const ReplyComment: React.FC<ReplyCommentProps> = ({ replies, onLikeReply, onRep
         let avatarUrl = '/default-avatar.png';
         const displayName = typeof reply._iduser === 'object' && reply._iduser !== null ? reply._iduser.displayName : 'Người dùng chưa xác định';
         if (typeof reply._iduser === 'object' && reply._iduser.avt && reply._iduser.avt.length > 0) {
-          avatarUrl = reply._iduser.avt[reply._iduser.avt.length - 1]; // Get the last avatar in the array
+          const lastAvatar = reply._iduser.avt[reply._iduser.avt.length - 1];
+          avatarUrl = lastAvatar && typeof lastAvatar.link === 'string' ? String(lastAvatar.link) : '/default-avatar.png';
         }
-
         return (
           <Box key={replyIndex} sx={{ marginTop: 2 }}>
             <Box display="flex" alignItems="center">

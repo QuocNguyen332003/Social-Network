@@ -23,8 +23,10 @@ import {
   FormControl,
   OutlinedInput,
   Chip,
+  CircularProgress,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate } from 'react-router-dom';
 import { Group } from '../../../interface/interface';
 import axios from 'axios';
 
@@ -35,9 +37,10 @@ interface GroupHeaderProps {
   onUpdateGroup: (updatedGroup: Group) => void;
 }
 
-const hobbiesOptions = ['Sports', 'Music', 'Travel', 'Technology', 'Reading', 'Art', 'Cooking', '223'];
+const hobbiesOptions = ['Sports', 'Music', 'Travel', 'Technology', 'Reading', 'Art', 'Cooking',];
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup }) => {
+  const navigate = useNavigate();
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
   const currentUserId = sessionStorage.getItem('userId') || '';
   const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -48,14 +51,16 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [friendsNotInGroup, setFriendsNotInGroup] = useState<any[]>([]); // Danh sách bạn bè chưa tham gia nhóm
-  const [avtPreview, setAvtPreview] = useState<string | undefined>(group.avt);
-  const [backGroundPreview, setBackGroundPreview] = useState<string | undefined>(group.backGround);
+  const [avtPreview, setAvtPreview] = useState<string | undefined>((group.avt?.link) as unknown as string || '' );
+  const [backGroundPreview, setBackGroundPreview] = useState<string | undefined>((group.backGround?.link) as unknown as string || '');
+
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     if (group) {
       setEditedGroup(group);
       setHobbies(group.hobbies || []);
-      setAvtPreview(group.avt);
-      setBackGroundPreview(group.backGround);
+      setAvtPreview((group.avt?.link) as unknown as string || '');
+      setBackGroundPreview((group.backGround?.link) as unknown as string || '');
     }
   }, [group]);
 
@@ -103,32 +108,34 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
   };
 
   const handleUpdateGroup = async () => {
+    setIsLoading(true); 
     try {
       const formData = new FormData();
       formData.append('userId', currentUserId);
       formData.append('groupName', editedGroup.groupName);
       formData.append('introduction', editedGroup.introduction);
       formData.append('hobbies', hobbies.join(','));
-  
+
       if (editedGroup.avtFile) formData.append('avt', editedGroup.avtFile);
       if (editedGroup.backGroundFile) formData.append('backGround', editedGroup.backGroundFile);
-  
-      // Gửi yêu cầu cập nhật nhóm
+
       const response = await axios.put(`http://localhost:3000/v1/group/${editedGroup._id}/edit`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`, // Thêm token vào header
+          Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (response.status === 200) {
         onUpdateGroup(response.data.group);
-        alert('Nhóm đã được cập nhật thành công!');
         handleCloseEditDialog();
+        window.location.reload();
       }
     } catch (error) {
       console.error('Lỗi khi cập nhật nhóm:', error);
       alert('Có lỗi xảy ra khi cập nhật nhóm!');
+    } finally {
+      setIsLoading(false); // Dừng loading
     }
   };
   
@@ -180,12 +187,15 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
     <Box
       sx={{
         position: 'relative',
-        backgroundImage: `url(${group.backGround})`,
-        height: '280px', // Increased height for better view
-        backgroundSize: 'cover',
+        backgroundImage: `url(${group.backGround.link})`,
+        height: '300px', // Đặt chiều cao mong muốn
+        width: '100%', // Đảm bảo ảnh nền bao phủ toàn bộ chiều rộng
+        backgroundSize: 'contain', // Ảnh sẽ bao phủ toàn bộ khung
+        backgroundRepeat: 'no-repeat', 
+        backgroundColor: '#fff',
         backgroundPosition: 'center',
         overflow: 'hidden',
-        borderRadius: '12px', // To make it slightly rounder
+        borderRadius: '12px', // Bo góc cho ảnh nền
       }}
     >
       {/* Text Background Box */}
@@ -201,7 +211,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar src={group.avt} sx={{ width: '90px', height: '90px', border: '4px solid white', marginRight: '20px' }} />
+          <Avatar src={(group.avt?.link) as unknown as string} sx={{ width: '90px', height: '90px', border: '4px solid white', marginRight: '20px' }} />
           <Box>
             <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold' }}>
               {group.groupName}
@@ -230,6 +240,8 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
           Mời thành viên
         </Button>
       </Box>
+
+      {isLoading && <CircularProgress sx={{ position: 'absolute', top: '50%', left: '50%' }} />}
 
        {/* Edit Group Dialog */}
         <Dialog
@@ -305,7 +317,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
                   <Typography textAlign="center" fontSize="14px" fontWeight="bold">
                     Ảnh nền
                   </Typography>
-                  <img src={backGroundPreview} alt="Background" style={{ width: '200px', height: '100px', borderRadius: '8px' }} />
+                  <img src={backGroundPreview} alt="Background" style={{ width: '200px', height: '150px', borderRadius: '8px',  }} />
                 </Box>
               )}
             </Box>
@@ -346,8 +358,24 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
             <Button onClick={handleCloseEditDialog} variant="outlined" sx={{ borderRadius: '8px', px: 3 }}>
               Hủy
             </Button>
-            <Button variant="contained" onClick={handleUpdateGroup} sx={{ backgroundColor: '#1976d2', borderRadius: '8px', px: 3 }}>
-              Cập nhật nhóm
+            <Button
+              variant="contained"
+              onClick={handleUpdateGroup}
+              disabled={isLoading}
+              sx={{
+                backgroundColor: '#1976d2',
+                borderRadius: '8px',
+                px: 3,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {isLoading ? (
+                <CircularProgress size={24} sx={{ color: 'white' }} />
+              ) : (
+                'Cập nhật nhóm'
+              )}
             </Button>
           </DialogActions>
         </Dialog>
@@ -418,7 +446,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <ListItemAvatar>
-                      <Avatar src={friend.avatar} />
+                       <Avatar src={friend.avt || '/path/to/default/avatar.jpg'} />
                     </ListItemAvatar>
                     <ListItemText primary={friend.displayName} />
                   </Box>
@@ -472,7 +500,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
               },
             }}
           >
-            Mời {selectedFriends.length > 0 ? `(${selectedFriends.length})` : ''}
+            Mời
           </Button>
         </DialogActions>
       </Dialog>

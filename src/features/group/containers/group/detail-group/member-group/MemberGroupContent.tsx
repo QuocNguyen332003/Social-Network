@@ -105,7 +105,7 @@ const MemberGroupContent: React.FC = () => {
               <ListItem sx={{ paddingLeft: 0, borderBottom: '1px solid #e0e0e0' }}>
                 <ListItemAvatar>
                   <Avatar 
-                    src={member?.idUser?.avt[member?.idUser?.avt.length - 1] ||  '/static/images/avatar/default.jpg'} 
+                    src={ (member?.idUser?.avt?.length  ? member.idUser.avt[member.idUser.avt.length - 1].link : '/static/images/avatar/default.jpg') as string}                    
                   />
                 </ListItemAvatar>
                 <ListItemText
