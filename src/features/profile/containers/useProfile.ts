@@ -2,6 +2,7 @@ import {useEffect, useState } from "react"
 import { User, UserDataDisplay } from "../../../interface/interface";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { updateAboutMe, updateAccount, updateDetails, updateDisplayName, updateName, updateUserName } from "../services/UpdateProfile";
 
 export const useProfile = () => {
     const location = useLocation();
@@ -80,8 +81,43 @@ export const useProfile = () => {
         setMyUser(updateUser);
       }
     }
+
+    const changeAboutMe = (dataInput: string[]) => {
+      if (myUser != null){
+        updateAboutMe(currentUserId, dataInput[0]);
+        const updateUser = {
+          ...myUser,
+          aboutMe: dataInput[0]
+        };
+        setMyUser(updateUser);
+      }
+    }
+
+    const changeDisplayName = (dataInput: string[]) => {
+      if (myUser != null){
+        updateDisplayName(currentUserId, dataInput[0]);
+        const updateUser = {
+          ...myUser,
+          displayName: dataInput[0]
+        };
+        setMyUser(updateUser);
+      }
+    }
+
+    const changeUserName = (dataInput: string[]) => {
+      if (myUser != null){
+        updateUserName(currentUserId, dataInput[0]);
+        const updateUser = {
+          ...myUser,
+          userName: dataInput[0],
+        };
+        setMyUser(updateUser);
+      }
+    }
+
     const changeName = (dataInput: string[]) => {
       if (myUser != null){
+        updateName(currentUserId, dataInput[0], dataInput[1]);
         const updateUser = {
           ...myUser,
           firstName: dataInput[0], 
@@ -91,18 +127,9 @@ export const useProfile = () => {
       }
     }
 
-    const changeUserName = (dataInput: string[]) => {
-      if (myUser != null){
-        const updateUser = {
-          ...myUser,
-          userName: dataInput[0],
-        };
-        setMyUser(updateUser);
-      }
-    }
-
     const changeEmail = (dataInput: string[]) => {
       if (myUser != null){
+        updateAccount(currentUserId, dataInput[0], myUser.account.password);
         const updateUser = {
           ...myUser,
           account: {
@@ -117,6 +144,7 @@ export const useProfile = () => {
 
     const changePassword = (dataInput: string[]) => {
       if (myUser != null && dataInput[0] == myUser.account.password && dataInput[0] == dataInput[1]){
+        updateAccount(currentUserId, myUser.account.email, dataInput[2]);
         const updateUser = {
           ...myUser,
           account: {
@@ -129,17 +157,14 @@ export const useProfile = () => {
       }
     }
 
-    const changeAboutMe = (dataInput: string[]) => {
-      if (myUser != null){
-        const updateUser = {
-          ...myUser,
-          aboutMe: dataInput[0]
-        };
-        setMyUser(updateUser);
-      }
-    }
     const changePhoneNumber = (dataInput: string[]) => {
       if (myUser != null){
+        updateDetails(currentUserId, {
+          phoneNumber: dataInput[0],
+          address: myUser.details.address,
+          gender: myUser.details.gender,
+          birthDate: myUser.details.birthDate,
+        })
         const updateUser = {
           ...myUser,
           details: {
@@ -152,6 +177,12 @@ export const useProfile = () => {
     }
     const changeAddress= (dataInput: string[]) => {
       if (myUser != null){
+        updateDetails(currentUserId, {
+          phoneNumber: myUser.details.phoneNumber,
+          address: dataInput[0],
+          gender: myUser.details.gender,
+          birthDate: myUser.details.birthDate,
+        })
         const updateUser = {
           ...myUser,
           details: {
@@ -165,6 +196,12 @@ export const useProfile = () => {
 
     const changeBirthday= (dataInput: Date) => {
       if (myUser != null){
+        updateDetails(currentUserId, {
+          phoneNumber: myUser.details.phoneNumber,
+          address: myUser.details.address,
+          gender: myUser.details.gender,
+          birthDate: dataInput,
+        })
         const updateUser = {
           ...myUser,
           details: {
@@ -177,6 +214,12 @@ export const useProfile = () => {
     }
     const changeGender= (dataInput: boolean) => {
       if (myUser != null){
+        updateDetails(currentUserId, {
+          phoneNumber: myUser.details.phoneNumber,
+          address: myUser.details.address,
+          gender: dataInput,
+          birthDate: myUser.details.birthDate,
+        })
         const updateUser = {
           ...myUser,
           details: {
@@ -226,6 +269,7 @@ export const useProfile = () => {
         changeAddress,
         changeBirthday,
         changeGender,
+        changeDisplayName,
         isLoading,
         error,
         isOwner,

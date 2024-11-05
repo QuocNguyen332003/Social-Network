@@ -1,34 +1,38 @@
-import React, { useState } from 'react';
-import { Button, Grid, Box, Typography, Container } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Button, Grid, Box, Typography, Container, CircularProgress } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { Hobby } from '../../../../interface/mainInterface';
 
-const Hobby: React.FC = () => {
+interface chooseHobby{
+  name: string;
+  isChoose: boolean;
+}
+
+const HobbyScreen: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   // Extract the data passed via state from the previous form
   const { firstName, lastName, email, password, phoneNumber, address, gender, birthday, cccdFile } = location.state || {};
-
+  const [dataHobby, setDataHobby] = useState<chooseHobby[]>([]);
   // State to store selected hobbies
-  const [dataHobby, setDataHobby] = useState([
-    { name: 'Ẩm thực', isChoose: false },
-    { name: 'Du Lịch', isChoose: false },
-    { name: 'Giải trí', isChoose: false },
-    { name: 'Thời trang', isChoose: false },
-    { name: 'Công nghệ', isChoose: false },
-    { name: 'Giáo dục', isChoose: false },
-    { name: 'Thể thao', isChoose: false },
-    { name: 'Sức khỏe', isChoose: false },
-    { name: 'Kinh doanh', isChoose: false },
-    { name: 'Nghệ thuật', isChoose: false },
-    { name: 'Âm nhạc', isChoose: false },
-    { name: 'Phim ảnh', isChoose: false },
-    { name: 'Sách', isChoose: false },
-    { name: 'Khoa học', isChoose: false },
-    { name: 'Tài chính', isChoose: false },
-    { name: 'Môi trường', isChoose: false },
-    { name: 'Lịch sử', isChoose: false },
-  ]);
+  useEffect(()=> {
+    getHobbies();
+  }, []);
+
+  const getHobbies = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/v1/hobbies/`);
+      setDataHobby(response.data.map((data: Hobby)=> ({
+        name: data.name,
+        isChoose: false
+      })))
+    } catch (error) {
+      console.error("Failed:", error);
+      throw error;
+    }
+  };
 
   // Handle the submission of hobbies
   const handleSubmit = () => {
@@ -50,7 +54,7 @@ const Hobby: React.FC = () => {
       }
     });
   };
-
+  if (dataHobby.length <= 0) return (<CircularProgress/>)
   return (
     <Container component="main" maxWidth="xs">
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -96,4 +100,4 @@ const Hobby: React.FC = () => {
   );
 };
 
-export default Hobby;
+export default HobbyScreen;

@@ -4,6 +4,8 @@ import ShareIcon from '@mui/icons-material/Share';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { useRef, useState } from 'react';
 import { User } from '../../../interface/interface';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 type DataChangeUser = {
   myUser: User,
@@ -12,32 +14,67 @@ type DataChangeUser = {
 }
 
 const ProfileHeaderEdit = ({myUser, changeAvt, changeBackground}: DataChangeUser) => {
+  const navigate = useNavigate();
+  const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
+  const currentUserId = sessionStorage.getItem('userId') || '';
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isAvt, setIsAvt] = useState<boolean>(true);
+  const [images, setImages] = useState<(File | null)[]>([null, null]); 
+
   const openFile = () => {
     // Kích hoạt input file ẩn khi gọi hàm
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
     if (file) {
       const fileUrl = URL.createObjectURL(file);
       if (isAvt){
+        setImages([file, images[1]]);
         changeAvt(fileUrl);
       } else {
+        setImages([images[0], file]);
         changeBackground(fileUrl);
       }
     }
+    (event.target as any).value = null;
   };
   const handlePressChangeBackground = () => {
-    openFile();
     setIsAvt(false);
+    openFile();
   }
   const handlePressChangeAvt = () => {
-    openFile();
     setIsAvt(true);
+    openFile();
+  }
+
+  const handleSave = async () => {
+    const formData = new FormData();
+    // Thêm hình ảnh cho avatar
+    if (images[0]) { // Kiểm tra xem hình ảnh avatar có tồn tại không
+      formData.append('avatar', images[0]); // Thêm hình ảnh avatar
+    }
+
+    // Thêm hình ảnh cho background
+    if (images[1]) { // Kiểm tra xem hình ảnh background có tồn tại không
+        formData.append('background', images[1]); // Thêm hình ảnh background
+    }
+
+    try {
+      const response = await axios.patch(`http://localhost:3000/v1/user/${currentUserId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      });
+      console.log('Thay đổi thành công:', response.data);
+      
+    } catch (error) {
+      console.error('Lỗi khi gửi bài viết:', error);
+    }
   }
   return (
     <Box
@@ -88,6 +125,7 @@ const ProfileHeaderEdit = ({myUser, changeAvt, changeBackground}: DataChangeUser
             backgroundColor: '#e9e9e9',
             color: '#1976d2',  textTransform: 'none',
            }} 
+          onClick={handleSave}
           >
           Lưu
         </Button>
@@ -95,8 +133,9 @@ const ProfileHeaderEdit = ({myUser, changeAvt, changeBackground}: DataChangeUser
         sx={{ width: '150px',
           backgroundColor: '#e9e9e9',
           color: '#1976d2',  textTransform: 'none',
-         }} >
-          Chia sẻ
+         }} 
+         onClick={() => navigate('/edit-profile/hobbies')}>
+          Chọn sở thích
         </Button>
       </Box>
       <input
@@ -106,6 +145,7 @@ const ProfileHeaderEdit = ({myUser, changeAvt, changeBackground}: DataChangeUser
         accept="image/*" // Giới hạn chỉ nhận file ảnh
         onChange={handleFileChange} // Xử lý khi file được chọn
       />
+
     </Box>
   );
 };

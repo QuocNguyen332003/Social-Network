@@ -33,6 +33,7 @@ import InfoPersonal from '../../features/user-authentication/containers/register
 import InfoAccount from '../../features/user-authentication/containers/register/InfoAccount';
 import AddAvtAndBackground from '../../features/user-authentication/containers/register/AddAvtAndBackground';
 import { ProtectedRoute } from './ProtectedRoute';
+import ChangeHobby from '../../features/profile/containers/edit-profile/ChangeHobby';
 const Routes = () => {
 
   function MessagesWrapper() {
@@ -230,6 +231,10 @@ const Routes = () => {
         {
           path: '',
           element: <ProfileEdit />,
+        },
+        {
+          path: 'hobbies',
+          element: <ChangeHobby />,
         },
       ],
     },
