@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import {  Grid } from '@mui/material';
 import  Header  from '../../../../shared/components/header/Header';
 import SidebarLeft from '../../../../shared/components/sidebarLeft/SidebarLeft';
 import SidebarRight from '../../../../shared/components/sidebarRight/SidebarRight';
@@ -8,9 +8,11 @@ import { useProfile } from '../useProfile';
 import EditCardDate from '../../components/EditCardDate';
 
 const ProfileEdit = () => {
+
   const {myUser, changeAvt, changeBackground, 
     changeName, changeUserName, changeEmail, changePassword,
-    changePhoneNumber, changeAboutMe, changeAddress, changeBirthday} = useProfile();
+    changePhoneNumber, changeAboutMe, changeAddress, changeBirthday,
+    changeDisplayName} = useProfile();
 
   if (myUser == null) return <></>
   return (
@@ -42,7 +44,7 @@ const ProfileEdit = () => {
             <Grid item xs={6}>
                 <EditProfileCard label={'Thay đổi tên hiển thị'} 
                     textInput={[myUser.displayName]} 
-                    saveData={changeName}/>
+                    saveData={changeDisplayName}/>
             </Grid>
             <Grid item xs={6}>
                 <EditProfileCard label={'Thay đổi Username'} 

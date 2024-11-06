@@ -1,5 +1,6 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
 import { useState } from "react";
+import { toast, ToastContainer } from 'react-toastify';
 
 interface EditCardProps {
     label: string;
@@ -7,12 +8,24 @@ interface EditCardProps {
     saveData: (dataInput: Date) => void;
 }
 
+const formatDate = (date: Date) => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+  const year = String(date.getFullYear());
+  return `${day}/${month}/${year}`;
+};
+
 const EditCardDate = ({label, textInput, saveData}: EditCardProps) =>{
-    const [selectedDate, setSelectedDate] = useState<Date>(textInput);
+    const initialDate = new Date(textInput);
+    const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
 
     const changeDataInput = (value: string) => {
         const newDate = new Date(value);
-        setSelectedDate(newDate);
+        if (isNaN(newDate.getTime())) {
+            toast.error("Ngày không hợp lệ. Vui lòng nhập lại."); // Hiển thị lỗi bằng toast
+        } else {
+            setSelectedDate(newDate);
+        }
     }
     return (
         <Box sx={{display: 'flex', flexDirection: 'column',
@@ -24,7 +37,7 @@ const EditCardDate = ({label, textInput, saveData}: EditCardProps) =>{
           </Typography>
           <TextField
               id="outlined-basic"
-              label={textInput.toDateString()}
+              label={formatDate(initialDate)}
               variant="outlined"
               type="date"  // Đổi thành kiểu Date
               sx={{
@@ -49,6 +62,7 @@ const EditCardDate = ({label, textInput, saveData}: EditCardProps) =>{
           }} onClick={() => {saveData(selectedDate)}}>
             Lưu
           </Button>
+          <ToastContainer position="top-right" autoClose={3000} />
         </Box>
     )
 }

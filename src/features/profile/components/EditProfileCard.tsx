@@ -13,7 +13,7 @@ const EditProfileCard = ({label, textInput, saveData}: EditCardProps) =>{
     useEffect(() => {
       setDataInput(Array(textInput.length).fill(""));
     }, [textInput]);
-    
+     
     const changeDataInput = (value: string, index: number) => {
       const updatedDataInput = [...dataInput];
       updatedDataInput[index] = value;
