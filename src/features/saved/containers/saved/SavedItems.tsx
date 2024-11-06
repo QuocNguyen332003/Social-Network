@@ -47,7 +47,7 @@ const SavedItems = () => {
   }, [currentUserId, selectedCollectionId]);
 
   // Fetch articles when a collection is selected
-  useEffect(() => {
+  useEffect(() => { 
     const fetchArticles = async () => {
       if (selectedCollectionId && user) {
         try {

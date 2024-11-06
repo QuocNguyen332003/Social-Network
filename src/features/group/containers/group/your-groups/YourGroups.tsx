@@ -216,7 +216,7 @@ const YourGroups: React.FC = () => {
                 <Box display="flex" alignItems="center" mb={2} sx={{ width: '100%' }}>
                   {/* Hình ảnh đại diện của nhóm */}
                   <img
-                    src={group.avt}
+                    src={(group.avt?.link) as unknown as string}
                     alt={group.groupName}
                     style={{
                       width: '100%',

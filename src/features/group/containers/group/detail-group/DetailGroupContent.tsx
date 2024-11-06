@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import axios from 'axios';
@@ -9,21 +8,26 @@ import { Group } from '../../../../../interface/interface';
 const DetailGroupContent: React.FC = () => {
   const location = useLocation();
   const token = sessionStorage.getItem('token');
-  // State lưu trữ dữ liệu nhóm và vai trò người dùng
-  const [group, setGroup] = useState<Group | undefined>(location.state?.group);
-  const [role, setRole] = useState<'owner' | 'admin' | 'member' | 'none'>(location.state?.role || 'none');
   const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
 
-  // Hàm gọi API lấy lại vai trò người dùng
+  // Kiểm tra `location.state` hoặc lấy dữ liệu từ `sessionStorage`
+  const initialGroup = location.state?.group || JSON.parse(sessionStorage.getItem('groupData') || 'null');
+  const initialRole = location.state?.role || sessionStorage.getItem('groupRole') || 'none';
+
+  const [group, setGroup] = useState<Group | undefined>(initialGroup);
+  const [role, setRole] = useState<'owner' | 'admin' | 'member' | 'none'>(initialRole as 'owner' | 'admin' | 'member' | 'none');
+
+  // Hàm gọi API lấy lại vai trò người dùng nếu cần
   const fetchUserRole = async (groupId: string, userId: string) => {
     try {
       const response = await axios.get(`http://localhost:3000/v1/group/${groupId}/role`, {
         headers: {
-          Authorization: `Bearer ${token}` // Thêm token vào headers
+          Authorization: `Bearer ${token}`,
         },
         params: { userId },
-      },);
-      setRole(response.data.role); // Cập nhật lại vai trò người dùng
+      });
+      setRole(response.data.role); // Cập nhật vai trò người dùng
+      sessionStorage.setItem('groupRole', response.data.role); // Lưu vào sessionStorage
     } catch (error) {
       console.error('Lỗi khi lấy vai trò của người dùng trong nhóm:', error);
     }
@@ -33,8 +37,10 @@ const DetailGroupContent: React.FC = () => {
   useEffect(() => {
     if (location.state?.group && location.state.group._id !== group?._id) {
       setGroup(location.state.group);
-      setRole(location.state.role || 'none'); // Cập nhật role từ state nếu có
-      console.log('Cập nhật dữ liệu group mới từ state:', location.state.group);
+      setRole(location.state.role || 'none');
+      // Lưu vào sessionStorage
+      sessionStorage.setItem('groupData', JSON.stringify(location.state.group));
+      sessionStorage.setItem('groupRole', location.state.role || 'none');
     }
   }, [location.state?.group]);
 
@@ -73,7 +79,6 @@ const DetailGroupContent: React.FC = () => {
   if (!group) {
     return <div>Không tìm thấy dữ liệu nhóm.</div>;
   }
-  console.log('Group Data in DetailGroupContent:', group);
 
   return (
     <>

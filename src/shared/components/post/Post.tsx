@@ -382,7 +382,7 @@ const Post = ({
         <Box display="flex" alignItems="center" onClick={handleAvatarClick} sx={{ cursor: 'pointer' }}>
           <Avatar 
             alt={post?.createdBy?.displayName || 'Anonymous'} 
-            src={post?.createdBy?.avt?.length ? post?.createdBy?.avt[post?.createdBy?.avt.length - 1] : '/static/images/avatar/default.jpg'} 
+            src={(post?.createdBy?.avt?.length ? post?.createdBy?.avt[post?.createdBy?.avt.length - 1].link : '/static/images/avatar/default.jpg') as string} 
             sx={{ width: 48, height: 48 }} 
           />
           <Box sx={{ marginLeft: 2 }}>
@@ -443,107 +443,113 @@ const Post = ({
       </Box>
 
       {post.listPhoto.length > 0 && (
-        <>
-          <Box sx={{ marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {post.listPhoto.slice(0, 3).map((url, index) => (
-              <Box key={index} sx={{ position: 'relative', cursor: 'pointer' }} onClick={() => handleOpenImageViewer(index)}>
+          <>
+            <Box sx={{ marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {post.listPhoto.slice(0, 3).map((photo, index) => (
+                <Box key={index} sx={{ position: 'relative', cursor: 'pointer' }} onClick={() => handleOpenImageViewer(index)}>
+                  <img
+                   src={(photo?.link as unknown) as string}
+                    alt={`post-image-${index}`}
+                    style={{ width: '200px', height: '200px', borderRadius: '8px', objectFit: 'contain' }} // Sử dụng objectFit: 'contain'
+                  />
+                  {/* Hiển thị lớp phủ +n nếu là ảnh thứ 3 và còn ảnh khác */}
+                  {index === 2 && post.listPhoto.length > 3 && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Typography variant="h4" sx={{ color: '#fff' }}>
+                        +{post.listPhoto.length - 3}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              ))}
+            </Box>
+
+            {/* Dialog hiển thị từng ảnh */}
+            <Dialog open={isImageViewerOpen} onClose={handleCloseImageViewer} maxWidth="md" fullWidth>
+              <DialogTitle sx={{ textAlign: 'center', color: '#1976d2' }}>
+                Ảnh {currentImageIndex + 1} / {post.listPhoto.length}
+              </DialogTitle>
+              <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+                {/* Nút mũi tên trái */}
+                <IconButton
+                  onClick={handlePreviousImage}
+                  sx={{
+                    position: 'absolute',
+                    left: '20px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    width: '48px',
+                    height: '48px',
+                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 6L9 12L15 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </IconButton>
+
+                {/* Hình ảnh đang hiển thị */}
                 <img
-                  src={url}
-                  alt={`post-image-${index}`}
-                  style={{ width: '200px', height: '200px', borderRadius: '8px', objectFit: 'cover' }}
+                  src={(post.listPhoto[currentImageIndex].link as unknown) as string}
+                  alt={`view-image-${currentImageIndex}`}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '80vh',
+                    borderRadius: '8px',
+                    objectFit: 'contain', // Đảm bảo ảnh vừa khít với khung
+                    transition: 'all 0.5s ease'
+                  }}
                 />
-                {/* Hiển thị lớp phủ +n nếu là ảnh thứ 3 và còn ảnh khác */}
-                {index === 2 && post.listPhoto.length > 3 && (
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Typography variant="h4" sx={{ color: '#fff' }}>
-                      +{post.listPhoto.length - 3}
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-            ))}
-          </Box>
 
-          {/* Dialog hiển thị từng ảnh */}
-          <Dialog open={isImageViewerOpen} onClose={handleCloseImageViewer} maxWidth="md" fullWidth>
-            <DialogTitle sx={{ textAlign: 'center', color: '#1976d2' }}>
-              Ảnh {currentImageIndex + 1} / {post.listPhoto.length}
-            </DialogTitle>
-            <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
-              {/* Nút mũi tên trái */}
-              <IconButton
-                onClick={handlePreviousImage}
-                sx={{
-                  position: 'absolute',
-                  left: '20px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                  color: '#fff',
-                  borderRadius: '50%',
-                  width: '48px',
-                  height: '48px',
-                  '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                {/* Sử dụng biểu tượng SVG mũi tên tùy chỉnh */}
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15 6L9 12L15 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </IconButton>
+                {/* Nút mũi tên phải */}
+                <IconButton
+                  onClick={handleNextImage}
+                  sx={{
+                    position: 'absolute',
+                    right: '20px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    width: '48px',
+                    height: '48px',
+                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </IconButton>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseImageViewer} sx={{ color: '#1976d2' }}>
+                  Đóng
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </>
+        )}
 
-              {/* Hình ảnh đang hiển thị */}
-              <img
-                src={post.listPhoto[currentImageIndex]}
-                alt={`view-image-${currentImageIndex}`}
-                style={{ maxWidth: '80%', maxHeight: '80%', borderRadius: '8px', objectFit: 'cover', transition: 'all 0.5s ease' }}
-              />
 
-              {/* Nút mũi tên phải */}
-              <IconButton
-                onClick={handleNextImage}
-                sx={{
-                  position: 'absolute',
-                  right: '20px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                  color: '#fff',
-                  borderRadius: '50%',
-                  width: '48px',
-                  height: '48px',
-                  '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                {/* Sử dụng biểu tượng SVG mũi tên tùy chỉnh */}
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 6L15 12L9 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </IconButton>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseImageViewer} sx={{ color: '#1976d2' }}>
-                Đóng
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </>
-      )}
 
       <Divider sx={{ marginY: 2 }} />
 

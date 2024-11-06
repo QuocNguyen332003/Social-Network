@@ -114,7 +114,7 @@ const SavedItemCard: React.FC<SavedItemCardProps> = ({
           }}
         >
           <img
-              src={article.listPhoto && article.listPhoto.length > 0 ? article.listPhoto[0] : 'src/assets/images/unknow.png'}
+              src={(article.listPhoto && article.listPhoto.length > 0 ? article.listPhoto[0].link : 'src/assets/images/unknow.png') as string}
               alt={article.content}
               style={{
                 width: '100%',

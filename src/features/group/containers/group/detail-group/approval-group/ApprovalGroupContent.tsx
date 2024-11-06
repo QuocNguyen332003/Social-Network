@@ -1,96 +1,85 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, Divider, IconButton, Grid, CircularProgress } from '@mui/material';
+import { Box, Button, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, Divider, IconButton, Grid, CircularProgress, Dialog, DialogContent, DialogTitle, DialogActions } from '@mui/material';
 import { MoreHoriz } from '@mui/icons-material';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios'; // Thêm axios để gọi API
+import axios from 'axios';
 import { Group, Article } from '../../../../../../interface/interface.ts';
 
 const ApprovaGroupContent: React.FC = () => {
   const token = sessionStorage.getItem('token');
   const { group } = useOutletContext<{ group: Group }>();
-  const [pendingPosts, setPendingPosts] = useState<Article[]>([]); 
-  const [approvedPosts, setApprovedPosts] = useState<string[]>([]); 
-  const [rejectedPosts, setRejectedPosts] = useState<string[]>([]); 
-  const [loading, setLoading] = useState(true); 
-  const currentUserId = sessionStorage.getItem('userId') || ''; 
-  // Gọi API để lấy danh sách bài viết đang chờ duyệt khi component được render lần đầu
+  const [pendingPosts, setPendingPosts] = useState<Article[]>([]);
+  const [approvedPosts, setApprovedPosts] = useState<string[]>([]);
+  const [rejectedPosts, setRejectedPosts] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [currentPhotos, setCurrentPhotos] = useState<string[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const currentUserId = sessionStorage.getItem('userId') || '';
+
   useEffect(() => {
     const fetchPendingArticles = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/pending-articles`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, 
-            },
-          }
-        );
-        setPendingPosts(response.data.articles || []); // Cập nhật danh sách bài viết vào state
+        const response = await axios.get(`http://localhost:3000/v1/group/${group._id}/pending-articles`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setPendingPosts(response.data.articles || []);
       } catch (error) {
         console.error('Lỗi khi lấy danh sách bài viết pending:', error);
       } finally {
         setLoading(false);
       }
     };
-    
     fetchPendingArticles();
   }, [group._id]);
-  // Hàm duyệt bài viết và gọi API
+
   const handleApproval = async (postId: string) => {
     try {
-      const response = await axios.post(
-        `http://localhost:3000/v1/group/${group._id}/article/${postId}/processed`,
-        { userId: currentUserId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, 
-          },
-        } 
-      );
-      
+      const response = await axios.post(`http://localhost:3000/v1/group/${group._id}/article/${postId}/processed`, { userId: currentUserId }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (response.status === 200) {
-        setApprovedPosts((prevApproved) => [...prevApproved, postId]);
-        setRejectedPosts((prevRejected) => prevRejected.filter(id => id !== postId)); // Xóa khỏi danh sách từ chối nếu có
-      } 
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data.message || error.message;
-        console.log(`❗ Lỗi khi duyệt bài viết: ${errorMessage}`);
-      } else {
-        console.error('Lỗi hệ thống:', error);
+        setApprovedPosts((prev) => [...prev, postId]);
+        setRejectedPosts((prev) => prev.filter(id => id !== postId));
       }
+    } catch (error) {
+      console.error('Lỗi khi duyệt bài viết:', error);
     }
   };
-  
 
-  // Hàm từ chối bài viết và gọi API
   const handleRejection = async (postId: string) => {
     try {
-      const response = await axios.post(
-        `http://localhost:3000/v1/group/${group._id}/article/${postId}/reject`,
-        { userId: currentUserId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, 
-          },
-        } 
-      );
-  
+      const response = await axios.post(`http://localhost:3000/v1/group/${group._id}/article/${postId}/reject`, { userId: currentUserId }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (response.status === 200) {
-        setRejectedPosts((prevRejected) => [...prevRejected, postId]);
-        setApprovedPosts((prevApproved) => prevApproved.filter((id) => id !== postId)); // Xóa khỏi danh sách đã duyệt nếu có
-      } 
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data.message || error.message;
-        console.log(`❗ Lỗi khi từ chối bài viết: ${errorMessage}`);
-      } else {
-        console.error('Lỗi hệ thống:', error);
+        setRejectedPosts((prev) => [...prev, postId]);
+        setApprovedPosts((prev) => prev.filter(id => id !== postId));
       }
+    } catch (error) {
+      console.error('Lỗi khi từ chối bài viết:', error);
     }
   };
-  
+
+  const handleOpenImageViewer = (index: number, photos: string[]) => {
+    setCurrentImageIndex(index);
+    setCurrentPhotos(photos);
+    setIsImageViewerOpen(true);
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % currentPhotos.length);
+  };
+
+  const handlePreviousImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? currentPhotos.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleCloseImageViewer = () => setIsImageViewerOpen(false);
 
   return (
     <Box
@@ -102,9 +91,7 @@ const ApprovaGroupContent: React.FC = () => {
         margin: '0 auto',
         overflowY: 'auto',
         scrollbarWidth: 'none',
-        '&::-webkit-scrollbar': {
-          display: 'none',
-        },
+        '&::-webkit-scrollbar': { display: 'none' },
       }}
     >
       {loading ? (
@@ -131,8 +118,10 @@ const ApprovaGroupContent: React.FC = () => {
               >
                 <ListItem sx={{ paddingLeft: 0 }}>
                   <ListItemAvatar>
-                    <Avatar src={post?.createdBy?.avt?.length ? post?.createdBy?.avt[post?.createdBy?.avt.length - 1] : '/static/images/avatar/default.jpg'} 
-                    sx={{ width: 50, height: 50 }} />
+                    <Avatar 
+                     src={(post?.createdBy?.avt?.length ? post.createdBy.avt[post.createdBy.avt.length - 1].link
+                     : '/static/images/avatar/default.jpg') as string} 
+                     sx={{ width: 50, height: 50 }} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={
@@ -145,44 +134,119 @@ const ApprovaGroupContent: React.FC = () => {
                         </Typography>
                       </Box>
                     }
-                    secondary={
-                      <Typography variant="body2" color="textSecondary">
-                        @{post.createdBy?.displayName || 'anonymous'}
-                      </Typography>
-                    }
+                    secondary={<Typography variant="body2" color="textSecondary">@{post.createdBy?.displayName || 'anonymous'}</Typography>}
                   />
-                  <IconButton>
-                    <MoreHoriz />
-                  </IconButton>
+                  <IconButton><MoreHoriz /></IconButton>
                 </ListItem>
                 <Box sx={{ marginTop: 2 }}>
                   <Typography sx={{ marginBottom: 2, color: '#555' }}>{post.content}</Typography>
                   {post.listPhoto && post.listPhoto.length > 0 && (
-                    <Grid container spacing={1}>
-                      {post.listPhoto.map((image, imgIndex) => (
-                        <Grid item xs={12} key={imgIndex}>
+                    <>
+                      <Grid container spacing={1} sx={{ marginTop: 2 }}>
+                        {post.listPhoto.slice(0, 3).map((photo, index) => (
+                          <Grid item xs={4} key={index} sx={{ position: 'relative', cursor: 'pointer' }}>
+                            <img
+                              src={(photo?.link as unknown) as string}
+                              alt={`post-image-${index}`}
+                              style={{
+                                width: '100%',
+                                height: '200px',
+                                borderRadius: '8px',
+                                objectFit: 'contain'
+                              }}
+                              onClick={() => handleOpenImageViewer(index, post.listPhoto.map((p) => p.link as unknown as string))}
+                            />
+                            {index === 2 && post.listPhoto.length > 3 && (
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  width: '100%',
+                                  height: '100%',
+                                  borderRadius: '8px',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <Typography variant="h4" sx={{ color: '#fff' }}>
+                                  +{post.listPhoto.length - 3}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Grid>
+                        ))}
+                      </Grid>
+
+                      <Dialog open={isImageViewerOpen} onClose={handleCloseImageViewer} maxWidth="md" fullWidth>
+                        <DialogTitle sx={{ textAlign: 'center', color: '#1976d2' }}>
+                          Ảnh {currentImageIndex + 1} / {currentPhotos.length}
+                        </DialogTitle>
+                        <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+                          <IconButton
+                            onClick={handlePreviousImage}
+                            sx={{
+                              position: 'absolute',
+                              left: '20px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                              color: '#fff',
+                              borderRadius: '50%',
+                              width: '48px',
+                              height: '48px',
+                              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+                              transition: 'all 0.3s ease'
+                            }}
+                          >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M15 6L9 12L15 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </IconButton>
                           <img
-                            src={image}
-                            alt={`post image ${imgIndex}`}
+                            src={currentPhotos[currentImageIndex]}
+                            alt={`view-image-${currentImageIndex}`}
                             style={{
-                              width: '100%',
-                              height: '200px',
-                              objectFit: 'cover',
-                              borderRadius: 8,
+                              maxWidth: '100%',
+                              maxHeight: '80vh',
+                              borderRadius: '8px',
+                              objectFit: 'contain',
+                              transition: 'all 0.5s ease'
                             }}
                           />
-                        </Grid>
-                      ))}
-                    </Grid>
+                          <IconButton
+                            onClick={handleNextImage}
+                            sx={{
+                              position: 'absolute',
+                              right: '20px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                              color: '#fff',
+                              borderRadius: '50%',
+                              width: '48px',
+                              height: '48px',
+                              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+                              transition: 'all 0.3s ease'
+                            }}
+                          >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M9 6L15 12L9 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </IconButton>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleCloseImageViewer} sx={{ color: '#1976d2' }}>Đóng</Button>
+                        </DialogActions>
+                      </Dialog>
+                    </>
                   )}
                   {approvedPosts.includes(post._id) ? (
-                    <Typography sx={{ marginTop: 2, color: '#4caf50', fontWeight: 'bold' }}>
-                      Đã duyệt
-                    </Typography>
+                    <Typography sx={{ marginTop: 2, color: '#4caf50', fontWeight: 'bold' }}>Đã duyệt</Typography>
                   ) : rejectedPosts.includes(post._id) ? (
-                    <Typography sx={{ marginTop: 2, color: '#d32f2f', fontWeight: 'bold' }}>
-                      Đã từ chối
-                    </Typography>
+                    <Typography sx={{ marginTop: 2, color: '#d32f2f', fontWeight: 'bold' }}>Đã từ chối</Typography>
                   ) : (
                     <>
                       <Divider sx={{ marginY: 2 }} />
@@ -193,9 +257,7 @@ const ApprovaGroupContent: React.FC = () => {
                             backgroundColor: '#1976d2',
                             width: '48%',
                             padding: '12px 0',
-                            '&:hover': {
-                              backgroundColor: '#1565c0',
-                            },
+                            '&:hover': { backgroundColor: '#1565c0' },
                           }}
                           onClick={() => handleApproval(post._id)}
                         >
@@ -208,9 +270,7 @@ const ApprovaGroupContent: React.FC = () => {
                             color: '#d32f2f',
                             width: '48%',
                             padding: '12px 0',
-                            '&:hover': {
-                              backgroundColor: '#f9f9f9',
-                            },
+                            '&:hover': { backgroundColor: '#f9f9f9' },
                           }}
                           onClick={() => handleRejection(post._id)}
                         >
@@ -223,9 +283,7 @@ const ApprovaGroupContent: React.FC = () => {
               </Box>
             ))
           ) : (
-            <Typography textAlign="center" color="textSecondary">
-              Không có bài viết nào đang chờ duyệt.
-            </Typography>
+            <Typography textAlign="center" color="textSecondary">Không có bài viết nào đang chờ duyệt.</Typography>
           )}
         </List>
       )}

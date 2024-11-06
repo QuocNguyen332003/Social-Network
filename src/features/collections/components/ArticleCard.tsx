@@ -14,7 +14,7 @@ interface ArticleCardProps {
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, collection }) => {
   const navigate = useNavigate();
   const handleViewArticle = () => {
-    navigate(`/new-feeds/${article._id}`);
+    navigate(`/new-feeds/${article._id}`, { state: { article } });
   };
 
   return (
@@ -31,7 +31,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, collection }) => {
       >
         <Box sx={{ width: { xs: '100%', sm: '15%' }, mb: { xs: 2, sm: 0 }, mr: { sm: 2 } }}>
           <img
-            src={article.listPhoto[article.listPhoto.length - 1]}
+            src={(article.listPhoto && article.listPhoto.length > 0 ? article.listPhoto[0].link : 'src/assets/images/unknow.png') as string}
             alt={"Ảnh bài viết"}
             style={{ width: '100px', display: 'block', borderRadius: 10 }}
           />

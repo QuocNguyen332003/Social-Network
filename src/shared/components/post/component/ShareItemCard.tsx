@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Avatar, Divider } from '@mui/material';
 import axios from 'axios';
-import { Article } from '../../../../interface/interface'; 
+import { Article } from '../../../../interface/interface';
 
 interface ShareItemCardProps {
-  sharedPostId: string; // Nhận sharedPostId từ props
+  sharedPostId: string;
 }
 
 const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
   const token = sessionStorage.getItem('token');
-  const [article, setArticle] = useState<Article | null>(null); 
+  const [article, setArticle] = useState<Article | null>(null);
 
   useEffect(() => {
     const fetchSharedArticle = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/v1/article/${sharedPostId}`,
+        const response = await axios.get(
+          `http://localhost:3000/v1/article/${sharedPostId}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, 
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -40,16 +41,20 @@ const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
         padding: 2,
         marginTop: 2,
         borderRadius: 2,
-        boxShadow: '0 3px 10px rgba(0, 0, 0, 0.2)', 
-        backgroundColor: '#ffffff', 
-        border: '1px solid #bdbdbd', 
+        boxShadow: '0 3px 10px rgba(0, 0, 0, 0.2)',
+        backgroundColor: '#ffffff',
+        border: '1px solid #bdbdbd',
       }}
     >
       {/* Header thông tin bài viết */}
       <Box display="flex" alignItems="center" sx={{ marginBottom: 2 }}>
-      <Avatar
+        <Avatar
           alt={article.createdBy?.displayName || 'Anonymous'}
-          src={Array.isArray(article.createdBy?.avt) ? article.createdBy.avt[0] : article.createdBy?.avt || './src/assets/images/avt.png'}
+          src={
+            Array.isArray(article.createdBy?.avt)
+              ? (article.createdBy.avt[0].link as unknown as string)
+              : './src/assets/images/avt.png'
+          }
           sx={{ width: 48, height: 48 }}
         />
         <Box sx={{ marginLeft: 2, flex: 1 }}>
@@ -73,16 +78,16 @@ const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
       </Box>
 
       {/* Hiển thị hình ảnh nếu có */}
-      {article.listPhoto.length > 0 && (
+      {Array.isArray(article.listPhoto) && article.listPhoto.length > 0 && article.listPhoto[0]?.link && (
         <Box>
           <img
-            src={article.listPhoto[0]}
-            alt={`Shared item image`}
+            src={article.listPhoto[0].link as unknown as string}
+            alt="Shared item image"
             style={{
               width: '100%',
               borderRadius: '8px',
-              objectFit: 'cover',
-              maxHeight: '300px', 
+              objectFit: 'contain', // Thay đổi từ 'cover' sang 'contain'
+              maxHeight: '300px',
             }}
           />
         </Box>

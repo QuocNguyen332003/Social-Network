@@ -126,7 +126,9 @@ const InviteGroupContent: React.FC = () => {
           {filteredUsers.map((request, index) => (
               <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
                   <ListItemAvatar>
-                      <Avatar src={request.idUser.avt.length > 0 ? request.idUser.avt[0] : '/path/to/default/avatar.jpg'} />
+                      <Avatar 
+                      src={request.idUser.avt.length > 0 ? request.idUser.avt[request.idUser.avt.length - 1] : '/path/to/default/avatar.jpg'}
+                      />
                   </ListItemAvatar>
                   <ListItemText
                       primary={

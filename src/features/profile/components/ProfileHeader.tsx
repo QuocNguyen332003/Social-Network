@@ -47,7 +47,7 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
     >
       <Box
       sx={{
-        backgroundImage: `url(${myUser.backGround[myUser.backGround.length - 1]})`,
+        backgroundImage: `url(${myUser.backGround[myUser.backGround.length - 1]?.link})`,
         height: '300px',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -59,7 +59,7 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
       {/* Group Info and Avatar */}
       <Box sx={{ position: 'absolute', bottom: '20px', left: '16px', display: 'flex', alignItems: 'center' }}>
         <IconButton sx={{padding: 0}}>
-          <Avatar src={myUser.avt[myUser.avt.length - 1]} sx={{ width: '150px', height: '150px', border: '4px solid white' }} />
+          <Avatar src={(myUser.avt[myUser.avt.length - 1]?.link as unknown) as string}  sx={{ width: '150px', height: '150px', border: '4px solid white' }} />
         </IconButton>
         <Box sx={{ marginLeft: '16px', marginTop: '10px'}}>
           <Typography variant="h5" color="black" fontWeight="bold">
