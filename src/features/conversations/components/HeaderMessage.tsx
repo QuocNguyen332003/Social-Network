@@ -11,8 +11,10 @@ const HeaderMessages = ({dataConversation}: HeaderMessageProps) => {
   const [friend, setFriend] = useState<DataUser | null>(null);
 
 useEffect(() => {
-  const firstFriend = dataConversation.dataUser.find((dataUser) => dataUser.userID !== currentUserId);
-  setFriend(firstFriend || null);
+  if (dataConversation && Array.isArray(dataConversation.dataUser)) {
+    const firstFriend = dataConversation.dataUser.find((dataUser) => dataUser.userID !== currentUserId);
+    setFriend(firstFriend || null);
+  }
 }, [currentUserId, dataConversation]);
 
   return (
@@ -36,7 +38,7 @@ useEffect(() => {
         <Box
           sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 10px'}}>
           <img
-            src= {friend?.avt[friend.avt.length - 1]}
+            src= {friend?.avt.link}
             alt="Ảnh đại diện"
             style={{width: '30px', height: '30px', borderRadius: 50 }}
           />

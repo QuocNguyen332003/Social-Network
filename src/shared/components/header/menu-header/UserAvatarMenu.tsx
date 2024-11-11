@@ -61,7 +61,7 @@ const UserAvatarMenu = () => {
         return navigate('/login');
       }
 
-      await axios.post('http://localhost:3000/v1/auth/logout', {}, {
+      await axios.post(`http://localhost:3000/v1/auth/logout/${currentUserId}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`, 
         },

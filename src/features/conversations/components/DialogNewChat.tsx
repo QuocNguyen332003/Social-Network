@@ -35,7 +35,7 @@ const DialogNewChat = (props: SimpleDialogProps) => {
                   })}
                   >
                     <ListItemAvatar>
-                      <Avatar sx={{}}>
+                      <Avatar src={user.avt.link || '/static/images/avatar/default.jpg'}>
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText primary={user.displayName} />

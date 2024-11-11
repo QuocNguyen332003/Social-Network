@@ -76,7 +76,7 @@ const MessageCard = ({currMessage, dataCard, onClick}: MessageCardProps) => {
         <Box
           sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 10px'}}>
           <img
-            src= {dataFriend?.avt[dataFriend.avt.length - 1]}
+            src= {dataFriend?.avt.link}
             alt="Ảnh đại diện"
             style={{width: '30px', height: '30px', borderRadius: 50 }}
           />
@@ -102,7 +102,7 @@ const MessageCard = ({currMessage, dataCard, onClick}: MessageCardProps) => {
                   fontSize: 12,
                 }, isRead? {}: {fontWeight: 'bold'}]}
               >
-              {lastContent.message.data}
+              {lastContent.userId === currentUserId? "Bạn: ": "Bạn bè: "}{lastContent.message.data}
               </Typography>
                 {!isRead && <div style={{width: '8px', height: '8px', backgroundColor: 'black', borderRadius: 50}}/>}
             </Box>

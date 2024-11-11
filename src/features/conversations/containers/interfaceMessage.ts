@@ -1,3 +1,5 @@
+import { MyPhoto } from "../../../interface/mainInterface";
+
 interface Message {
     type: 'text' | 'image' | 'video'; 
     data: string;                    
@@ -12,7 +14,7 @@ export interface Content {
   
 export interface DataUser {
     userID: string;
-    avt: string[];
+    avt: MyPhoto;
     name: string; 
   }
   

@@ -2,12 +2,15 @@
 import {useEffect, useState } from "react"
 import { Content, ConversationAPI, DataUser } from "./interfaceMessage";
 import axios from "axios";
+import { io } from "socket.io-client";
 
-export const useMessage = (friendID: string) => {
+const socket = io('http://localhost:3000');
+
+export const useMessage = (friendID: string, readMessage: (_idConversation: string) =>void) => {
   const token = sessionStorage.getItem('token');
     const currentUserId = sessionStorage.getItem('userId') || '';
     const [conversation, setConversation] = useState<ConversationAPI | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingMessage, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [idFriend, setIdFriend] = useState<string | null>(null);
     const [newChat, setNewChat] = useState<boolean>(false);
@@ -17,6 +20,24 @@ export const useMessage = (friendID: string) => {
             fetchMessagesWithFriend(friendID);
           }
     }, [friendID]);
+
+    useEffect(()=>{
+      if (conversation !== null){
+          try {
+            socket.on(`conversation-${conversation._id}`, (dataSocket) => {
+              if (dataSocket._id === conversation._id){
+                setConversation({
+                  ...conversation,
+                  content: [...conversation.content, dataSocket.newContent]
+                });
+              }
+            })
+            readMessage(conversation._id);
+          } catch{
+            setError('Lỗi socket');
+          } 
+        }
+    }, [conversation]);
 
     const fetchMessagesWithFriend = async (changeID: string) => {
         setIsLoading(true); 
@@ -38,15 +59,15 @@ export const useMessage = (friendID: string) => {
       };
 
     const sendNewMessage = (idConversation: string, content: Content) => {
-        setConversation(prevConversation => {
-          if (!prevConversation) {
-            return null;
-          }
-          return {
-            ...prevConversation,
-            content: [...prevConversation.content, content]
-          };
-        });
+        // setConversation(prevConversation => {
+        //   if (!prevConversation) {
+        //     return null;
+        //   }
+        //   return {
+        //     ...prevConversation,
+        //     content: [...prevConversation.content, content]
+        //   };
+        // });
         postSendNewMessage(idConversation, content)
       };
     
@@ -76,6 +97,7 @@ export const useMessage = (friendID: string) => {
         }
     };
     const addNewMessage = async (content: Content) => {
+        setNewChat(false);
         try {
             const response = await axios.post(`http://localhost:3000/v1/messages/create-conversation`,
                 {   
@@ -117,7 +139,7 @@ export const useMessage = (friendID: string) => {
         }
     }
     return {
-        isLoading, error,
+        isLoadingMessage, error,
         conversation,
         sendNewMessage,
         createNewChat,

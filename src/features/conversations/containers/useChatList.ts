@@ -2,8 +2,9 @@
 import {useEffect, useState } from "react"
 import axios from "axios";
 import { CardConversationAPI, Content } from "./interfaceMessage";
+import { io } from "socket.io-client";
 
-
+const socket = io('http://localhost:3000');
 
 export const useChatList = () => {
     const token = sessionStorage.getItem('token');
@@ -16,7 +17,41 @@ export const useChatList = () => {
 
     useEffect(()=> {
       fetchMessages();
+
+      socket.on(`new-messages-${currentUserId}`, (dataSocket) => {
+        setData([...data, dataSocket])
+        setFilterData([...data, dataSocket])
+      });
+
     },[]);
+
+    useEffect(()=> {
+      socketAllChatList();
+    },[data]);
+
+    const socketAllChatList = () => {
+      data.map((currData)=> {
+        socketChatListByIdUser(currData._id)
+      })
+    }
+  
+    const socketChatListByIdUser = (conversationId: string) => {
+      socket.on(`chat-list-${conversationId}`, (dataSocket) => {
+        const newData = data.map((currData)=> {
+          if (currData._id === dataSocket._id){
+            return {
+              ...currData,
+              content: dataSocket.content
+          }
+          } else{
+            return currData
+          }
+        })
+        setData(newData);
+        setFilterData(newData);
+      });
+    }
+
     const readMessage = (_idConversation: string) => {
 
       setData(prevData =>
@@ -84,6 +119,7 @@ export const useChatList = () => {
         );
         setData(response.data);
         setFilterData(response.data);
+        console.log(data);
       } catch (error) {
         console.error('Lỗi khi lấy bài viết:', error);
         setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');

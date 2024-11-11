@@ -1,9 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { MyPhoto } from "../../../../interface/mainInterface";
 
 export interface UserWithoutChat {
     _id: string;
-    avt: string[];
+    avt: MyPhoto;
     displayName: string; 
     userName: string;
   }

@@ -9,8 +9,8 @@ import { useNavigate } from "react-router-dom";
 
 const App = ({friendID}: MessageProps) => {  
   const navigate = useNavigate();
-  const {filterData, searchChat, setValueMessageList, readMessage, fetchMessages} = useChatList();
-  const {conversation, sendNewMessage, setNewChat, createNewChat, addNewMessage, newChat} = useMessage(friendID);
+  const {filterData, searchChat, setValueMessageList, readMessage, fetchMessages, isLoading} = useChatList();
+  const {conversation, sendNewMessage, setNewChat, createNewChat, addNewMessage, newChat, isLoadingMessage} = useMessage(friendID, readMessage);
 
   const changeChat = (friendID: string, _idConversation: string) => {
     setNewChat(false);
@@ -43,7 +43,7 @@ const App = ({friendID}: MessageProps) => {
         </Grid>
         <Grid item xs={8}>
           <Conversations conversation={conversation}
-          sendMessage={sendMessage}/>
+          sendMessage={sendMessage} isloading={isLoading&&isLoadingMessage}/>
         </Grid>
       </Grid>
     </Box>
