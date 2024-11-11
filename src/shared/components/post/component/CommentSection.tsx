@@ -58,12 +58,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({
           const isLiked = commentLikes[comment._id] || false;
 
           // Sử dụng type guard để kiểm tra và lấy avatar/displayName
-          let avatarUrl = '/default-avatar.png';
-          if (isUserObject(comment._iduser)) {
-            avatarUrl = comment._iduser.avt.length > 0 
-              ? comment._iduser.avt[comment._iduser.avt.length - 1] // Lấy ảnh cuối cùng trong mảng avatar
-              : '/default-avatar.png'; // Sử dụng ảnh mặc định nếu không có avatar
+          let avatarUrl: string = '/default-avatar.png';
+          if (isUserObject(comment._iduser) && comment._iduser.avt.length > 0) {
+            const lastAvatar = comment._iduser.avt[comment._iduser.avt.length - 1];
+            avatarUrl = lastAvatar && typeof lastAvatar.link === 'string' ? String(lastAvatar.link) : '/default-avatar.png';
           }
+
           const displayName = isUserObject(comment._iduser) ? comment._iduser.displayName : 'Anonymous';
 
           return (

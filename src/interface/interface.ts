@@ -55,9 +55,7 @@ export interface User {
     follow: string[];
     follower: UserDataDisplay[];
   
-  
-  
-  
+
     senderId: User; // Thay đổi từ string sang User
 }
   
@@ -163,6 +161,7 @@ export interface Article {
     content: string;
     hashTag: string[];
     listPhoto: string[];
+    link: string;
     scope: string;
     interact: Interact;
     createdAt: Date;
@@ -218,3 +217,4 @@ export interface Article {
   backGroundFile?: File;  // <-- Add these properties
 }
   
+

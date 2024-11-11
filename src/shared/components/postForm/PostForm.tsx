@@ -30,17 +30,25 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
           },
         });
         const userData = response.data;
+  
         setDisplayName(userData.displayName || `${userData.firstName} ${userData.lastName}`);
-        setAvatar(userData.avt[userData.avt.length - 1]); // Lấy avatar cuối cùng
+        
+        // Kiểm tra và lấy avatar cuối cùng trong mảng
+        const lastAvatar = userData.avt && userData.avt.length > 0
+          ? userData.avt[userData.avt.length - 1].link
+          : "default-avatar-url"; // Đặt URL mặc định nếu không có avatar
+        setAvatar(lastAvatar);
+        
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     };
-
+  
     if (userId) {
       fetchUserData();
     }
   }, [userId, token]);
+  
 
   // Hàm điều hướng tới trang cá nhân
   const handleAvatarClick = () => {
@@ -105,7 +113,7 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
           <Avatar
             alt={displayName || 'Anonymous'}
             src={avatar || '/static/images/avatar/default.jpg'}
-            sx={{ width: 48, height: 48, marginRight: 2 }}
+            sx={{ width: 48, height: 48, marginRight: 2,  objectFit: 'contain', borderRadius: '50%' }}
           />
         </Box>
         <Box>

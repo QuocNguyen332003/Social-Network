@@ -24,7 +24,10 @@ const UserAvatarMenu = () => {
         });
         const userData = response.data;
         setDisplayName(userData.displayName || `${userData.firstName} ${userData.lastName}`);
-        setAvatarUrl(userData.avt[userData.avt.length - 1]); // Lấy avatar cuối cùng trong mảng
+        const lastAvatar = userData.avt && userData.avt.length > 0
+        ? userData.avt[userData.avt.length - 1].link
+        : "default-avatar-url"; // Đặt URL mặc định nếu không có avatar
+        setAvatarUrl(lastAvatar); // Lấy avatar cuối cùng trong mảng
       } catch (error) {
         console.error('Error fetching user data:', error);
         toast.error('Lỗi khi lấy dữ liệu người dùng.');
@@ -88,6 +91,8 @@ const UserAvatarMenu = () => {
             width: 40,
             height: 40,
             border: '2px solid #e0e0e0',
+            objectFit: 'contain', // Giữ tỷ lệ ảnh mà không làm méo
+            borderRadius: '50%' // Đảm bảo ảnh nằm trong khung tròn
           }}
         />
       </IconButton>
