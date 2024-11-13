@@ -51,7 +51,7 @@ const Header = () => {
               Bảng tin
             </Typography>
           </Button>
-          <Button
+          {/* <Button
             color="inherit"
             sx={{
               display: 'flex',
@@ -71,7 +71,7 @@ const Header = () => {
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
               Đặt chỗ
             </Typography>
-          </Button>
+          </Button> */}
         </Box>
 
         <Box display="flex" alignItems="center">

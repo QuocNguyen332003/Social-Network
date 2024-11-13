@@ -27,6 +27,7 @@ import axios from 'axios';
 import ShareItemCard from './component/ShareItemCard'; 
 import { v4 as uuidv4 } from 'uuid';
 import { io } from 'socket.io-client';
+import VideoCard from '../video-card/VideoCard.tsx';
 
 interface PostComponentProps {
   post: Article;
@@ -447,11 +448,11 @@ const Post = ({
             <Box sx={{ marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {post.listPhoto.slice(0, 3).map((photo, index) => (
                 <Box key={index} sx={{ position: 'relative', cursor: 'pointer' }} onClick={() => handleOpenImageViewer(index)}>
-                  <img
+                  {photo.type === "img" ? <img
                    src={(photo?.link as unknown) as string}
                     alt={`post-image-${index}`}
                     style={{ width: '200px', height: '200px', borderRadius: '8px', objectFit: 'contain' }} // Sử dụng objectFit: 'contain'
-                  />
+                  /> : <VideoCard linkVideo={(photo?.link as unknown) as string}/>}
                   {/* Hiển thị lớp phủ +n nếu là ảnh thứ 3 và còn ảnh khác */}
                   {index === 2 && post.listPhoto.length > 3 && (
                     <Box
