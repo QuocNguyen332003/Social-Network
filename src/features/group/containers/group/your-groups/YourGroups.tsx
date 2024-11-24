@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Button, IconButton, Menu, MenuItem, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Box, Typography, Grid, Button, IconButton, Menu, MenuItem, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField, InputAdornment } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import SearchIcon from '@mui/icons-material/Search';
 import { Group } from '../../../../../interface/interface';
 
 const YourGroups: React.FC = () => {
@@ -13,6 +14,7 @@ const YourGroups: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [userRoles, setUserRoles] = useState<{ [groupId: string]: string }>({}); // Lưu trữ role của từng nhóm
+  const [searchTerm, setSearchTerm] = useState(''); // Thêm state để lưu từ khóa tìm kiếm
   const currentUserId = sessionStorage.getItem('userId') || ''; // Lấy userId từ sessionStorage
 
   // Trạng thái cho menu sắp xếp
@@ -92,13 +94,19 @@ const YourGroups: React.FC = () => {
     console.log('Group Data When View:', group); // In ra dữ liệu `group` khi nhấn "Xem nhóm"
     navigate(`/group/${group._id}`, { state: { group, role } });
   };
-  
 
-  // Hàm xử lý sắp xếp theo tên nhóm
-  const handleSortGroups = () => {
-    const sortedGroups = [...joinedGroups].sort((a, b) => a.groupName.localeCompare(b.groupName));
-    setJoinedGroups(sortedGroups);
+  const normalizeString = (str: string): string => {
+    return str
+      .normalize('NFD') // Chuyển đổi chuỗi sang dạng tổ hợp ký tự
+      .replace(/[\u0300-\u036f]/g, '') // Loại bỏ các dấu tổ hợp
+      .replace(/đ/g, 'd') // Thay thế 'đ' thành 'd'
+      .replace(/Đ/g, 'D') // Thay thế 'Đ' thành 'D'
+      .toLowerCase(); // Chuyển tất cả về chữ thường
   };
+  const filteredGroups = joinedGroups.filter((group) =>
+    normalizeString(group.groupName).includes(normalizeString(searchTerm))
+  );
+
 
   // Hàm xử lý xóa nhóm (Chỉ chủ nhóm mới có quyền này)
   const handleDeleteGroup = async () => {
@@ -158,25 +166,38 @@ const YourGroups: React.FC = () => {
       }}
     >
       {/* Tiêu đề và nút sắp xếp */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.2rem', flexGrow: 1 }}>
-          Tất cả các nhóm bạn đã tham gia ({joinedGroups.length})
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+        sx={{ borderBottom: '1px solid #ddd', pb: 2 }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
+          Tất cả các nhóm bạn đã tham gia ({filteredGroups.length})
         </Typography>
-        <Box>
-          <Typography
-            variant="body2"
-            sx={{
-              color: '#1976d2',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-              whiteSpace: 'nowrap',
-              ml: 2,
-            }}
-            onClick={handleSortGroups}
-          >
-            Sắp xếp
-          </Typography>
-        </Box>
+
+        <TextField
+          placeholder="Tìm kiếm nhóm"
+          variant="outlined"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            width: '300px',
+            borderRadius: '8px',
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: '#fff',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            },
+          }}
+        />
       </Box>
 
       {/* Kiểm tra trạng thái loading và hiển thị vòng tròn chờ */}
@@ -191,7 +212,7 @@ const YourGroups: React.FC = () => {
       ) : (
         /* Grid chứa các thẻ nhóm */
         <Grid container spacing={3} sx={{ maxWidth: '100%' }}>
-          {joinedGroups.map((group) => (
+          {filteredGroups.map((group) => (
             <Grid item xs={12} sm={6} md={6} key={group._id}>
               <Box
                 display="flex"
@@ -307,3 +328,7 @@ const YourGroups: React.FC = () => {
 };
 
 export default YourGroups;
+function normalizeString(groupName: string) {
+  throw new Error('Function not implemented.');
+}
+

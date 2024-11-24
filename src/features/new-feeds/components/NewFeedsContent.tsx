@@ -5,6 +5,7 @@ import axios from 'axios';
 import PostForm from '../../../shared/components/postForm/PostForm';
 import Post from '../../../shared/components/post/Post';
 import { Article, Comment } from '../../../interface/interface';
+import { toast } from 'react-toastify';
 
 const NewFeedsContent = () => {
   const [posts, setPosts] = useState<Article[]>([]); // State lưu trữ danh sách bài viết
@@ -63,14 +64,18 @@ const NewFeedsContent = () => {
     }
   };
   
-
-  // Xử lý khi gửi bài viết mới
-  const handlePostSubmit = async (newPost: string, images: File[], visibility: string, hashTags: string[]) => {
+  
+  const handlePostSubmit = async (
+    newPost: string,
+    images: File[],
+    visibility: string,
+    hashTags: string[]
+  ) => {
     const formData = new FormData();
     formData.append('content', newPost);
     formData.append('scope', visibility);
     formData.append('userId', currentUserId);
-    hashTags.forEach(tag => {
+    hashTags.forEach((tag) => {
       formData.append('hashTag[]', tag);
     });
     images.forEach((image) => {
@@ -84,13 +89,21 @@ const NewFeedsContent = () => {
           Authorization: `Bearer ${token}`, // Thêm token vào header
         },
       });
+  
       console.log('Bài viết đã được tạo thành công:', response.data);
-      setPosts((prevPosts) => [response.data.post, ...prevPosts]); 
-      
-    } catch (error) {
+      setPosts((prevPosts) => [response.data.post, ...prevPosts]);
+  
+      // Hiển thị thông báo thành công
+      toast.success('Bài viết đã được tạo thành công!', { position: 'top-right' });
+    } catch (error: any) {
       console.error('Lỗi khi gửi bài viết:', error);
+  
+      // Lấy thông báo lỗi từ backend hoặc hiển thị lỗi mặc định
+      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại sau.';
+      toast.error(`Lỗi: ${errorMessage}`, { position: 'top-right' });
     }
   };
+  
   
 
   const handleLikePost = async (postId: string) => {

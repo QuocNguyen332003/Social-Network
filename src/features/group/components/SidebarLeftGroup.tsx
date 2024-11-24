@@ -203,26 +203,6 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
           <SettingsIcon sx={{ color: '#1e88e5' }} />
         </IconButton>
       </div>
-
-      <TextField
-        fullWidth
-        variant="outlined"
-        placeholder="Tìm kiếm nhóm"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon sx={{ color: '#1e88e5' }} />
-            </InputAdornment>
-          ),
-        }}
-        sx={{
-          mb: 2,
-          borderRadius: '50px',
-          backgroundColor: '#f0f2f5',
-          '& fieldset': { border: 'none' },
-        }}
-      />
-
       <List>
         <ListItem
           button

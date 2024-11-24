@@ -377,6 +377,8 @@ const Post = ({
     navigate(`/profile?id=${post?.createdBy?._id}`);
   };
 
+  
+
   return (
     <Paper sx={{ padding: 2, marginBottom: 3, borderRadius: 3, boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
@@ -448,7 +450,7 @@ const Post = ({
             <Box sx={{ marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {post.listPhoto.slice(0, 3).map((photo, index) => (
                 <Box key={index} sx={{ position: 'relative', cursor: 'pointer' }} onClick={() => handleOpenImageViewer(index)}>
-                  {photo.type === "img" ? <img
+                  {(photo as any).type === "img" ? <img
                    src={(photo?.link as unknown) as string}
                     alt={`post-image-${index}`}
                     style={{ width: '200px', height: '200px', borderRadius: '8px', objectFit: 'contain' }} // Sử dụng objectFit: 'contain'
@@ -635,7 +637,7 @@ const Post = ({
           <TextField
             autoFocus
             margin="dense"
-            label="Hãy nói gì đó về nội dung này (không bắt buộc)"
+            label="Hãy nói gì đó về nội dung này (bắt buộc)"
             type="text"
             fullWidth
             variant="outlined"
