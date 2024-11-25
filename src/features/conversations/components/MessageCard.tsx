@@ -102,7 +102,8 @@ const MessageCard = ({currMessage, dataCard, onClick}: MessageCardProps) => {
                   fontSize: 12,
                 }, isRead? {}: {fontWeight: 'bold'}]}
               >
-              {lastContent.userId === currentUserId? "Bạn: ": "Bạn bè: "}{lastContent.message.data}
+              {lastContent.userId === currentUserId? "Bạn: ": "Bạn bè: "}
+              {lastContent.message.type === 'text'? lastContent.message.data: lastContent.message.type === 'image'? "Hình ảnh": "video"}
               </Typography>
                 {!isRead && <div style={{width: '8px', height: '8px', backgroundColor: 'black', borderRadius: 50}}/>}
             </Box>
