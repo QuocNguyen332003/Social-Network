@@ -30,6 +30,11 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleGetMessage = () => {
+    handleClose();
+    navigate(`/messages?friendID=${myUser._id}`);
+  }
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -178,7 +183,7 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleGetMessage}>
           <ListItemIcon>
             <MessageIcon/>
           </ListItemIcon>

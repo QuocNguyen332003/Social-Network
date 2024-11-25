@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Hobby } from '../../../../interface/mainInterface';
 
 interface chooseHobby{
+  _id: string;
   name: string;
   isChoose: boolean;
 }
@@ -25,6 +26,7 @@ const HobbyScreen: React.FC = () => {
     try {
       const response = await axios.get(`http://localhost:3000/v1/hobbies/`);
       setDataHobby(response.data.map((data: Hobby)=> ({
+        _id: data._id,
         name: data.name,
         isChoose: false
       })))
@@ -36,7 +38,7 @@ const HobbyScreen: React.FC = () => {
 
   // Handle the submission of hobbies
   const handleSubmit = () => {
-    const chosenHobbies = dataHobby.filter(hobby => hobby.isChoose).map(hobby => hobby.name);
+    const chosenHobbies = dataHobby.filter(hobby => hobby.isChoose).map(hobby => hobby._id);
 
     // Navigate to the next form with the complete data, including hobbies
     navigate('/new-user/avt-background', {

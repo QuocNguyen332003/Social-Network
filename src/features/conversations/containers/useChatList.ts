@@ -88,7 +88,9 @@ export const useChatList = () => {
             : conversation
         )
       );
-      putReadMessage(_idConversation);
+      if (_idConversation){
+        putReadMessage(_idConversation);
+      }
     };
     const putReadMessage = async (_idConversation: string) => {
       try {
@@ -100,6 +102,7 @@ export const useChatList = () => {
             },
           }
         );
+        console.log(response);
       } catch (error) {
         console.error('Lỗi khi lấy bài viết:', error);
         setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');

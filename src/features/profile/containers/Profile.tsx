@@ -6,12 +6,19 @@ import ProfileTabs from '../components/ProfileTabs';
 import SidebarRight from '../../../shared/components/sidebarRight/SidebarRight';
 import { Outlet } from 'react-router-dom';
 import { useProfile } from './useProfile';
+import FormError from '../../../shared/components/form-error/FormError';
 
 const Profile = () => {
-  const {myUser, addNewFollower, deleteFollower, isOwner} = useProfile();
+  const {myUser, addNewFollower, deleteFollower, isOwner, error,
+    setError
+  } = useProfile();
   
   if (myUser == null) {
-    return <></>;
+    return (
+      <>
+        <FormError open={error !== null} setOpen={(value) => {setError(value?null:null)}} message={error?error:""}/>
+      </>
+    )
   }
   return (
     <>
@@ -39,6 +46,7 @@ const Profile = () => {
         <Grid item xs={2.5}>
           <SidebarRight />
         </Grid>
+        <FormError open={error !== null} setOpen={(value) => {setError(value?null:null)}} message={error?error:""}/>
       </Grid>
     </>
   );

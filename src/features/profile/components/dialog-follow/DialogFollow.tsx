@@ -21,7 +21,7 @@ interface DialogFollowProps {
 const  DialogFollow = ({open, myUser, handleClose, first, dataFriends, dataFollower}: DialogFollowProps) => {
   const navigate = useNavigate();
   const [currentTab, setCurrenTab] = React.useState(0);
-  const [listUser, setListUser] = React.useState<UserDataDisplay[] | null>(null);
+  const [listUser, setListUser] = React.useState<UserDataDisplay[] | null>(dataFriends);
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
       setCurrenTab(newValue);
   };
@@ -40,7 +40,7 @@ const  DialogFollow = ({open, myUser, handleClose, first, dataFriends, dataFollo
     } else if (currentTab === 2){
       setListUser(dataFollower);
     }
-  }, [currentTab]);
+  }, [currentTab, dataFriends, myUser, dataFollower]);
   
   return (
     <React.Fragment>
