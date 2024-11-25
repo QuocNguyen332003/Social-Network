@@ -1,8 +1,9 @@
  
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Button, IconButton, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Box, Typography, Grid, Button, IconButton, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, InputAdornment, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
+import SearchIcon from '@mui/icons-material/Search';
 import { Group } from '../../../../../interface/interface';
 
 const ExploreGroups: React.FC = () => {
@@ -10,6 +11,7 @@ const ExploreGroups: React.FC = () => {
   const [notJoinedGroups, setNotJoinedGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
   // Lấy danh sách các nhóm chưa tham gia và nhóm đã có trạng thái pending
@@ -101,14 +103,54 @@ const ExploreGroups: React.FC = () => {
       console.error('Lỗi khi thu hồi yêu cầu tham gia nhóm:', error);
     }
   };
+  const normalizeString = (str: string): string => {
+    return str
+      .normalize('NFD') // Chuyển đổi chuỗi sang dạng tổ hợp ký tự
+      .replace(/[\u0300-\u036f]/g, '') // Loại bỏ các dấu tổ hợp
+      .replace(/đ/g, 'd') // Thay thế 'đ' thành 'd'
+      .replace(/Đ/g, 'D') // Thay thế 'Đ' thành 'D'
+      .toLowerCase(); // Chuyển tất cả về chữ thường
+  };
+  
+  const filteredGroups = notJoinedGroups.filter((group) =>
+    normalizeString(group.groupName).includes(normalizeString(searchTerm))
+  );
 
   return (
     <Box sx={{ width: '100%', padding: 2, overflowX: 'hidden', boxSizing: 'border-box', height: '130vh' }}>
       <Box sx={{ marginBottom: 4 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.2rem', flexGrow: 1 }}>
+      <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+          sx={{ borderBottom: '1px solid #ddd', pb: 2 }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
             Nhóm chưa tham gia
           </Typography>
+
+          <TextField
+            placeholder="Tìm kiếm nhóm"
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              width: '300px',
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: '#fff',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              },
+            }}
+          />
         </Box>
 
         {loading ? (
@@ -117,7 +159,7 @@ const ExploreGroups: React.FC = () => {
           </Box>
         ) : notJoinedGroups.length > 0 ? (
           <Grid container spacing={2} sx={{ maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
-            {notJoinedGroups.map((group) => (
+            {filteredGroups.map((group) => (
               <Grid item xs={12} sm={6} md={4} key={group._id}>
                 <Box
                   sx={{
