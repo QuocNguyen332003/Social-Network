@@ -7,6 +7,10 @@ export interface UserDataDisplay {
   name: string;
 }
 
+export interface UserSetting {
+  profileVisibility: string, 
+  allowMessagesFromStrangers: boolean,
+}
 export interface Collection {
   _id: string;
   name: string;
@@ -44,6 +48,7 @@ export interface User {
     aboutMe: string,
     hobbies: string[];
     listArticle: string[];
+    setting: UserSetting,
     createdAt: Date;
     updatedAt: Date | null;
     _destroy: Date | null;

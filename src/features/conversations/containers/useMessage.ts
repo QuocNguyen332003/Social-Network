@@ -49,9 +49,26 @@ export const useMessage = (friendID: string, readMessage: (_idConversation: stri
               },
             }
           );
-          setConversation(response.data);
+          if (response.data.success){
+            if (response.data.data === null){
+              try{
+                const response = await axios.get(`http://localhost:3000/v1/user/${changeID}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${token}`, // Thêm token vào header
+                    },
+                  }
+                );
+
+                createNewChat({userID: response.data._id, avt: response.data.avt, name: response.data.userName});
+              } catch(error){
+                console.error('Lỗi khi lấy tin nhắn viết:', error);
+              }
+            }
+            setConversation(response.data.data);
+          }
         } catch (error) {
-          console.error('Lỗi khi lấy bài viết:', error);
+          console.error('Lỗi khi lấy tin nhắn:', error);
           setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
         } finally {
           setIsLoading(false); 
@@ -74,7 +91,7 @@ export const useMessage = (friendID: string, readMessage: (_idConversation: stri
     const postSendNewMessage = async (idConversation: string, content: Content) => {
         setIsLoading(true); 
         try {
-          const response = await axios.put(
+          const response = await axios.patch(
             `http://localhost:3000/v1/messages/send-message/${idConversation}`,
             { 
                 message: content.message,
@@ -89,6 +106,7 @@ export const useMessage = (friendID: string, readMessage: (_idConversation: stri
               },
             }
           );
+          console.log(response.data);
         } catch (error) {
           console.error('Lỗi khi gửi tin nhắn:', error);
           setError('Lỗi khi gửi tin nhắn. Vui lòng thử lại sau.');

@@ -92,7 +92,7 @@ export const useChatList = () => {
     };
     const putReadMessage = async (_idConversation: string) => {
       try {
-        const response = await axios.put(`http://localhost:3000/v1/messages/read-message/${_idConversation}/${currentUserId}`, 
+        const response = await axios.patch(`http://localhost:3000/v1/messages/read-message/${_idConversation}/${currentUserId}`, 
           {},
           {
             headers: {

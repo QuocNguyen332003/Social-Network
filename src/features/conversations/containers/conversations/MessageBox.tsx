@@ -2,7 +2,7 @@ import { Box, CircularProgress } from "@mui/material";
 import MessageReceived, { Position } from "../../components/MessageReceived";
 import MessageSend from "../../components/MessageSend";
 import { Content, ConversationAPI, DataUser } from "../interfaceMessage";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 
 const getPositionAndDisplayAvt = (currentIndex: number, contents: Content[]) => {
@@ -34,6 +34,7 @@ type MessageBoxProps = {
     dataConversation: ConversationAPI;
 }
 const MessageBox = ({ dataConversation }: MessageBoxProps) => {
+    const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
     const currentUserId = sessionStorage.getItem('userId') || '';
   
     const [dataUser, setDataUser] = useState<DataUser | null>(null);
@@ -48,6 +49,7 @@ const MessageBox = ({ dataConversation }: MessageBoxProps) => {
             setDataFriend(userData);
           }
         });
+        endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
       }
     }, [dataConversation]);
   
@@ -89,6 +91,7 @@ const MessageBox = ({ dataConversation }: MessageBoxProps) => {
             />
           );
         })}
+        <div ref={endOfMessagesRef} />
       </Box>
     );
   };

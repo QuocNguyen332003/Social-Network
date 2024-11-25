@@ -3,6 +3,7 @@ import { IconButton, Avatar, Menu, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Import axios để gọi API
 import { toast } from 'react-toastify'; // Optional: Sử dụng toast để hiển thị thông báo
+import Setting from '../../setting/Setting';
 
 
 const UserAvatarMenu = () => {
@@ -13,6 +14,8 @@ const UserAvatarMenu = () => {
   const token = sessionStorage.getItem('token'); // Retrieve token from session
   const navigate = useNavigate();
   const currentUserId = sessionStorage.getItem('userId') || '';
+
+  const [openSetting, setOpenSetting] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -124,9 +127,10 @@ const UserAvatarMenu = () => {
         }}
       >
         <MenuItem onClick={() => handleMenuClick(`/profile?id=${userId}`)}>Trang Cá Nhân</MenuItem>
-        <MenuItem onClick={() => handleMenuClick('/settings')}>Cài đặt</MenuItem>
+        <MenuItem onClick={() => setOpenSetting(true)}>Cài đặt</MenuItem>
         <MenuItem onClick={handleLogout}>Log out</MenuItem>
       </Menu>
+      <Setting open={openSetting} setOpen={setOpenSetting}/>
     </>
   );
 };
