@@ -16,6 +16,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import GoogleIcon from '@mui/icons-material/Google';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const theme = createTheme();
 
@@ -29,17 +30,20 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:3000/v1/auth/login', { email, password });
-
-      // Lưu token vào sessionStorage hoặc sessionStorage
+  
+      // Lưu token và thông tin người dùng vào sessionStorage
       sessionStorage.setItem('token', response.data.token);
       sessionStorage.setItem('userId', response.data.user._id); 
       sessionStorage.setItem('avt', JSON.stringify(response.data.user.avt));
       sessionStorage.setItem('displayName', response.data.user.displayName); 
-      
-      // Điều hướng người dùng tới trang chính (ví dụ: /new-feeds)
+  
+      // Điều hướng người dùng tới trang chính
+      toast.success('Đăng nhập thành công!');
       navigate('/new-feeds');
-    } catch (err) {
-      setError('Đăng nhập thất bại, vui lòng kiểm tra lại thông tin đăng nhập.');
+    } catch (err: any) {
+      // Kiểm tra nếu server trả về lỗi và hiển thị thông báo chi tiết
+      const errorMessage = err.response?.data?.message || 'Đăng nhập thất bại, vui lòng thử lại.';
+      toast.error(errorMessage); // Hiển thị lỗi bằng toast
     }
   };
 

@@ -17,10 +17,30 @@ const DetailArticles = () => {
   const [posts, setPosts] = useState<Article[]>([]);
 
   useEffect(() => {
+    const fetchPostById = async (postId: string) => {
+      try {
+        const response = await axios.get(`http://localhost:3000/v1/article/${postId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.status === 200) {
+          setPosts([response.data]); // Thêm bài viết vào `posts`
+        }
+      } catch (error) {
+        console.error('Lỗi khi lấy bài viết:', error);
+      }
+    };
+  
     if (article) {
-      setPosts([article]); // Thêm bài viết vào mảng posts
+      setPosts([article]); // Nếu có dữ liệu từ `location.state`, sử dụng trực tiếp
+    } else {
+      const postId = location.pathname.split('/').pop(); // Lấy `postId` từ URL
+      if (postId) {
+        fetchPostById(postId); // Gọi API để lấy bài viết
+      }
     }
-  }, [article]);
+  }, [article, location.pathname, token]);
 
   // Xử lý thêm comment mới
   const handleLikePost = async (postId: string) => {
