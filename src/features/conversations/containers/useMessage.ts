@@ -3,6 +3,7 @@ import {useEffect, useState } from "react"
 import { Content, ConversationAPI, DataUser } from "./interfaceMessage";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { Friends } from "../../../interface/mainInterface";
 
 const socket = io('http://localhost:3000');
 
@@ -52,7 +53,7 @@ export const useMessage = (friendID: string, readMessage: (_idConversation: stri
           if (response.data.success){
             if (response.data.data === null){
               try{
-                const response = await axios.get(`http://localhost:3000/v1/user/${changeID}`,
+                const newResponse = await axios.get(`http://localhost:3000/v1/user/${changeID}`,
                   {
                     headers: {
                       Authorization: `Bearer ${token}`, // Thêm token vào header
@@ -60,12 +61,21 @@ export const useMessage = (friendID: string, readMessage: (_idConversation: stri
                   }
                 );
 
-                createNewChat({userID: response.data._id, avt: response.data.avt, name: response.data.userName});
+                if (newResponse){
+                  const isFriend = newResponse.data.friends.some((friend: Friends)=> friend.idUser === currentUserId);
+
+                  if (newResponse.data.setting.allowMessagesFromStrangers || isFriend){
+                    createNewChat({userID: newResponse.data._id, avt: newResponse.data.avt[newResponse.data.avt.length - 1], name: `${newResponse.data.firstName} ${newResponse.data.lastName}`});
+                  } else {
+                    setError("Người dùng không nhận tin nhắn từ người lạ");
+                  }
+                }
               } catch(error){
                 console.error('Lỗi khi lấy tin nhắn viết:', error);
               }
+            } else{
+              setConversation(response.data.data);
             }
-            setConversation(response.data.data);
           }
         } catch (error) {
           console.error('Lỗi khi lấy tin nhắn:', error);
@@ -147,7 +157,8 @@ export const useMessage = (friendID: string, readMessage: (_idConversation: stri
             avt: currentUserAvt,
             name: currentUserName,
         }
-        if (idFriend !== null){
+
+        if (dataFriend.userID !== null){
             setConversation({
                 _id: "",
                 _user: [currentUserId, dataFriend.userID],
@@ -157,12 +168,12 @@ export const useMessage = (friendID: string, readMessage: (_idConversation: stri
         }
     }
     return {
-        isLoadingMessage, error,
+        isLoadingMessage, error, setError,
         conversation,
         sendNewMessage,
         createNewChat,
         addNewMessage,
-        newChat, setNewChat
+        newChat, setNewChat,
     }
 }
 

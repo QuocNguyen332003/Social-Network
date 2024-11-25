@@ -3,6 +3,7 @@ import { User, UserDataDisplay } from "../../../interface/interface";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { updateAboutMe, updateAccount, updateDetails, updateDisplayName, updateName, updateUserName } from "../services/UpdateProfile";
+import { Friends } from "../../../interface/mainInterface";
 
 export const useProfile = () => {
     const location = useLocation();
@@ -53,7 +54,20 @@ export const useProfile = () => {
             },
           }
         );
-        setMyUser(response.data);
+        if (response.data._id !== currentUserId){
+          const isFriend = response.data.friends.some((friend: Friends)=> friend.idUser === currentUserId);
+          if (response.data.setting.profileVisibility === 'public'){
+            setMyUser(response.data);
+          }
+          else if (response.data.setting.profileVisibility === 'friends' && isFriend){
+            setMyUser(response.data);
+          } 
+          else {
+            setError("Người dùng không muốn cho bạn xem thông tin của họ");
+          }
+        } else {
+          setMyUser(response.data);
+        }
       } catch (error) {
         console.error('Lỗi khi lấy bài viết:', error);
         setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
@@ -271,7 +285,7 @@ export const useProfile = () => {
         changeGender,
         changeDisplayName,
         isLoading,
-        error,
+        error, setError,
         isOwner,
         idUserView,
     }

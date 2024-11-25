@@ -27,7 +27,7 @@ export interface Details{
 }
 
 export interface Friends{
-    userId: string;
+    idUser: string;
     addDate: string;
 }
 

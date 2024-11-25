@@ -29,16 +29,16 @@ const useSetting = () => {
 
     const saveSetting = async () => {
         try{
+          console.log(userSetting);
             const response = await axios.patch(`http://localhost:3000/v1/user/setting/${userId}`,
-                {userSetting},
+              userSetting,
               {
                 headers: {
                   Authorization: `Bearer ${token}`, // Thêm token vào header
                 },
               }
             );
-
-            setUserSetting(response.data.setting);
+            setUserSetting(response.data.data.setting);
           } catch(error){
             console.error('Lỗi khi lấy tin nhắn viết:', error);
           }
