@@ -328,7 +328,4 @@ const YourGroups: React.FC = () => {
 };
 
 export default YourGroups;
-function normalizeString(groupName: string) {
-  throw new Error('Function not implemented.');
-}
 

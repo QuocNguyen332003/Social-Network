@@ -128,7 +128,7 @@ const SidebarRight = () => {
         sx={{ mb: 1, position: 'relative' }}
         onClick={() => navigate(`/messages?friendID=${contact._id}`)}
       >
-        <Avatar alt={contact.name} src={contact.avt.link} />
+        <Avatar alt={contact.name} src={contact.avt && contact.avt.link ? contact.avt.link : '/default-avatar.png'}  />
         {contact.status === 'online' && (
           <Box
             sx={{
