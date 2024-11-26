@@ -1,9 +1,7 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, IconButton, Box, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../../assets/images/QQ Social.png'; // Adjust the path
+import logo from '../../../assets/images/logo.png'; // Adjust the path
 import NotificationMenu from './menu-header/NotificationMenu'; // Import NotificationMenu
 import UserAvatarMenu from './menu-header/UserAvatarMenu'; // Import UserAvatarMenu
 
@@ -25,7 +23,7 @@ const Header = () => {
           <img
             src={logo}
             alt="Lotus"
-            style={{ marginRight: '24px', height: '80px', width: '80px' }}
+            style={{ marginRight: '24px', height: '60px', width: 'auto' }}
           />
         </Box>
 

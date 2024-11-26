@@ -37,7 +37,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onEmailSubmit }
 
   return (
     <Container maxWidth="xs" sx={{ textAlign: 'center', mt: 4 }}>
-      <img src="./path-to-your-logo/bamboo-logo.png" alt="Bamboo Logo" style={{ marginBottom: 24, maxWidth: '50%' }} />
+      <img src="./src/assets/images/logo_nocap.png" alt="Logo" style={{ marginBottom: 24, maxWidth: '50%' }} />
       <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
         Quên mật khẩu
       </Typography>

@@ -90,7 +90,7 @@ const AddAvtAndBackground: React.FC = () => {
       <Grid xs={2.5}></Grid>
       <Grid xs={7}>
         <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', borderBottom: '1px solid #e9e9e9' }}>
-          <img src="/src/assets/images/QQ Social.png" alt="Logo" style={{ marginBottom: 16, maxWidth: '10vw' }} />
+          <img src="/src/assets/images/logo_nocap.png" alt="Logo" style={{ marginBottom: 16, maxWidth: '10vw' }} />
           <Typography variant="h4" fontWeight={500}>
             Thêm ảnh nền và ảnh đại diện của bạn
           </Typography>
