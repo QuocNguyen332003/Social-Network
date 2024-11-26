@@ -95,7 +95,7 @@ const Login: React.FC = () => {
               }}
             >
               <img
-                src="./src/assets/images/QQ Social.png"
+                src="./src/assets/images/logo_nocap.png"
                 alt="Logo"
                 style={{ marginBottom: 16, maxWidth: '50%' }}
               />

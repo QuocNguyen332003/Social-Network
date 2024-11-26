@@ -29,7 +29,7 @@ const InfoAccount: React.FC = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {/* Logo Display */}
       <img
-        src="./src/assets/images/QQ Social.png"
+        src="./src/assets/images/logo_nocap.png"
         alt="Logo"
         style={{ marginBottom: 16, maxWidth: '50%' }}
       />

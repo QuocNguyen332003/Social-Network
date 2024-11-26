@@ -57,7 +57,7 @@ const Forgot: React.FC = () => {
                 alignItems: 'center',
               }}
             >
-              <img src="./src/assets/images/QQ Social.png" alt="Logo" style={{ marginBottom: 16, maxWidth: '50%' }} /> {/* Thêm logo */}
+              <img src="./src/assets/images/logo_nocap.png" alt="Logo" style={{ marginBottom: 16, maxWidth: '50%' }} /> {/* Thêm logo */}
               <Typography
                 component="h1"
                 variant="h5"
