@@ -19,7 +19,7 @@ const AddAvtAndBackground: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   // Extract form data from the location state
-  const { firstName, lastName, email, password, phoneNumber, address, gender, birthday, hobbies, cccdFile  } = location.state || {};
+  const { firstName, lastName, email, password, phoneNumber, address, gender, hobbies, cccdFile  } = location.state || {};
 
   const handleAvtChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
@@ -46,7 +46,6 @@ const AddAvtAndBackground: React.FC = () => {
       formData.append('phoneNumber', phoneNumber as string);
       formData.append('address', address as string);
       formData.append('gender', gender as string);
-      formData.append('birthday', birthday as string);
       formData.append('hobbies', hobbies);
 
       // Attach the avatar and background images if provided

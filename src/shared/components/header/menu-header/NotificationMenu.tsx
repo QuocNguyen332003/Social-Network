@@ -82,18 +82,31 @@ const NotificationMenu = () => {
         setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
       }
     });
-
+    socket.on('friend_request_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('friend_request_accepted', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
     return () => {
-      socket.off('like_article_notification'); // rồi nè (fix)
-      socket.off('like_comment_notification'); // rồi (Fix)
-      socket.off('like_reply_notification'); // rồi (fix)
-      socket.off('new_comment_notification'); // rồi nè (fix)
-      socket.off('new_reply_notification'); // rồi (fix)
-      socket.off('share_article_notification'); // rồi (fix)
-      socket.off('article_reported'); // rồi  (fix)
-      socket.off('user_accepted_notification'); // chưa (fix)
-      socket.off('invite_become_admin'); // chưa (fix)
-      socket.off('new_group_invite_notification'); // chưa (fix)
+      socket.off('like_article_notification');
+      socket.off('like_comment_notification');
+      socket.off('like_reply_notification');
+      socket.off('new_comment_notification');
+      socket.off('new_reply_notification');
+      socket.off('share_article_notification');
+      socket.off('article_reported');
+      socket.off('user_accepted_notification');
+      socket.off('invite_become_admin'); 
+      socket.off('new_group_invite_notification'); 
+      socket.off('friend_request_notification'); 
+      socket.off('friend_request_accepted'); 
     };
   }, [currentUserId]);
   // Fetch notifications from backend API
