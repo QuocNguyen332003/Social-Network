@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Avatar, Divider } from '@mui/material';
 import axios from 'axios';
 import { Article } from '../../../../interface/interface';
+import VideoCard from '../../video-card/VideoCard.tsx';
 
 interface ShareItemCardProps {
   sharedPostId: string;
@@ -77,19 +78,56 @@ const ShareItemCard: React.FC<ShareItemCardProps> = ({ sharedPostId }) => {
         </Typography>
       </Box>
 
-      {/* Hiển thị hình ảnh nếu có */}
-      {Array.isArray(article.listPhoto) && article.listPhoto.length > 0 && article.listPhoto[0]?.link && (
-        <Box>
-          <img
-            src={article.listPhoto[0].link as unknown as string}
-            alt="Shared item image"
-            style={{
-              width: '100%',
-              borderRadius: '8px',
-              objectFit: 'contain', // Thay đổi từ 'cover' sang 'contain'
-              maxHeight: '300px',
-            }}
-          />
+      {/* Hiển thị hình ảnh hoặc video nếu có */}
+      {Array.isArray(article.listPhoto) && article.listPhoto.length > 0 && (
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+            gap: 1,
+          }}
+        >
+          {article.listPhoto.map((photo, index) =>
+            (photo as any).type === 'img' ? (
+              <Box
+                key={index}
+                sx={{
+                  width: '150px',
+                  height: '150px',
+                  overflow: 'hidden',
+                  borderRadius: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <img
+                  src={(photo?.link as unknown) as string}
+                  alt={`post-image-${index}`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover', // Để hiển thị khung vuông, bạn có thể sử dụng "cover"
+                  }}
+                />
+              </Box>
+            ) : (
+              <Box
+                key={index}
+                sx={{
+                  width: '150px',
+                  height: '150px',
+                  overflow: 'hidden',
+                  borderRadius: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <VideoCard linkVideo={(photo?.link as unknown) as string} />
+              </Box>
+            )
+          )}
         </Box>
       )}
     </Paper>

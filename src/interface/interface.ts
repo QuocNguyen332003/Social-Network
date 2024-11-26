@@ -99,6 +99,7 @@ export interface Notification {
     readAt?:  Date | null;
     createdAt: Date;
     _destroy?: Date | null;
+    link?: string | null;
 }
   
   // Hobbies Interface

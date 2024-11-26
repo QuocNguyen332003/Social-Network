@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { IconButton, Menu, MenuItem, Badge, List, ListItem, ListItemAvatar, ListItemText, Avatar, Divider, Typography, Box, Button } from '@mui/material';
 import { Notifications, MoreVert } from '@mui/icons-material'; 
 import { Notification } from '../../../../interface/interface'; 
+import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client'; // Import socket.io-client
 
 const socket = io('http://localhost:3000');
@@ -15,6 +16,7 @@ const NotificationMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); 
   const [selectedNotification, setSelectedNotification] = useState<string | null>(null); 
   const currentUserId = sessionStorage.getItem('userId') || ''; 
+  const navigate = useNavigate();
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
 
   useEffect(() => {
@@ -202,9 +204,12 @@ const NotificationMenu = () => {
     }
   };
 
-  const handleNotificationClick = (notificationId: string, isUnread: boolean) => {
-    if (isUnread) {
-      markAsRead(notificationId);
+  const handleNotificationClick = (notification: Notification) => {
+    if (notification.status === 'unread') {
+      markAsRead(notification._id);
+    }
+    if (notification.link) {
+      window.location.href = notification.link; // Điều hướng tới URL đầy đủ
     }
   };
 
@@ -278,7 +283,7 @@ const NotificationMenu = () => {
               <div key={notification._id}>
                 <ListItem 
                   button 
-                  onClick={() => handleNotificationClick(notification._id, notification.status === 'unread')}
+                  onClick={() => handleNotificationClick(notification)}
                   secondaryAction={
                     <IconButton
                       onClick={(event) => handleMoreClick(event, notification._id)} 
