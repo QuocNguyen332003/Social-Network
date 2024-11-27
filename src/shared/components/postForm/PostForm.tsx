@@ -106,7 +106,7 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
   };
 
   return (
-    <Paper sx={{ padding: 2, marginBottom: 2, borderRadius: '8px' }}>
+    <Paper sx={{ padding: 2, marginBottom: 2, borderRadius: '20px' }}>
       <Box display="flex" alignItems="center" mb={2}>
         {/* Avatar wrapped in Box to handle click */}
         <Box onClick={handleAvatarClick} sx={{ cursor: 'pointer' }}>

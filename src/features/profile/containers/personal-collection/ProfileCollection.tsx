@@ -8,7 +8,6 @@ const ProfileCollection = () => {
   return (
     <Box sx={{
       backgroundColor: '#e9e9e9',
-      padding: '20px'
     }}>
       <CollectionCard title={"Ảnh"} data={photos.img} id={'collection-image'} type={"img"}/>
       <CollectionCard title={"Video"} data={photos.video} id={'collection-video'} type={"video"}/>
