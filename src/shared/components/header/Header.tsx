@@ -15,7 +15,8 @@ const Header = () => {
       sx={{
         backgroundColor: '#ffffff',
         borderBottom: '1px solid #e0e0e0',
-        padding: '8px 24px',
+        padding: '0px 24px',
+        maxHeight: '15vh'
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between' }}>

@@ -15,7 +15,8 @@ const Conversations = ({conversation, sendMessage, isloading}: ConversationsProp
   return (
     <Box 
       sx={{ 
-        height: '84vh', 
+        height: '79vh', 
+        padding: '20px',
         border: '1px solid #e0e0e0',
         backgroundColor: 'white',
         display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
