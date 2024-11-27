@@ -329,7 +329,7 @@ const ProfilePost = () => {
   };
 
   return (
-    <Box sx={{ padding: 2, height: '85vh' }}>
+    <Box sx={{ height: '85vh', paddingTop: '20px' }}>
       {(idUserView !== null && idUserView === currentUserId) && (
         <PostForm onSubmit={handlePostSubmit} />
       )}

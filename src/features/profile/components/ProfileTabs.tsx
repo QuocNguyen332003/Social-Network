@@ -24,7 +24,12 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ userID }) => {
   };
 
   return (
-    <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: '#fff' }}>
+    <Box sx={{ 
+      borderBottom: 1, borderColor: 'divider', backgroundColor: '#fff', 
+      display: 'flex', justifyContent: 'center',
+      borderEndEndRadius: 20, borderEndStartRadius: 20, 
+      }}
+    >
       <Tabs value={currentTab} onChange={handleTabChange} aria-label="group tabs">
         <Tab label="Bài đăng" />
         <Tab label="Bộ sưu tập" />
