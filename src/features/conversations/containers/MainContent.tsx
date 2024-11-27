@@ -48,10 +48,11 @@ const App = ({friendID}: MessageProps) => {
       }}
     >
       <Grid container >
-        <Grid item xs={4}>
+        <Grid item xs={3.9}>
           <ListMesssages data={filterData} changeChat={changeChat} 
             createNewChat={createNewChat} searchChat={searchChat}/>
         </Grid>
+        <Grid item xs={0.1}/>
         <Grid item xs={8}>
           <Conversations conversation={conversation}
           sendMessage={sendMessage} isloading={isLoading&&isLoadingMessage}/>

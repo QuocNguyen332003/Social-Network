@@ -103,8 +103,7 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
         <Box sx={{ position: 'absolute', bottom: '20px', right: '20px', display: 'flex', alignItems: 'center' }}>
         <Button variant="contained" startIcon={<BorderColorIcon />}
           sx={{ marginRight: '8px', width: '150px', height: '30px',
-            backgroundColor: '#e9e9e9',
-            color: '#1976d2',  textTransform: 'none',
+            textTransform: 'none',
            }} 
            onClick={()=> {navigate(`/edit-profile?id=${myUser._id}`)}}
           >
@@ -112,8 +111,7 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
         </Button>
         <Button variant="contained" startIcon={<ShareIcon/>}
         sx={{ height: '30px',
-          backgroundColor: '#e9e9e9',
-          color: '#1976d2',  textTransform: 'none',
+          textTransform: 'none',
          }} >
           Chia sẻ trang cá nhân
         </Button>
@@ -122,8 +120,7 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
       <Box sx={{ position: 'absolute', bottom: '20px', right: '20px', display: 'flex', alignItems: 'center' }}>
         <Button variant="contained" startIcon={<AddToQueueIcon />}
           sx={{ marginRight: '8px', height: '30px', padding: '0px 20px',
-            backgroundColor: '#e9e9e9',
-            color: '#1976d2',  textTransform: 'none',
+            textTransform: 'none',
            }} 
           onClick={follow}
           >
@@ -131,8 +128,7 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
         </Button>
         <Button variant="contained" startIcon={<PersonAddIcon/>}
           sx={{ marginRight: '8px', height: '30px', padding: '0px 20px',
-            backgroundColor: '#e9e9e9',
-            color: '#1976d2',  textTransform: 'none',
+            textTransform: 'none',
            }} 
           onClick={handleFriend}
           > 
@@ -140,8 +136,7 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
         </Button>
         <Button variant="contained"
           sx={{ marginRight: '8px', height: '30px',
-            backgroundColor: '#e9e9e9',
-            color: '#1976d2',  textTransform: 'none',
+            textTransform: 'none',
            }} 
           onClick={handleAvatarClick}>
           <MenuIcon/>

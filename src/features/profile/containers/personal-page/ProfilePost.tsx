@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import axios from 'axios';
 import PostForm from '../../../../shared/components/postForm/PostForm';
 import Post from '../../../../shared/components/post/Post';
@@ -356,7 +356,14 @@ const ProfilePost = () => {
           />
         ))
       ) : (
-        <p>Không có bài viết nào.</p>
+        <Box sx={{ 
+          padding: 2, marginBottom: 3, borderRadius: '20px', 
+          boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
+          backgroundColor: '#fff'
+         }}
+         >
+          <Typography>Người dùng chưa có bài viết</Typography>
+         </Box>
       )}
     </Box>
   );
