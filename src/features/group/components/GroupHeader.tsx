@@ -119,7 +119,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
       if (editedGroup.avtFile) formData.append('avt', editedGroup.avtFile);
       if (editedGroup.backGroundFile) formData.append('backGround', editedGroup.backGroundFile);
 
-      const response = await axios.put(`http://localhost:3000/v1/group/${editedGroup._id}/edit`, formData, {
+      const response = await axios.patch(`http://localhost:3000/v1/group/${editedGroup._id}/edit`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -127,9 +127,11 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
       });
 
       if (response.status === 200) {
-        onUpdateGroup(response.data.group);
+        const updatedGroup = response.data.group;
+        onUpdateGroup(updatedGroup); // Cập nhật nhóm trong cha
+        setEditedGroup(updatedGroup); // Cập nhật nhóm tại chỗ
+        setHobbies(updatedGroup.hobbies || []); // Cập nhật sở thích
         handleCloseEditDialog();
-        window.location.reload();
       }
     } catch (error) {
       console.error('Lỗi khi cập nhật nhóm:', error);
@@ -187,7 +189,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
     <Box
       sx={{
         position: 'relative',
-        backgroundImage: `url(${group.backGround.link})`,
+        backgroundImage: `url(${group.backGround?.link || ''})`,
         height: '300px', // Đặt chiều cao mong muốn
         width: '100%', // Đảm bảo ảnh nền bao phủ toàn bộ chiều rộng
         backgroundSize: 'contain', // Ảnh sẽ bao phủ toàn bộ khung

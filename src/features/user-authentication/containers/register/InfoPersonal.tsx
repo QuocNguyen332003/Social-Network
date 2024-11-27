@@ -12,7 +12,6 @@ const InfoPersonal: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [gender, setGender] = useState('');
-  const [birthday, setBirthday] = useState('');
   const [cccdFile, setCccdFile] = useState<File | null>(null); // State for CCCD file
 
   const handleCccdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,7 +26,7 @@ const InfoPersonal: React.FC = () => {
 
     // Navigate to the next form, passing the state object including CCCD
     navigate('/register/choose-interest', {
-      state: { firstName, lastName, email, password, phoneNumber, address, gender, birthday, cccdFile }
+      state: { firstName, lastName, email, password, phoneNumber, address, gender, cccdFile }
     });
   };
 
@@ -78,19 +77,6 @@ const InfoPersonal: React.FC = () => {
               <MenuItem value="female">Nữ</MenuItem>
               <MenuItem value="other">Khác</MenuItem>
             </TextField>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography>Ngày sinh:</Typography>
-            <TextField
-              required
-              fullWidth
-              name="birthday"
-              type="date"
-              id="birthday"
-              value={birthday}
-              onChange={(e) => setBirthday(e.target.value)}
-              autoComplete="birthday"
-            />
           </Grid>
           <Grid item xs={12}>
             <Typography>Tải lên CCCD:</Typography>

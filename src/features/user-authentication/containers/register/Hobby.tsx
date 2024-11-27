@@ -15,7 +15,7 @@ const HobbyScreen: React.FC = () => {
   const location = useLocation();
 
   // Extract the data passed via state from the previous form
-  const { firstName, lastName, email, password, phoneNumber, address, gender, birthday, cccdFile } = location.state || {};
+  const { firstName, lastName, email, password, phoneNumber, address, gender, cccdFile } = location.state || {};
   const [dataHobby, setDataHobby] = useState<chooseHobby[]>([]);
   // State to store selected hobbies
   useEffect(()=> {
@@ -50,7 +50,6 @@ const HobbyScreen: React.FC = () => {
         phoneNumber,
         address,
         gender,
-        birthday,
         hobbies: chosenHobbies,
         cccdFile
       }
