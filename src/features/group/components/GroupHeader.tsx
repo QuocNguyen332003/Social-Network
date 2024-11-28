@@ -37,7 +37,6 @@ interface GroupHeaderProps {
   onUpdateGroup: (updatedGroup: Group) => void;
 }
 
-const hobbiesOptions = ['Sports', 'Music', 'Travel', 'Technology', 'Reading', 'Art', 'Cooking',];
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup }) => {
   const navigate = useNavigate();
@@ -47,6 +46,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
   const [editedGroup, setEditedGroup] = useState<Group>(group);
   const [hobbies, setHobbies] = useState<string[]>(group.hobbies || []);
+  const [hobbiesOptions, setHobbiesOptions] = useState<any[]>([]); 
   const [newHobby, setNewHobby] = useState<string>('');
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,6 +78,24 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
       console.error('Lỗi khi lấy danh sách bạn bè chưa tham gia nhóm:', error);
     }
   };
+  useEffect(() => {
+    const fetchHobbies = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/v1/hobbies', {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        });
+        // Update the hobbies options from API response
+        if (response.data) {
+          setHobbiesOptions(response.data); 
+        }
+      } catch (error) {
+        console.error('Error fetching hobbies:', error);
+      }
+    };
+    fetchHobbies();
+  }, [token]);
 
 
 
@@ -326,15 +344,20 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
               
             {/* Lựa chọn sở thích với danh sách hiện tại */}
             <Box sx={{ mb: 2 }}>
-            {hobbies.map((hobby) => (
-              <Chip
-                key={hobby}
-                label={hobby}
-                onDelete={() => handleDeleteHobby(hobby)}
-                sx={{ margin: '5px' }}
-              />
-            ))}
-          </Box>
+              {hobbies.map((hobbyId) => {
+                const hobby = hobbiesOptions.find((hobby) => hobby._id === hobbyId);
+                return (
+                  hobby && (
+                    <Chip
+                      key={hobbyId}
+                      label={hobby.name}
+                      onDelete={() => handleDeleteHobby(hobbyId)}
+                      sx={{ margin: '5px' }}
+                    />
+                  )
+                );
+              })}
+            </Box>
             {/* Lựa chọn sở thích */}
             {/* Chọn sở thích mới */}
             <FormControl fullWidth sx={{ mb: 2 }}>
@@ -345,13 +368,22 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
                 onChange={(e) => setNewHobby(e.target.value)}
                 input={<OutlinedInput label="Thêm sở thích" />}
               >
-                {hobbiesOptions.map((hobby) => (
-                  <MenuItem key={hobby} value={hobby}>
-                    {hobby}
-                  </MenuItem>
-                ))}
+                {hobbiesOptions.length > 0 ? (
+                  hobbiesOptions.map((hobby) => (
+                    <MenuItem key={hobby._id} value={hobby._id}>
+                      {hobby.name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>Đang tải...</MenuItem>
+                )}
               </Select>
-              <Button variant="outlined" sx={{ mt: 1 }} onClick={handleAddHobby}>
+              <Button
+                variant="outlined"
+                sx={{ mt: 1 }}
+                onClick={handleAddHobby}
+                disabled={!newHobby}
+              >
                 Thêm sở thích
               </Button>
             </FormControl>

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   List,
   ListItem,
@@ -43,7 +43,7 @@ const SidebarLeftGroup = () => {
   const token = sessionStorage.getItem('token'); // Lấy token từ sessionStorage
   const [selectedTab, setSelectedTab] = useState('');
   const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
-  const [hobbiesOptions] = useState(['Sports', 'Music', 'Travel', 'Reading', 'Movies']);
+  const [hobbiesOptions, setHobbiesOptions] = useState<any[]>([]); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [newRule, setNewRule] = useState(''); // Dùng để nhập quy định mới
@@ -76,6 +76,25 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
     resetForm(); // Gọi hàm reset dữ liệu
     setOpenCreateGroupDialog(false);
   };
+  
+  useEffect(() => {
+    const fetchHobbies = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/v1/hobbies', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header nếu cần
+          },
+        });
+        // Lưu cả name và _id của sở thích vào hobbiesOptions
+        setHobbiesOptions(response.data);
+      } catch (error) {
+        console.error('Error fetching hobbies:', error);
+        setError('Có lỗi xảy ra khi tải sở thích. Vui lòng thử lại!');
+      }
+    };
+
+    fetchHobbies();
+  }, [token]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -354,20 +373,30 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
           </Box>
 
           {/* Thêm lựa chọn sở thích */}
-          <Select
-            multiple
-            fullWidth
-            value={groupData.hobbies}
-            onChange={handleSelectHobbies}
-            renderValue={(selected) => selected.join(', ')}
-            sx={{ mb: 2 }}
-          >
-            {hobbiesOptions.map((hobby) => (
-              <MenuItem key={hobby} value={hobby}>
-                {hobby}
-              </MenuItem>
-            ))}
-          </Select>
+          <Box sx={{ mb: 2 }}>
+            <Select
+              multiple
+              value={groupData.hobbies}
+              onChange={handleSelectHobbies}
+              renderValue={(selected) => {
+                if (hobbiesOptions.length === 0) return ''; 
+                return selected
+                  .map((id) => hobbiesOptions.find((hobby) => hobby._id === id)?.name || '')
+                  .join(', ');
+              }}
+              fullWidth
+            >
+              {hobbiesOptions.length > 0 ? (
+                hobbiesOptions.map((hobby) => (
+                  <MenuItem key={hobby._id} value={hobby._id}>
+                    {hobby.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>Đang tải...</MenuItem>
+              )}
+            </Select>
+          </Box>
           <Box sx={{ display: 'flex', mb: 2 }}>
             <TextField fullWidth label="Quy định nhóm" variant="outlined" value={newRule} onChange={(e) => setNewRule(e.target.value)} />
             <Button variant="contained" onClick={handleAddRule} sx={{ ml: 1 }}>{editIndex !== null ? 'Cập nhật' : 'Thêm'}</Button>
@@ -408,3 +437,5 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
 };
 
 export default SidebarLeftGroup;
+
+
