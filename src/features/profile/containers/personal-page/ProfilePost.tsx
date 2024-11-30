@@ -18,27 +18,34 @@ const ProfilePost = () => {
   // Gọi API để lấy danh sách bài viết khi component render lần đầu
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const userId = params.get("id");
-    setIdUserView(userId);
-    fetchPosts(userId);
-  }, []);
+    const userId = params.get("id"); // Lấy profileId từ URL
+    setIdUserView(userId); // Set idUserView để kiểm tra sau này
+    if (userId) {
+      fetchPosts(currentUserId, userId); // Lấy bài viết dựa trên userId của người hiện tại và profileId từ URL
+    } else {
+      setError("Không có profileId trong URL");
+    }
+  }, [location.search, currentUserId]);
 
-  const fetchPosts = async (userId: string | null) => {
+  const fetchPosts = async (userId: string, profileId: string) => {
     setIsLoading(true);
     setError(null); // Reset lỗi trước khi gọi API
     try {
-      if (userId !== null){
-        const response = await axios.get(`http://localhost:3000/v1/article/user/${userId}/articles`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Thêm token vào header
-            },
-          }
-        );
-        setPosts(response.data);
-      }
-      else{
-        setError('Người dùng không có id!');
+      if (userId && profileId) {
+        const response = await axios.get(`http://localhost:3000/v1/article/user/${userId}/articles`, {
+          params: { profileId }, // Truyền profileId vào params
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        });
+  
+        if (response.data.length === 0) {
+          setPosts([]);  // Thiết lập danh sách bài viết rỗng nếu không có bài viết
+        } else {
+          setPosts(response.data); // Nếu có bài viết, lưu dữ liệu vào state
+        }
+      } else {
+        setError('Người dùng hoặc profileId không hợp lệ!');
       }
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);
@@ -47,6 +54,7 @@ const ProfilePost = () => {
       setIsLoading(false);
     }
   };
+  
   // Xử lý khi gửi bài viết mới
   const handlePostSubmit = async (newPost: string, images: File[], visibility: string, hashTags: string[]) => {
     const formData = new FormData();
