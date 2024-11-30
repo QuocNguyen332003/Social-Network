@@ -24,6 +24,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -45,6 +46,9 @@ const Login: React.FC = () => {
       const errorMessage = err.response?.data?.message || 'Đăng nhập thất bại, vui lòng thử lại.';
       toast.error(errorMessage); // Hiển thị lỗi bằng toast
     }
+  };
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -123,7 +127,7 @@ const Login: React.FC = () => {
                   fullWidth
                   name="password"
                   label="Mật khẩu"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
                   autoComplete="current-password"
                   sx={{ mb: 2 }}
@@ -132,7 +136,13 @@ const Login: React.FC = () => {
                 />
                 {error && <Typography color="error">{error}</Typography>}
                 <FormControlLabel
-                  control={<Checkbox value="remember" color="primary" />}
+                  control={
+                    <Checkbox
+                      value="remember"
+                      color="primary"
+                      onChange={handleShowPassword} // Thay đổi trạng thái khi người dùng check/uncheck
+                    />
+                  }
                   label="Hiển thị mật khẩu"
                   sx={{ mb: 2 }}
                 />
