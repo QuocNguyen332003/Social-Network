@@ -133,7 +133,7 @@ const Login: React.FC = () => {
                 {error && <Typography color="error">{error}</Typography>}
                 <FormControlLabel
                   control={<Checkbox value="remember" color="primary" />}
-                  label="Ghi nhớ đăng nhập"
+                  label="Hiển thị mật khẩu"
                   sx={{ mb: 2 }}
                 />
                 <Button
