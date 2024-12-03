@@ -189,7 +189,7 @@ const ExploreGroups: React.FC = () => {
                       {group.groupName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {group.members.count} Thành Viên • {group.article.count} Bài Viết
+                      {group.members.count} Thành Viên • {group.article.count} Bài Viết • {group.friendCount} Bạn Chung
                     </Typography>
 
                     {/* Hiển thị trạng thái dựa vào `userState` */}

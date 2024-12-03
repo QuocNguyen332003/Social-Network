@@ -201,6 +201,15 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
     }
   };
   
+  // Xử lý tìm kiếm bạn bè
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Lọc danh sách bạn bè dựa trên tìm kiếm
+  const filteredFriends = friendsNotInGroup.filter(friend =>
+    friend.displayName && friend.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
 
   return (
@@ -466,8 +475,8 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
           </Box>
 
           <List sx={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {friendsNotInGroup.length > 0 ? (
-              friendsNotInGroup.map((friend) => (
+            {filteredFriends.length > 0 ? (
+              filteredFriends.map((friend) => (
                 <ListItem
                   key={friend._id}
                   sx={{
