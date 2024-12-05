@@ -23,10 +23,10 @@ const SidebarRight = () => {
     getNumberUnread();
     getDataFriend();
   }, [])
+
   useEffect(() => {
     if (contacts.length > 0) {
       socketStatusAllFriend();
-      
     }
   }, [contacts]);
 
@@ -86,12 +86,18 @@ const SidebarRight = () => {
           },
         }
       );
-      setContacts(response.data.friendData);
+      const sortedData = response.data.friendData.sort((a: Contacts, b: Contacts) => {
+        if (a.status === 'online' && b.status !== 'online') return -1; // 'online' lên trước
+        if (a.status !== 'online' && b.status === 'online') return 1;  // Các trạng thái khác xuống sau
+        return 0; // Không thay đổi vị trí nếu cả hai cùng trạng thái
+      });
+  
+      setContacts(sortedData);
     } catch (error) {
       console.error('Lỗi khi lấy bài viết:', error);
       
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   }
 
@@ -102,22 +108,38 @@ const SidebarRight = () => {
   }
 
   const socketStatusUser = (userId: string) => {
-    socket.on(`status-user-${userId}`, (data) => {
-      setContacts(contacts.map((contact)=> {
-        if (contact._id === data._id){
-          return {
-            ...contact,
-            status: data.status
-        }
-        } else{
-          return contact
-        }
-      }))
-    });
-  }
+    const statusListener = (data: { _id: string; status: string }) => {
+      setContacts((prevContacts) => {
+        // Cập nhật trạng thái của người dùng
+        const updatedContacts = prevContacts.map((contact) =>
+          contact._id === data._id ? { ...contact, status: data.status } : contact
+        );
+
+        // Sắp xếp lại danh sách theo trạng thái
+        return updatedContacts.sort((a, b) => {
+          if (a.status === 'online' && b.status !== 'online') return -1;
+          if (a.status !== 'online' && b.status === 'online') return 1;
+          return 0;
+        });
+      });
+    };
+
+    // Lắng nghe sự kiện từ socket
+    socket.on(`status-user-${userId}`, statusListener);
+
+    // Cleanup listener khi component unmount hoặc userId thay đổi
+    return () => {
+      socket.off(`status-user-${userId}`, statusListener);
+    };
+  };
+  
   if (isLoading || unRead === null) return <CircularProgress/> 
   return (
-    <Box sx={{ padding: '16px', borderLeft: '1px solid #e0e0e0', height: '85vh' }}>
+    <Box sx={{ padding: '16px', borderLeft: '1px solid #e0e0e0', height: '85vh',
+      overflowY: 'auto', // Kích hoạt cuộn theo chiều dọc
+      scrollbarWidth: 'none', // Ẩn thanh cuộn trên Firefox
+      '&::-webkit-scrollbar': { display: 'none' }, // Ẩn thanh cuộn trên Chrome, Safari, Edge
+    }}>
       <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
         Người liên hệ
       </Typography>

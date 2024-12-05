@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import FriendsCard from "../../components/FriendsCard";
 import { BoxButtonSuggest } from "../../components/BoxButton";
 import { useSuggestFriend } from "./useSuggestFriend";
@@ -23,19 +23,26 @@ function App() {
         '&::-webkit-scrollbar': {
           display: 'none', /* Chrome, Safari, Opera */
         },
-        backgroundColor: '#e9e9e9',
+        backgroundColor: '#f9f9f9',
       }}
     >
       <Typography variant="h5" component="h2"
       sx={{fontWeight: 'bold'}}>
         Gợi ý
       </Typography>
-      {data.map((item) => <FriendsCard 
+      <Grid container>
+      {data.map((item) => 
+      <Grid item xs={6}>
+        <FriendsCard 
         avt={item.avt} 
         name={item.name} 
         message={item.aboutMe}>
           <BoxButtonSuggest FuncButton={[() => {PressAddFiend(item.idUser, item.name)}]}/>
-        </FriendsCard>)}
+        </FriendsCard>
+      </Grid>
+      )}
+      </Grid>
+      
       <ConfirmDialog
         title = {"Thông Báo"}
         open={showDialog}

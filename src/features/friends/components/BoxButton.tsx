@@ -14,8 +14,8 @@ export const BoxButtonRequest = ({FuncButton} : BoxButtonProps) => {
     }
     return (
         <Box sx={{
-            width: '350px',
-            display: 'flex', justifyContent: 'space-between'
+            height: '100%', flexDirection: 'column',
+            display: 'flex', justifyContent: 'center',
         }}>
             <CustomButton title={"Từ chối"} clickButton={refuseFriend}/>
             <CustomButton title={"Đồng ý"} clickButton={AcceptFriend}/>
@@ -28,8 +28,8 @@ export const BoxButtonSuggest = ({FuncButton} : BoxButtonProps) => {
     }
     return (
         <Box sx={{
-            width: '350px',
-            display: 'flex', justifyContent: 'flex-end'
+            height: '100%', flexDirection: 'column',
+            display: 'flex', justifyContent: 'center',
         }}>
             <CustomButton title={"Gửi lời mời"} clickButton={AddFriend}/>
         </Box>
@@ -45,8 +45,9 @@ export const BoxButtonAllFriends: React.FC<BoxButtonProps> = ({ FuncButton }) =>
     }
     return (
         <Box sx={{
-            width: '350px',
-            display: 'flex', justifyContent: 'space-between'
+            height: '100%', flexDirection: 'column',
+            display: 'flex', justifyContent: 'center',
+
         }}>
             <CustomButton title={"Xóa bạn"} clickButton={deleteFriend} />
             <CustomButton title={"Xem trang cá nhân"} clickButton={viewPersonalPage}/>
@@ -60,8 +61,8 @@ export const BoxButtonMyRequest = ({FuncButton} : BoxButtonProps) => {
     }
     return (
         <Box sx={{
-            width: '350px',
-            display: 'flex', justifyContent: 'flex-end'
+            height: '100%', flexDirection: 'column',
+            display: 'flex', justifyContent: 'center',
         }}>
             <CustomButton title={"Thu hồi kết bạn"} clickButton={Recall}/>
         </Box>
