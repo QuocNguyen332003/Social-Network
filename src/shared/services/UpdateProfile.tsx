@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Details } from '../../../interface/mainInterface';
+import { Details } from '../../interface/mainInterface';
 const token = sessionStorage.getItem('token');
 
 export const updateAboutMe = async (userId: string, aboutMe: string) => {

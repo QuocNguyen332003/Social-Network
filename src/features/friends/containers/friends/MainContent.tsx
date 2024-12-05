@@ -18,18 +18,22 @@ function App() {
   return (
   <Box sx={{
     position:'relative',
-    height: '90vh'
+    height: '86vh',
+    borderRadius: 8,
+    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+    margin: 2
   }}>
     <Box 
     sx={{ 
       padding: '16px', 
       overflowY: 'scroll',
-      maxHeight: '700px',
+      borderRadius: 8,
+      height: '78vh',
       scrollbarWidth: 'none', /* Firefox */
       '&::-webkit-scrollbar': {
         display: 'none', /* Chrome, Safari, Opera */
       },
-      backgroundColor: '#f9f9f9',
+      backgroundColor: '#fff',
     }}
     >
       <Typography variant="h5" component="h2"
@@ -56,11 +60,19 @@ function App() {
         />
     </Box>
     <Box 
-    sx={{position: 'absolute', width: '100%', background: '#fff',
-      bottom: 0, display: 'flex', justifyContent: 'center',
+    sx={{position: 'absolute', width: '100%', height: '8vh', 
+      background: '#fff',
+      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+      bottom: -3, display: 'flex', justifyContent: 'center',
+      borderBottomLeftRadius: 20, borderBottomRightRadius: 20,
     }}
     >
-      <CustomPagination totalPages={totalsPage} handleActivityPageChange={changePage}/>
+      <Box sx={{width: '100%', background: '#fff', margin: 2,
+      display: 'flex', justifyContent: 'center',
+      borderBottomLeftRadius: 20, borderBottomRightRadius: 20,
+    }}>
+        <CustomPagination totalPages={totalsPage} handleActivityPageChange={changePage}/>
+      </Box>
     </Box>
   </Box>
   );
