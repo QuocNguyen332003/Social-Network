@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
 import { Group } from '../../../../../interface/interface';
+import CustomPagination from '../../../../../shared/components/pagination/CustomPagination';
 
 const YourGroups: React.FC = () => {
   const token = sessionStorage.getItem('token');
@@ -21,51 +22,58 @@ const YourGroups: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null); // Lưu ID nhóm đã chọn để hiện menu
-
-  // Trạng thái hiển thị Dialog xác nhận xóa nhóm
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1); // Current page
+  const [totalPages, setTotalPages] = useState(1); // Total number of pages
+  const [totalGroups, setTotalGroups] = useState(0); // Total groups count
   // Gọi API để lấy danh sách các nhóm mà người dùng đã tham gia
-  useEffect(() => {
-    const fetchJoinedGroups = async () => {
-      setLoading(true);
-      setError('');
+  const fetchJoinedGroups = async () => {
+    setLoading(true);
+    setError('');
 
-      try {
-        // Gọi API từ backend với userId hiện tại
-        const response = await axios.get(`http://localhost:3000/v1/group/${currentUserId}/joined-groups`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Thêm token vào header
-            },
-          }
-        );
-        const groups = response.data.groups || [];
-        setJoinedGroups(groups); // Lưu danh sách nhóm vào state
-
-        // Lấy vai trò của người dùng trong từng nhóm
-        const roles: { [groupId: string]: string } = {};
-        for (const group of groups) {
-          const roleResponse = await axios.get(`http://localhost:3000/v1/group/${group._id}/role`, {
-            headers: {
-              Authorization: `Bearer ${token}` // Thêm token vào headers
-            },
-            params: { userId: currentUserId },
+    try {
+      // Gọi API từ backend với userId hiện tại
+      const response = await axios.get(`http://localhost:3000/v1/group/${currentUserId}/joined-groups`,{
+        params: {
+          page: currentPage,
+          limit: 6, // You can adjust the limit here
+         search: searchTerm,
+        },
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
           },
-        );
-          roles[group._id] = roleResponse.data.role;
         }
-        setUserRoles(roles); // Lưu role của từng nhóm vào state
-      } catch (error: any) {
-        setError('Có lỗi xảy ra khi lấy danh sách nhóm.');
-        console.error('Error fetching groups:', error.message);
-      } finally {
-        setLoading(false);
+      );
+      const { groups, totalPages, totalGroups } = response.data || [];
+      setJoinedGroups(groups); // Lưu danh sách nhóm vào state
+      setTotalPages(totalPages);
+      setTotalGroups(totalGroups);
+      // Lấy vai trò của người dùng trong từng nhóm
+      const roles: { [groupId: string]: string } = {};
+      for (const group of groups) {
+        const roleResponse = await axios.get(`http://localhost:3000/v1/group/${group._id}/role`, {
+          headers: {
+            Authorization: `Bearer ${token}` // Thêm token vào headers
+          },
+          params: { userId: currentUserId },
+        },
+      );
+        roles[group._id] = roleResponse.data.role;
       }
-    };
+      setUserRoles(roles); // Lưu role của từng nhóm vào state
+    } catch (error: any) {
+      setError('Có lỗi xảy ra khi lấy danh sách nhóm.');
+      console.error('Error fetching groups:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+if (currentUserId) {
     fetchJoinedGroups();
-  }, [currentUserId]);
+    }
+  }, [currentPage, currentUserId]);
 
   // Mở menu khi nhấn vào nút ba dấu chấm và đặt ID của nhóm đã chọn
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>, groupId: string) => {
@@ -95,18 +103,9 @@ const YourGroups: React.FC = () => {
     navigate(`/group/${group._id}`, { state: { group, role } });
   };
 
-  const normalizeString = (str: string): string => {
-    return str
-      .normalize('NFD') // Chuyển đổi chuỗi sang dạng tổ hợp ký tự
-      .replace(/[\u0300-\u036f]/g, '') // Loại bỏ các dấu tổ hợp
-      .replace(/đ/g, 'd') // Thay thế 'đ' thành 'd'
-      .replace(/Đ/g, 'D') // Thay thế 'Đ' thành 'D'
-      .toLowerCase(); // Chuyển tất cả về chữ thường
-  };
-  const filteredGroups = joinedGroups.filter((group) =>
-    normalizeString(group.groupName).includes(normalizeString(searchTerm))
+  const filteredGroups = joinedGroups.filter(group => 
+    group.groupName.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
 
   // Hàm xử lý xóa nhóm (Chỉ chủ nhóm mới có quyền này)
   const handleDeleteGroup = async () => {
@@ -151,6 +150,10 @@ const YourGroups: React.FC = () => {
       alert('Có lỗi xảy ra khi rời nhóm!');
     }
     handleClose();
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -307,6 +310,11 @@ const YourGroups: React.FC = () => {
           ))}
         </Grid>
       )}
+      
+      <Box mt={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <CustomPagination totalPages={totalPages} handleActivityPageChange={handlePageChange} />
+      </Box>
+
 
       {/* Dialog xác nhận xóa nhóm */}
       <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
@@ -328,4 +336,3 @@ const YourGroups: React.FC = () => {
 };
 
 export default YourGroups;
-
