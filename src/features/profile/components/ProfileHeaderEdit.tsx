@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 type DataChangeUser = {
-  myUser: User,
+  myUser: User;
   changeAvt: (newAvt: string) => void;
   changeBackground: (newbg: string) => void;
 }
@@ -93,7 +93,7 @@ const ProfileHeaderEdit = ({myUser, changeAvt, changeBackground}: DataChangeUser
         overflow: 'hidden', borderRadius: 0, position: 'relative',
         display: 'flex', flexDirection: 'column',
         padding: 0,
-        backgroundImage: `url(${myUser.backGround[myUser.backGround.length - 1]})`,
+        backgroundImage: `url(${myUser.backGround[myUser.backGround.length - 1]?.link})`,
         backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
       }}
       onClick={handlePressChangeBackground}
@@ -106,7 +106,7 @@ const ProfileHeaderEdit = ({myUser, changeAvt, changeBackground}: DataChangeUser
       {/* Group Info and Avatar */}
       <Box sx={{ position: 'absolute', bottom: '20px', left: '16px', display: 'flex', alignItems: 'center' }}>
         <IconButton sx={{padding: 0}} onClick={handlePressChangeAvt}>
-          <Avatar src={myUser.avt[myUser.avt.length - 1]} sx={{ width: '150px', height: '150px', border: '4px solid white' }} />
+          <Avatar src={(myUser.avt[myUser.avt.length - 1]?.link as unknown) as string} sx={{ width: '150px', height: '150px', border: '4px solid white' }} />
         </IconButton>
         <Box sx={{ marginLeft: '16px', marginTop: '10px'}}>
           <Typography variant="h5" color="black" fontWeight="bold">

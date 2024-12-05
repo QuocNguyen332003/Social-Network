@@ -1,7 +1,6 @@
 import { RouterProvider, createBrowserRouter, useSearchParams } from 'react-router-dom';
 import Login from '../../features/user-authentication/containers/login/Login';
 import Register from '../../features/user-authentication/containers/register/Register';
-import Forgot from '../../features/user-authentication/containers/forgot/Forgot';
 import NewFeeds from '../../features/new-feeds/containers/new-feeds/NewFeeds';
 import Messages from '../../features/conversations/containers/Messages'
 import AllFriends from '../../features/friends/containers/friends/AllFriends';
@@ -232,6 +231,12 @@ const Routes = () => {
         {
           path: '',
           element: <ProfileEdit />,
+          children: [
+            {
+              path: '',
+              element: <ProfilePost />,
+            },
+          ]
         },
         {
           path: 'hobbies',

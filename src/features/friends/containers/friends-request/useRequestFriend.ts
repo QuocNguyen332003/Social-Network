@@ -9,21 +9,25 @@ export const useRequestFriend = () => {
     const [error, setError] = useState<string | null>(null);
     const token = sessionStorage.getItem('token');
     const currentUserId = sessionStorage.getItem('userId') || '';
+
+    const limit = 10;
     const [page, setPage] = useState<number>(1);
+    const [count, setCount] = useState<number>(0);
     useEffect(()=> {
       getAllFriendRequest();
     }, [])
 
     const getAllFriendRequest = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/v1/friends/${currentUserId}/request?page=${page}`, 
+        const response = await axios.get(`http://localhost:3000/v1/friends/${currentUserId}/request?page=${page}&limit=${limit}`, 
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setData(response.data);
+        setData(response.data.dataFriend);
+        setCount(response.data.count);
       } catch (error) {
         console.error('Lỗi khi lấy bài viết:', error);
         setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
@@ -68,6 +72,7 @@ export const useRequestFriend = () => {
         data, isLoading, error,
         setPage,
         AcceptsFriend,
-        RefuseFriend
+        RefuseFriend,
+        count, limit
     }
 }

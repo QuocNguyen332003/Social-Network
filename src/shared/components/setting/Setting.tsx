@@ -2,6 +2,7 @@ import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, L
 import { useState } from "react";
 import SettingUser from "./SettingUser";
 import useSetting from "./useSetting";
+import AccountSetting from "./AccountSetting";
 
 interface SettingProps{
     open: boolean;
@@ -10,8 +11,6 @@ interface SettingProps{
 const Setting = ({open, setOpen}:SettingProps) => {
     const options = [
         "Quyền riêng tư",
-        "Màn hình",
-        "Thông báo",
         "Tài khoản",
     ];
     const [selectedOption, setSelectedOption] = useState("Quyền riêng tư");
@@ -27,10 +26,12 @@ const Setting = ({open, setOpen}:SettingProps) => {
     return (
         <Box>
             {/* Dialog hiển thị giữa màn hình */}
-            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+            <Dialog open={open} onClose={handleClose} fullScreen maxWidth="sm">
                 <DialogTitle>Settings</DialogTitle>
                 <DialogContent>
-                    <Grid container> 
+                    <Grid container  sx={{
+                      height: '100%',
+                    }}> 
                         <Grid item xs={3}>
                             <List>
                                 {options.map((option) => (
@@ -46,10 +47,14 @@ const Setting = ({open, setOpen}:SettingProps) => {
                             </List>
                         </Grid>
                         <Grid xs={1}/>
-                        <Grid xs={8}>
+                        <Grid xs={8} sx={{
+                          height: '100%', 
+                          overflowY: 'auto', // Kích hoạt cuộn theo chiều dọc
+                          scrollbarWidth: 'none', // Ẩn thanh cuộn (Firefox)
+                          '&::-webkit-scrollbar': { display: 'none' }, // Ẩn thanh cuộn (Chrome, Safari, Edge)
+                        }}>
                             {selectedOption === "Quyền riêng tư" && <SettingUser data = {userSetting} setData = {setUserSetting}/>}
-                            {selectedOption === "Màn hình" && <Box>Setting for Screen</Box>}
-                            {selectedOption === "Thông báo" && <Box>Setting for Notifications</Box>}
+                            {selectedOption === "Tài khoản" && <AccountSetting/>}
                         </Grid>
                     </Grid>
                 </DialogContent>

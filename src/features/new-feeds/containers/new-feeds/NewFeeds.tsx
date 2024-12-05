@@ -8,10 +8,16 @@ const NewFeeds = () => {
   return (
     <>
       {/* Đặt Header cố định ở trên cùng */}
-      <Box sx={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: '#ffffff' }}>
+      <Box sx={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: '#ffffff',
+       }}>
         <Header />
       </Box>
-      <Grid container sx={{ boxSizing: 'border-box', overflowX: 'hidden' }}>
+      <Grid container sx={{ boxSizing: 'border-box', 
+        maxHeight: '88vh',
+        overflowY: 'auto',
+        scrollbarWidth: 'none',
+        '&::-webkit-scrollbar': { display: 'none' },
+       }}>
         {/* SidebarLeft cố định bên trái */}
         <Grid
           item
@@ -19,7 +25,7 @@ const NewFeeds = () => {
           sx={{
             position: 'sticky',
             top: 0,
-            height: '100vh',
+            height: '100%',
             overflowY: 'auto',
             boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
           }}
@@ -33,7 +39,7 @@ const NewFeeds = () => {
           xs={7}
           sx={{
             overflowY: 'auto',
-            height: '100vh',
+            height: '100%',
             scrollbarWidth: 'none',
             '&::-webkit-scrollbar': { display: 'none' },
             backgroundColor: '#e9e9e9',
@@ -49,7 +55,7 @@ const NewFeeds = () => {
           sx={{
             position: 'sticky',
             top: 0,
-            height: '100vh',
+            height: '100%',
             overflowY: 'auto',
             boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
           }}

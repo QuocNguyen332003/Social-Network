@@ -364,7 +364,8 @@ const NewFeedsContent = () => {
   
   
   return (
-    <Box sx={{ padding: 2 }}>
+    <Box sx={{ padding: 2,
+     }}>
       <PostForm onSubmit={handlePostSubmit} />
       {posts.map((post, index) => {
         // Đặt ref vào phần tử cuối cùng để kích hoạt tải thêm
