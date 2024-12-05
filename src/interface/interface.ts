@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // User Interface
 
+import { ReactNode } from "react";
+
 export interface UserDataDisplay {
   _id: string;
   avt: string[];

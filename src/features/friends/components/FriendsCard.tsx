@@ -14,46 +14,37 @@ function FriendsCard({ avt, name, message, children }: FriendsCardProps) {
     <Box 
       sx={{ 
         margin: '15px',  
+        padding: '20px',
         display: 'flex',
-        height: '200px',
+        height: '150px',
         justifyContent: 'space-between',
-        backgroundColor: '#f9f9f9',
-        border: '1px solid #ccc',
+        backgroundColor: '#fff',
+        borderRadius: 4,
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
       }}
     >
-      <Box 
-      sx={{
-        width: '15%', height: '200px',
-        display: 'flex', justifyContent: 'center', alignItems: 'center'
-      }}
-      >
-         <img
-            src= {avt.link}
-            alt="Ảnh đại diện"
-            style={{width: '130px', height: '130px', borderRadius: 50, marginLeft: '20px', objectFit: 'cover' }}
-          /> 
-      </Box>
+      <img
+        src= {avt.link}
+        alt="Ảnh đại diện"
+        style={{width: '130px', height: '130px', borderRadius: 50, marginLeft: '20px', objectFit: 'cover' }}
+      /> 
       <Box
-      sx={{
-        padding: '25px', width: '85%',
+        sx={{
+          width: '50%', height: '100%', padding: '10px',
+          display: 'flex', flexDirection: 'column', 
+          justifyContent: 'flex-start', alignItems: 'flex-start',
       }}>
-        <Box
-          sx={{
-            display: 'flex', justifyContent: 'space-between',
-            marginBottom: '40px',
-          }}>
-            <Typography variant="h6" component="h2"
-            sx={{color: 'fffffff', fontWeight: 'bold'}}>
-                {name}
-            </Typography>
-            {children}
-        </Box>
-        <Typography variant="body1" component="h2"
-            sx={{color: '#808080'}}
-        >
-            {message}
+        <Typography variant="h6" component="h2"
+        sx={{color: 'fffffff', fontWeight: 'bold'}}>
+            {name}
         </Typography>
-      </Box>
+        <Typography variant="body1" component="h2"
+          sx={{color: '#808080'}}
+        >
+          {message}
+        </Typography>
+      </Box>  
+      {children}
     </Box>
   );
 }

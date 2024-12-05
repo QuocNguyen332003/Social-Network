@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import FriendsCard from "../../components/FriendsCard";
 import { BoxButtonMyRequest } from "../../components/BoxButton";
 import { useMyRequestFriend } from "./useMyRequestFriend";
@@ -23,19 +23,25 @@ function App() {
         '&::-webkit-scrollbar': {
           display: 'none', /* Chrome, Safari, Opera */
         },
-        backgroundColor: '#e9e9e9',
+        backgroundColor: '#f9f9f9',
       }}
     >
       <Typography variant="h5" component="h2"
       sx={{fontWeight: 'bold'}}>
         Gợi ý
       </Typography>
-      {data.map((item) => <FriendsCard 
-        avt={item.avt} 
-        name={item.name} 
-        message={item.aboutMe}>
-          <BoxButtonMyRequest FuncButton={[() => {PressRecallFiend(item._id?item._id:null, item.name)}]}/>
-        </FriendsCard>)}
+      <Grid container>
+      {data.map((item) => 
+        <Grid item xs={6}>
+          <FriendsCard 
+          avt={item.avt} 
+          name={item.name} 
+          message={item.aboutMe}>
+            <BoxButtonMyRequest FuncButton={[() => {PressRecallFiend(item._id?item._id:null, item.name)}]}/>
+          </FriendsCard>
+        </Grid>
+      )}
+      </Grid>
       <ConfirmDialog
         title = {"Thông Báo"}
         open={showDialog}
