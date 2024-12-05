@@ -59,7 +59,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, userGroups }) => {
               {group.groupName}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {group.members.count} thành viên • {group.article.count}+ bài viết mỗi ngày
+              {group.members.count} thành viên • {group.article.count}+ bài viết mỗi ngày 
             </Typography>
 
             <Button variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }} onClick={handleClick}>

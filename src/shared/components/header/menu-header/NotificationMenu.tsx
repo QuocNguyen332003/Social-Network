@@ -94,6 +94,24 @@ const NotificationMenu = () => {
         setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
       }
     });
+    socket.on('group_lock_unlock_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('group_lock_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
+    socket.on('approve_report_notification', (notification) => {
+      if (notification.receiverId === currentUserId) {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+      }
+    });
     return () => {
       socket.off('like_article_notification');
       socket.off('like_comment_notification');
@@ -107,8 +125,13 @@ const NotificationMenu = () => {
       socket.off('new_group_invite_notification'); 
       socket.off('friend_request_notification'); 
       socket.off('friend_request_accepted'); 
+      socket.off('group_lock_unlock_notification'); 
+      socket.off('group_lock_notification'); 
+      socket.off('approve_report_notification'); 
+      
     };
   }, [currentUserId]);
+  
   // Fetch notifications from backend API
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -221,9 +244,10 @@ const NotificationMenu = () => {
 
   const handleNotificationClick = (notification: Notification, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent navigation if interacting with the menu
-  
+    // Remove notification from unread count
     if (notification.status === 'unread') {
       markAsRead(notification._id);
+      setUnreadCount((prevUnreadCount) => prevUnreadCount - 1);
     }
     if (notification.link) {
       window.location.href = notification.link; // Navigate to the link
