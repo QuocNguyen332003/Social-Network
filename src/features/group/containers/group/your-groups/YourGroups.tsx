@@ -37,7 +37,7 @@ const YourGroups: React.FC = () => {
         params: {
           page: currentPage,
           limit: 6, // You can adjust the limit here
-         search: searchTerm,
+          search: searchTerm,
         },
           headers: {
             Authorization: `Bearer ${token}`, // Thêm token vào header
@@ -73,7 +73,7 @@ const YourGroups: React.FC = () => {
 if (currentUserId) {
     fetchJoinedGroups();
     }
-  }, [currentPage, currentUserId]);
+  }, [currentPage, currentUserId, searchTerm]);
 
   // Mở menu khi nhấn vào nút ba dấu chấm và đặt ID của nhóm đã chọn
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>, groupId: string) => {
@@ -103,9 +103,10 @@ if (currentUserId) {
     navigate(`/group/${group._id}`, { state: { group, role } });
   };
 
-  const filteredGroups = joinedGroups.filter(group => 
-    group.groupName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); 
+  };
 
   // Hàm xử lý xóa nhóm (Chỉ chủ nhóm mới có quyền này)
   const handleDeleteGroup = async () => {
@@ -177,14 +178,14 @@ if (currentUserId) {
         sx={{ borderBottom: '1px solid #ddd', pb: 2 }}
       >
         <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
-          Tất cả các nhóm bạn đã tham gia ({filteredGroups.length})
+          Tất cả các nhóm bạn đã tham gia 
         </Typography>
 
         <TextField
           placeholder="Tìm kiếm nhóm"
           variant="outlined"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleSearch}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -215,7 +216,7 @@ if (currentUserId) {
       ) : (
         /* Grid chứa các thẻ nhóm */
         <Grid container spacing={3} sx={{ maxWidth: '100%' }}>
-          {filteredGroups.map((group) => (
+          {joinedGroups.map((group) => (
             <Grid item xs={12} sm={6} md={6} key={group._id}>
               <Box
                 display="flex"

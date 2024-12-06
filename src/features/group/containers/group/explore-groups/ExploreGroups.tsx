@@ -1,5 +1,5 @@
  
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Typography, Grid, Button, IconButton, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, InputAdornment, TextField } from '@mui/material';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
@@ -24,7 +24,7 @@ const ExploreGroups: React.FC = () => {
       try {
         setLoading(true);
         const userId = sessionStorage.getItem('userId');
-        const response = await axios.get(`http://localhost:3000/v1/group/${userId}/not-joined-groups?page=${currentPage}&limit=6`, // Truyền tham số phân trang
+        const response = await axios.get(`http://localhost:3000/v1/group/${userId}/not-joined-groups?page=${currentPage}&limit=6&searchTerm=${searchTerm}`, // Truyền tham số phân trang
           {
             headers: {
               Authorization: `Bearer ${token}`, // Thêm token vào header
@@ -47,7 +47,7 @@ const ExploreGroups: React.FC = () => {
     };
   
     fetchNotJoinedGroups();
-  }, [currentPage, token]);
+  }, [currentPage, token, searchTerm]);
 
   // Mở dialog xác nhận tham gia nhóm
   const handleOpenDialog = (group: Group) => {
@@ -110,25 +110,12 @@ const ExploreGroups: React.FC = () => {
       console.error('Lỗi khi thu hồi yêu cầu tham gia nhóm:', error);
     }
   };
-  const normalizeString = (str: string): string => {
-    return str
-      .normalize('NFD') // Chuyển đổi chuỗi sang dạng tổ hợp ký tự
-      .replace(/[\u0300-\u036f]/g, '') // Loại bỏ các dấu tổ hợp
-      .replace(/đ/g, 'd') // Thay thế 'đ' thành 'd'
-      .replace(/Đ/g, 'D') // Thay thế 'Đ' thành 'D'
-      .toLowerCase(); // Chuyển tất cả về chữ thường
-  };
   
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+    setCurrentPage(1); 
   };
 
-  // Lọc các nhóm theo từ khóa tìm kiếm trên dữ liệu đã tải
-  const filteredGroups = searchTerm
-    ? notJoinedGroups.filter(group =>
-        group.groupName.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : notJoinedGroups;
   // Hàm xử lý thay đổi trang khi người dùng chọn
   const handlePageChange = (page: number) => {
     setCurrentPage(page); // Cập nhật trang hiện tại
@@ -177,7 +164,7 @@ const ExploreGroups: React.FC = () => {
           </Box>
         ) : notJoinedGroups.length > 0 ? (
           <Grid container spacing={2} sx={{ maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
-            {filteredGroups.map((group) => (
+            {notJoinedGroups.map((group) => (
               <Grid item xs={12} sm={6} md={4} key={group._id}>
                 <Box
                   sx={{
