@@ -1,10 +1,10 @@
  
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Typography, Grid, Button, IconButton, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, InputAdornment, TextField } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
 import { Group } from '../../../../../interface/interface';
+import CustomPagination from '../../../../../shared/components/pagination/CustomPagination';
 
 const ExploreGroups: React.FC = () => {
   const token = sessionStorage.getItem('token');
@@ -13,6 +13,10 @@ const ExploreGroups: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [totalPages, setTotalPages] = useState<number>(1); // Tổng số trang
+  const [currentPage, setCurrentPage] = useState<number>(1); // Trang hiện tại
+  const [allGroups, setAllGroups] = useState<Group[]>([]); // Dữ liệu tất cả các nhóm để tìm kiếm
+
 
   // Lấy danh sách các nhóm chưa tham gia và nhóm đã có trạng thái pending
   useEffect(() => {
@@ -20,7 +24,7 @@ const ExploreGroups: React.FC = () => {
       try {
         setLoading(true);
         const userId = sessionStorage.getItem('userId');
-        const response = await axios.get(`http://localhost:3000/v1/group/${userId}/not-joined-groups`,
+        const response = await axios.get(`http://localhost:3000/v1/group/${userId}/not-joined-groups?page=${currentPage}&limit=6&searchTerm=${searchTerm}`, // Truyền tham số phân trang
           {
             headers: {
               Authorization: `Bearer ${token}`, // Thêm token vào header
@@ -29,9 +33,12 @@ const ExploreGroups: React.FC = () => {
         );
   
         // Đảm bảo gán đúng giá trị từ dữ liệu trả về
-        const { groups } = response.data;
+        const { groups, pages } = response.data;
   
-        setNotJoinedGroups(groups || []);
+        setNotJoinedGroups(groups);
+        setAllGroups((prev) => [...prev, ...groups]);
+        setTotalPages(pages); // Cập nhật tổng số trang từ API
+        setLoading(false);
       } catch (error) {
         console.error('Lỗi khi lấy danh sách nhóm chưa tham gia:', error);
       } finally {
@@ -40,7 +47,7 @@ const ExploreGroups: React.FC = () => {
     };
   
     fetchNotJoinedGroups();
-  }, []);
+  }, [currentPage, token, searchTerm]);
 
   // Mở dialog xác nhận tham gia nhóm
   const handleOpenDialog = (group: Group) => {
@@ -103,18 +110,16 @@ const ExploreGroups: React.FC = () => {
       console.error('Lỗi khi thu hồi yêu cầu tham gia nhóm:', error);
     }
   };
-  const normalizeString = (str: string): string => {
-    return str
-      .normalize('NFD') // Chuyển đổi chuỗi sang dạng tổ hợp ký tự
-      .replace(/[\u0300-\u036f]/g, '') // Loại bỏ các dấu tổ hợp
-      .replace(/đ/g, 'd') // Thay thế 'đ' thành 'd'
-      .replace(/Đ/g, 'D') // Thay thế 'Đ' thành 'D'
-      .toLowerCase(); // Chuyển tất cả về chữ thường
-  };
   
-  const filteredGroups = notJoinedGroups.filter((group) =>
-    normalizeString(group.groupName).includes(normalizeString(searchTerm))
-  );
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); 
+  };
+
+  // Hàm xử lý thay đổi trang khi người dùng chọn
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page); // Cập nhật trang hiện tại
+  };
 
   return (
     <Box sx={{ width: '100%', padding: 2, overflowX: 'hidden', boxSizing: 'border-box', height: '130vh' }}>
@@ -134,7 +139,7 @@ const ExploreGroups: React.FC = () => {
             placeholder="Tìm kiếm nhóm"
             variant="outlined"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearch}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -159,7 +164,7 @@ const ExploreGroups: React.FC = () => {
           </Box>
         ) : notJoinedGroups.length > 0 ? (
           <Grid container spacing={2} sx={{ maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
-            {filteredGroups.map((group) => (
+            {notJoinedGroups.map((group) => (
               <Grid item xs={12} sm={6} md={4} key={group._id}>
                 <Box
                   sx={{
@@ -227,7 +232,6 @@ const ExploreGroups: React.FC = () => {
                     }}
                     onClick={() => console.log(`Đóng nhóm ${group.groupName}`)}
                   >
-                    <CloseIcon />
                   </IconButton>
                 </Box>
               </Grid>
@@ -238,7 +242,9 @@ const ExploreGroups: React.FC = () => {
             Không có nhóm nào để tham gia.
           </Typography>
         )}
-
+         <Box mt={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <CustomPagination totalPages={totalPages} handleActivityPageChange={handlePageChange} />
+        </Box>
         <Dialog
           open={openDialog}
           onClose={handleCloseDialog}
