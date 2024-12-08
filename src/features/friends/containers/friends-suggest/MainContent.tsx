@@ -1,13 +1,14 @@
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, InputAdornment, TextField, Typography } from "@mui/material";
 import FriendsCard from "../../components/FriendsCard";
 import { BoxButtonSuggest } from "../../components/BoxButton";
 import { useSuggestFriend } from "./useSuggestFriend";
 import { useDialogRequestFriend } from "./useDialogRequestFriend";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import CustomPagination from "../../../../shared/components/pagination/CustomPagination";
+import SearchIcon from '@mui/icons-material/Search';
 
 function App() {  
-  const {data, SendAddFriend, limit, count, setPage} = useSuggestFriend();
+  const {data, SendAddFriend, limit, count, setPage, searchTerm, handleSearch} = useSuggestFriend();
   const {showDialog,message, setShowDialog, SetValueDialog} = useDialogRequestFriend();
 
   const PressAddFiend = (userID: string, name: string) => {
@@ -37,10 +38,33 @@ function App() {
         backgroundColor: '#f9f9f9',
       }}
     >
-      <Typography variant="h5" component="h2"
-      sx={{fontWeight: 'bold'}}>
-        Gợi ý
-      </Typography>
+      <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+        <Typography variant="h5" component="h2"
+        sx={{fontWeight: 'bold'}}>
+          Gợi ý
+        </Typography>
+        <TextField
+          placeholder="Tìm kiếm người dùng"
+          variant="outlined"
+          value={searchTerm}
+          onChange={handleSearch}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            width: '300px',
+            borderRadius: '8px',
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: '#fff',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            },
+          }}
+        />
+      </Box>
       <Grid container>
       {data.map((item) => 
       <Grid item xs={6}>

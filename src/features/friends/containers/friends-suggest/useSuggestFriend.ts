@@ -11,11 +11,17 @@ export const useSuggestFriend = () => {
     const currentUserId = sessionStorage.getItem('userId') || '';
     const [page, setPage] = useState<number>(1);
 
+    const [searchTerm, setSearchTerm] = useState<string>('');
     const limit = 10;
     const [count, setCount] = useState<number>(0);
+
     useEffect(()=> {
-      getSuggestFriend();
-    }, []);
+      if (searchTerm === ''){
+        getSuggestFriend();
+      } else {
+        getSuggestFriendFilter();
+      }
+    }, [searchTerm, page]);
 
     const getSuggestFriend = async () => {
       try {
@@ -28,6 +34,26 @@ export const useSuggestFriend = () => {
         );
         setData(response.data.dataFriend);
         setCount(response.data.count);
+      } catch (error) {
+        console.error('Lỗi khi lấy bài viết:', error);
+        setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
+      } finally {
+        setIsLoading(false); 
+      }
+    }
+
+    const getSuggestFriendFilter = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/v1/friends/${currentUserId}/suggest?page=${page}&limit=${limit}&filter=${searchTerm}`, 
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setData(response.data.dataFriend);
+        setCount(response.data.count);
+        console.log(response.data.count);
       } catch (error) {
         console.error('Lỗi khi lấy bài viết:', error);
         setError('Lỗi khi tải bài viết. Vui lòng thử lại sau.');
@@ -59,11 +85,16 @@ export const useSuggestFriend = () => {
         setIsLoading(false); 
       }
     }
+
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value);
+    };
     return {
         data,
         SendAddFriend,
         setPage,
         isLoading, error,
-        limit, count
+        limit, count,
+        searchTerm, handleSearch
     }
 }
