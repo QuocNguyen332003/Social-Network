@@ -19,7 +19,7 @@ export const useSuggestFriend = () => {
 
     const getSuggestFriend = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/v1/friends/${currentUserId}/suggest?page=${page}&limit=${limit}`, 
+        const response = await axios.get(`http://localhost:3000/v1/friends/${currentUserId}/friend-suggestions?page=${page}&limit=${limit}`, 
           {
             headers: {
               Authorization: `Bearer ${token}`,

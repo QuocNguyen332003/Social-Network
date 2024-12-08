@@ -32,7 +32,7 @@ const ChangeHobby: React.FC = () => {
         name: data.name,
         isChoose: false
       }));
-
+      console.log(allHobbies);
       // Gọi API lấy sở thích của người dùng và cập nhật trạng thái `isChoose`
       await getUserHobbies(allHobbies);
     } catch (error) {
@@ -58,7 +58,6 @@ const ChangeHobby: React.FC = () => {
         name: hobby.name,
         isChoose: userHobbiesName.includes(hobby.name)
       }));
-      console.log(updatedHobbies);
 
       setDataHobby(updatedHobbies);
     } catch (error) {
