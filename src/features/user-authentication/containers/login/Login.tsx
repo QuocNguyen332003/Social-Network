@@ -161,33 +161,6 @@ const Login: React.FC = () => {
                   </Link>
                 </Box>
 
-                {/* Đường gạch ngang với dòng chữ */}
-                <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
-                  <Box sx={{ flexGrow: 1, borderBottom: '1px solid #ccc' }} />
-                  <Typography variant="body2" sx={{ mx: 2, color: '#666' }}>
-                    Đăng nhập với
-                  </Typography>
-                  <Box sx={{ flexGrow: 1, borderBottom: '1px solid #ccc' }} />
-                </Box>
-
-                {/* Các nút đăng nhập mạng xã hội */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 2,
-                    flexWrap: 'wrap', // Cho phép các nút xuống dòng khi không đủ chỗ
-                  }}
-                >
-                  <Button
-                    variant="outlined"
-                    startIcon={<GoogleIcon />}
-                    sx={{ mx: 1, flex: '1 1 30%', minWidth: '100px', mb: 1 }} // Đảm bảo mỗi button có tối thiểu 100px, và có khoảng cách dưới khi xuống dòng
-                  >
-                    Google
-                  </Button>
-                </Box>
-
                 <Grid container justifyContent="center">
                   <Grid item>
                     <Link href="#" variant="body2" onClick={() => navigate('/register')}>
