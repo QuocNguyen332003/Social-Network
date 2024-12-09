@@ -11,6 +11,7 @@ import AddToQueueIcon  from '@mui/icons-material/AddToQueue';
 import useDialogFollow from './dialog-follow/useDialogFollow';
 import useProfileHeader from './useProfileHeader';
 import DialogFollow from './dialog-follow/DialogFollow';
+import { toast } from 'react-toastify';
 
 export type DataUser = {
   myUser: User;
@@ -35,6 +36,19 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
     handleClose();
     navigate(`/messages?friendID=${myUser._id}`);
   }
+
+  const handleGetShare = () => {
+    handleClose();
+    const url = `http://localhost:5173/profile?id=${myUser._id}`; // URL cần lưu vào clipboard
+    navigator.clipboard.writeText(url)
+        .then(() => {
+            toast.success('URL đã được sao chép vào clipboard!')
+        })
+        .catch((err) => {
+          toast.error('Lỗi khi sao chép URL vào clipboard:', err)
+        });
+  }
+
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -112,7 +126,8 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
         <Button variant="contained" startIcon={<ShareIcon/>}
         sx={{ height: '30px',
           textTransform: 'none',
-         }} >
+         }} 
+         onClick={handleGetShare}>
           Chia sẻ trang cá nhân
         </Button>
       </Box>
@@ -184,7 +199,7 @@ const ProfileHeader = ({myUser, isOwner, addNewFollower, deleteFollower}: DataUs
           </ListItemIcon>
             Nhắn tin
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleGetShare}>
           <ListItemIcon>
             <ShareIcon/>
           </ListItemIcon>
