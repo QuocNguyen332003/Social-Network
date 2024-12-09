@@ -104,13 +104,14 @@ const ChangeHobby: React.FC = () => {
           sm={7}
           md={8}
           sx={{
-            backgroundImage: 'url(./src/assets/images/background-login.png)', // Sử dụng đường dẫn đến ảnh của bạn
+            backgroundImage: 'url(https://storage.googleapis.com/quocquan_storage/public/background-login.png)', // Sử dụng đường dẫn đến ảnh của bạn
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             height: '100%',
           }}
-        />
+        >
+        </Grid>
 
         {/* Phần bên phải (1/3 màn hình) */}
         <Grid
