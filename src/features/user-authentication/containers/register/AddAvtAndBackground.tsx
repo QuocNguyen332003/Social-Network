@@ -74,10 +74,20 @@ const AddAvtAndBackground: React.FC = () => {
         setTimeout(() => navigate('/login'), 1000);
       } else {
         toast.error(`Đăng ký thất bại: ${response.data.message || 'Lỗi không xác định'}`);
+        setTimeout(() => navigate('/login'), 1000);
       }
     } catch (error: any) {
-      console.error(error.response ? error.response.data : error.message);
-      toast.error('Có lỗi xảy ra. Vui lòng thử lại sau.');
+      console.log("Lỗi:", error); // In ra toàn bộ object lỗi
+      console.log("error.response:", error.response); // In ra error.response
+      console.log("error.response.data:", error.response.data); // In ra error.response.data
+      console.log("error.response.data.message:", error.response.data.message); // In ra message
+      
+      // Kiểm tra lỗi và hiển thị thông báo Toast
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.message || 'Lỗi không xác định từ server');
+      } else {
+        toast.error(error.message || 'Lỗi không xác định');
+    }
     } finally {
       setLoading(false);
     }
