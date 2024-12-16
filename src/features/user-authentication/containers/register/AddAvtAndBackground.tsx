@@ -88,6 +88,7 @@ const AddAvtAndBackground: React.FC = () => {
       } else {
         toast.error(error.message || 'Lỗi không xác định');
     }
+    setTimeout(() => navigate('/login'), 1000);
     } finally {
       setLoading(false);
     }
