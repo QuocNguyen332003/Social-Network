@@ -6,8 +6,6 @@ import VideoCard from "../video-card/VideoCard";
 import CloseIcon from '@mui/icons-material/Close';
 import { MyPhoto } from "../../../interface/interface";
 import { useCollectionCard } from "./useCollectionCard";
-import ShareIcon from '@mui/icons-material/Share';
-import ReplyIcon from '@mui/icons-material/Reply';
 interface CollectionCardProps{
     id: string;
     title: string;
@@ -146,14 +144,6 @@ const CollectionCard = ({id, title,type, data}: CollectionCardProps) => {
               <Typography variant="body2" color="text.secondary" sx={{ fontWeight: '500', fontSize: 15, margin: '5vh 3vw' }}>
                 Updated: {photo ? new Date(photo.updatedAt).toLocaleDateString() : ""}
               </Typography>
-              <Button variant="contained" endIcon={<ShareIcon />}
-              sx={{margin: '2vh 3vw'}}>
-                Chia sẻ
-              </Button>
-              <Button variant="outlined" endIcon={<ReplyIcon />}
-              sx={{backgroundColor: '#fff', margin: '2vh 3vw'}}>
-                Xem bài viết gốc
-              </Button>
             </Box>
             </Grid>
             <Grid item xs={0.5}>
