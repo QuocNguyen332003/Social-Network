@@ -5,8 +5,10 @@ import { useMyRequestFriend } from "./useMyRequestFriend";
 import { useDialogRequestFriend } from "./useDialogRequestFriend";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import CustomPagination from "../../../../shared/components/pagination/CustomPagination";
+import { useNavigate } from "react-router-dom";
 
 function App() {  
+  const navigate = useNavigate();
   const {data, revokeInvitation, limit, count, setPage} = useMyRequestFriend();
   const {showDialog,message, setShowDialog, SetValueDialog} = useDialogRequestFriend();
 
@@ -14,7 +16,9 @@ function App() {
     revokeInvitation(_id);
     SetValueDialog(`Bạn đã thu hồi lời mời kết bạn với ${name}`)
   }
-
+  const viewPersonalPage = (userID: string) => {
+    navigate(`/profile?id=${userID}`)
+  }
   const totalsPage = Math.ceil(count/limit);
   return (
   <Box sx={{
@@ -48,7 +52,7 @@ function App() {
           avt={item.avt} 
           name={item.name} 
           message={item.aboutMe}>
-            <BoxButtonMyRequest FuncButton={[() => {PressRecallFiend(item._id?item._id:null, item.name)}]}/>
+            <BoxButtonMyRequest FuncButton={[() => {PressRecallFiend(item._id?item._id:null, item.name)}, () => {viewPersonalPage(item.idUser)}]}/>
           </FriendsCard>
         </Grid>
       )}
