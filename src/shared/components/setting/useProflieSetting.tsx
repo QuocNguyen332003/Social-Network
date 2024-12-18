@@ -3,6 +3,7 @@ import { User } from "../../../interface/interface";
 import axios from "axios";
 import { updateAboutMe, updateAccount, updateDetails, updateDisplayName, updateName, updateUserName } from "../../services/UpdateProfile"
 import { Friends } from "../../../interface/mainInterface";
+import { toast } from "react-toastify";
 
 export const useProfileSetting = () => {
     const [myUser, setMyUser] = useState<User | null>(null);
@@ -100,24 +101,12 @@ export const useProfileSetting = () => {
       }
     }
 
-    const changeEmail = (dataInput: string[]) => {
-      if (myUser != null){
-        updateAccount(currentUserId, dataInput[0], myUser.account.password);
-        const updateUser = {
-          ...myUser,
-          account: {
-            warningLevel: myUser.account.warningLevel,
-            email: dataInput[0],
-            password: myUser.account.password
-          },
-        };
-        setMyUser(updateUser);
-      }
-    }
-
-    const changePassword = (dataInput: string[]) => {
-      if (myUser != null && dataInput[0] == myUser.account.password && dataInput[0] == dataInput[1]){
-        updateAccount(currentUserId, myUser.account.email, dataInput[2]);
+    const changePassword = async (dataInput: string[]) => {
+      if (myUser != null && dataInput[1] == dataInput[2]){
+        const result = await updateAccount(currentUserId, myUser.account.email, dataInput[2]);
+        if (!result.success){
+          toast.error(result.message)
+        }
         const updateUser = {
           ...myUser,
           account: {
@@ -127,6 +116,9 @@ export const useProfileSetting = () => {
           },
         };
         setMyUser(updateUser);
+      }
+      else if (myUser != null && dataInput[1] != dataInput[2]) {
+        toast.error("Mật khẩu mới không trùng nhau");
       }
     }
 
@@ -208,7 +200,6 @@ export const useProfileSetting = () => {
         myUser, 
         changeName,
         changeUserName,
-        changeEmail,
         changePassword,
         changeAboutMe,
         changePhoneNumber,

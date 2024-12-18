@@ -80,7 +80,6 @@ export const updateAccount = async (userId: string, email: string, password: str
         },
       }
     );
-      console.log("Account updated successfully:", response.data);
       return response.data;
     } catch (error) {
       console.error("Failed to update Account:", error);

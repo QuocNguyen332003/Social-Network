@@ -26,12 +26,16 @@ export const BoxButtonSuggest = ({FuncButton} : BoxButtonProps) => {
     const AddFriend = () => {
         FuncButton[0]()
     }
+    const viewPersonalPage = () => {
+        FuncButton[1]()
+    }
     return (
         <Box sx={{
             height: '100%', flexDirection: 'column',
             display: 'flex', justifyContent: 'center',
         }}>
             <CustomButton title={"Gửi lời mời"} clickButton={AddFriend}/>
+            <CustomButton title={"Xem trang cá nhân"} clickButton={viewPersonalPage}/>
         </Box>
     )
 }
@@ -59,12 +63,16 @@ export const BoxButtonMyRequest = ({FuncButton} : BoxButtonProps) => {
     const Recall = () => {
         FuncButton[0]()
     }
+    const viewPersonalPage = () => {
+        FuncButton[1]()
+    }
     return (
         <Box sx={{
             height: '100%', flexDirection: 'column',
             display: 'flex', justifyContent: 'center',
         }}>
             <CustomButton title={"Thu hồi kết bạn"} clickButton={Recall}/>
+            <CustomButton title={"Xem trang cá nhân"} clickButton={viewPersonalPage}/>
         </Box>
     )
 }

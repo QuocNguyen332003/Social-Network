@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, TextField, Grid, Box, Typography, MenuItem } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const InfoPersonal: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +24,11 @@ const InfoPersonal: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+  if (!address.trim() || !gender.trim() || cccdFile == null) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
     // Navigate to the next form, passing the state object including CCCD
     navigate('/register/choose-interest', {
       state: { firstName, lastName, email, password, phoneNumber, address, gender, cccdFile }

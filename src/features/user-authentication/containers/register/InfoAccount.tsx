@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, TextField, Grid, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const InfoAccount: React.FC = () => {
   const navigate = useNavigate();
@@ -12,10 +13,14 @@ const InfoAccount: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
     // Password validation
     if (password !== confirmPassword) {
-      alert('Mật khẩu không khớp');
+      toast.error("Mật khẩu không khớp")
       return;
     }
 

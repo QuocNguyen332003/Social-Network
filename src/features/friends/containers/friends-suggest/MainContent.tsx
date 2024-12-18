@@ -6,8 +6,10 @@ import { useDialogRequestFriend } from "./useDialogRequestFriend";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import CustomPagination from "../../../../shared/components/pagination/CustomPagination";
 import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate } from "react-router-dom";
 
 function App() {  
+  const navigate = useNavigate();
   const {data, SendAddFriend, limit, count, setPage, searchTerm, handleSearch} = useSuggestFriend();
   const {showDialog,message, setShowDialog, SetValueDialog} = useDialogRequestFriend();
 
@@ -15,7 +17,9 @@ function App() {
     SendAddFriend(userID);
     SetValueDialog(`Bạn đã gửi lời mời kết bạn đến ${name}`)
   }
-
+  const viewPersonalPage = (userID: string) => {
+    navigate(`/profile?id=${userID}`)
+  }
   const totalsPage = Math.ceil(count/limit);
   return (
     <Box sx={{
@@ -72,7 +76,7 @@ function App() {
         avt={item.avt} 
         name={item.name} 
         message={item.aboutMe}>
-          <BoxButtonSuggest FuncButton={[() => {PressAddFiend(item.idUser, item.name)}]}/>
+          <BoxButtonSuggest FuncButton={[() => {PressAddFiend(item.idUser, item.name)}, () => {viewPersonalPage(item.idUser)}]}/>
         </FriendsCard>
       </Grid>
       )}
