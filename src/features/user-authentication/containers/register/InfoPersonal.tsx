@@ -19,6 +19,8 @@ const InfoPersonal: React.FC = () => {
     const file = e.target.files && e.target.files[0];
     if (file) {
       setCccdFile(file); // Store CCCD file
+    }else {
+      setCccdFile(null); // Nếu không có file, đặt lại thành null
     }
   };
 

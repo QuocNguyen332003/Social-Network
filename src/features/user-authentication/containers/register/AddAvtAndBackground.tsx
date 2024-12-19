@@ -70,11 +70,11 @@ const AddAvtAndBackground: React.FC = () => {
       });
 
       if (response.data.success) {
+        navigate('/login')
         toast.success('Đăng ký thành công!');
-        setTimeout(() => navigate('/login'), 1000);
       } else {
+        navigate('/login')
         toast.error(`Đăng ký thất bại: ${response.data.message || 'Lỗi không xác định'}`);
-        setTimeout(() => navigate('/login'), 1000);
       }
     } catch (error: any) {
       console.log("Lỗi:", error); // In ra toàn bộ object lỗi

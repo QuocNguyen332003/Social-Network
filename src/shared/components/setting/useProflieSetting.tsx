@@ -103,7 +103,8 @@ export const useProfileSetting = () => {
 
     const changePassword = async (dataInput: string[]) => {
       if (myUser != null && dataInput[1] == dataInput[2]){
-        const result = await updateAccount(currentUserId, myUser.account.email, dataInput[2]);
+        const result = await updateAccount(currentUserId, myUser.account.email, dataInput[2], dataInput[0]);
+        console.log(result);
         if (!result.success){
           toast.error(result.message)
         }
@@ -116,6 +117,7 @@ export const useProfileSetting = () => {
           },
         };
         setMyUser(updateUser);
+        toast.success("Thay đổi thành công")
       }
       else if (myUser != null && dataInput[1] != dataInput[2]) {
         toast.error("Mật khẩu mới không trùng nhau");

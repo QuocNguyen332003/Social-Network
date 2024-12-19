@@ -67,12 +67,13 @@ export const updateName = async (userId: string, firstName: string, lastName: st
       throw error;
     }
 };
-export const updateAccount = async (userId: string, email: string, password: string) => {
+export const updateAccount = async (userId: string, email: string, password: string, oldPass: string) => {
     try {
       const response = await axios.patch(`http://localhost:3000/v1/user/${userId}`, { 
         account: {
         email: email,
-        password: password
+        password: password,
+        oldPassword: oldPass
     } },
     {
         headers: {
