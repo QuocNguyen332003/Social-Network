@@ -66,20 +66,34 @@ const MemberGroupContent: React.FC = () => {
   // Xóa thành viên ra khỏi nhóm
   const handleRemoveMember = async () => {
     try {
-      const response = await axios.delete(`http://localhost:3000/v1/group/${group._id}/member/${selectedMemberId}`, {
-        headers: {
-          Authorization: `Bearer ${token}` // Thêm token vào headers
-        },
-        data: { requesterId: currentUserId },
-      },
-    );
-      setMembers((prev) => prev.filter((member) => member.idUser._id !== selectedMemberId)); // Cập nhật lại danh sách thành viên
-      setOpenConfirmDialog(false);
-      toast.success(response.data.message);
-    } catch (error) {
-      toast.error('Có lỗi xảy ra khi xóa thành viên.');
+      // Gửi yêu cầu xóa thành viên
+      const response = await axios.delete(
+        `http://localhost:3000/v1/group/${group._id}/member/${selectedMemberId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}` // Thêm token vào headers
+          },
+          data: { requesterId: currentUserId },
+        }
+      );
+      
+      // Cập nhật lại danh sách thành viên sau khi xóa thành công
+      setMembers((prev) => prev.filter((member) => member.idUser._id !== selectedMemberId)); 
+      setOpenConfirmDialog(false);  // Đóng hộp thoại xác nhận
+      toast.success(response.data.message);  // Hiển thị thông báo thành công
+  
+    } catch (error: any) {
+      // Kiểm tra nếu có lỗi từ server (ví dụ: thông báo lỗi chi tiết)
+      if (error.response) {
+        // Lỗi trả về từ server (có thể là thông báo lỗi như "Không thể xóa người tạo nhóm")
+        toast.error(error.response.data.message || 'Có lỗi xảy ra khi xóa thành viên.');
+      } else {
+        // Lỗi khác (ví dụ: lỗi kết nối)
+        toast.error('Có lỗi xảy ra khi xóa thành viên.');
+      }
     }
   };
+  
 
   return (
     <Box

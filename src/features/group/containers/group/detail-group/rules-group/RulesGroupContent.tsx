@@ -59,7 +59,7 @@ const RulesGroupContent: React.FC = () => {
       }}
     >
       <Paper sx={{ padding: 2 }}>
-        {rules.length > 0 ? (
+        {rules && rules.length > 0  ? (
           rules.map((rule, index) => (
             <Box key={index} sx={{ marginBottom: 2 }}>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>

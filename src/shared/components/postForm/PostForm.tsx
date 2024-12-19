@@ -3,6 +3,7 @@ import { Box, Paper, IconButton, Button, InputBase, Avatar, MenuItem, Select, Fo
 import { InsertPhoto, LocalOffer, EmojiEmotions, Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface PostFormProps {
   onSubmit: (newPost: string, images: File[], visibility: string, hashTags: string[]) => void;
@@ -20,6 +21,8 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
   const token = sessionStorage.getItem('token');
   const navigate = useNavigate(); // For navigation
 
+  const isInGroup = window.location.pathname.includes('/group');
+  
   // Cập nhật tên hiển thị và avatar người dùng từ API
   useEffect(() => {
     const fetchUserData = async () => {
@@ -84,6 +87,13 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
 
   // Hàm xử lý khi người dùng nhấn nút Đăng bài
   const handlePostSubmit = () => {
+    if (!newPost.trim()) {
+      // Nếu không có nội dung và không có ảnh, hiển thị thông báo lỗi
+      toast.error('Vui lòng nhập nội dung bài viết', {
+        autoClose: 3000,
+      });
+      return;
+    }
     if (newPost.trim() || selectedImages.length > 0) {
       onSubmit(newPost, selectedImages, visibility, hashTags);
       setNewPost('');
@@ -119,12 +129,20 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit }) => {
         <Box>
           <Typography variant="subtitle1" fontWeight="bold">{displayName}</Typography>
           <FormControl sx={{ minWidth: 120 }}>
-            <Select
+          <Select
               value={visibility}
-              onChange={handleVisibilityChange}
+              onChange={(e) => setVisibility(e.target.value)}
               displayEmpty
               inputProps={{ 'aria-label': 'Phạm vi bài viết' }}
               sx={{ fontSize: '14px' }}
+              MenuProps={{
+                disableScrollLock: true,
+                PaperProps: {
+                  sx: {
+                    pointerEvents: isInGroup ? 'none' : 'auto', // Không cho phép chọn khi ở trong nhóm
+                  },
+                },
+              }}
             >
               <MenuItem value="public">Công khai</MenuItem>
               <MenuItem value="friends">Bạn bè</MenuItem>
