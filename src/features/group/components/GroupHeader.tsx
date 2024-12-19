@@ -159,9 +159,14 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
         setHobbies(updatedGroup.hobbies || []); // Cập nhật sở thích
         handleCloseEditDialog();
       }
-    } catch (error) {
-      console.error('Lỗi khi cập nhật nhóm:', error);
-      alert('Có lỗi xảy ra khi cập nhật nhóm!');
+    } catch (err: any) {
+      console.error('Error creating group:', err.message);
+  
+      // Kiểm tra lỗi trả về từ server và hiển thị toast phù hợp
+      const errorMessage =
+        err.response?.data?.error || 'Có lỗi xảy ra khi tạo nhóm. Vui lòng thử lại!';
+      toast.error(errorMessage);
+      
     } finally {
       setIsLoading(false); // Dừng loading
     }
