@@ -29,6 +29,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import { Group } from '../../../interface/interface';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 
 interface GroupHeaderProps {
@@ -127,6 +128,13 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({ group, role, onUpdateGroup })
 
   const handleUpdateGroup = async () => {
     setIsLoading(true); 
+    if (!editedGroup.groupName.trim()) {
+          // Nếu không có nội dung và không có ảnh, hiển thị thông báo lỗi
+          toast.error('Vui lòng không bỏ trống tên nhóm', {
+            autoClose: 3000,
+          });
+          return;
+    }
     try {
       const formData = new FormData();
       formData.append('userId', currentUserId);

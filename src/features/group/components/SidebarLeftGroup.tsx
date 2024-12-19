@@ -36,6 +36,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { Group } from '../../../interface/interface';
 import axios from 'axios'; // Thêm axios để gọi API
+import { toast } from 'react-toastify';
 
 
 const SidebarLeftGroup = () => {
@@ -66,6 +67,7 @@ const SidebarLeftGroup = () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     _destroy: new Date(),
+    friendCount: undefined
   };
 
 const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData);
@@ -123,6 +125,10 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
   };
   
   const handleCreateGroup = async () => {
+    if (!groupData.groupName.trim()) {
+      toast.error("Tên nhóm không được để trống!");
+      return;
+    }
     setLoading(true);
     setError('');
   
@@ -136,7 +142,11 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
       // Thêm từng giá trị của mảng hobbies vào FormData mà không dùng JSON.stringify()
       groupData.hobbies.forEach((hobby) => formData.append('hobbies', hobby));
       // Thêm từng quy định vào FormData mà không dùng JSON.stringify()
-      groupData.rule.forEach((rule) => formData.append('rule', rule));
+      // Loại bỏ các giá trị null hoặc trống trong rule
+      const validRules = groupData.rule.filter((rule) => rule && rule.trim() !== "");
+
+      // Thêm quy định vào FormData nếu có
+      validRules.forEach((rule) => formData.append('rule', rule));
   
       // Thêm ảnh đại diện và ảnh nền nếu có
       if (groupData.avtFile) {
@@ -159,11 +169,15 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
       });
   
       console.log('Group created successfully:', response.data.group);
-      alert('Nhóm đã được tạo thành công!');
+      toast.success('Nhóm đã được tạo thành công!');
       handleCloseCreateGroupDialog();
     } catch (err: any) {
       console.error('Error creating group:', err.message);
-      setError('Có lỗi xảy ra khi tạo nhóm. Vui lòng thử lại!');
+  
+      // Kiểm tra lỗi trả về từ server và hiển thị toast phù hợp
+      const errorMessage =
+        err.response?.data?.error || 'Có lỗi xảy ra khi tạo nhóm. Vui lòng thử lại!';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -172,16 +186,27 @@ const [groupData, setGroupData] = useState<Omit<Group, '_id'>>(initialGroupData)
   
   
   const handleAddRule = () => {
+    if (newRule.trim() === "") {
+      // Nếu quy định trống, không làm gì
+      setNewRule(''); // Đảm bảo rằng input được reset
+      return;
+    }
+  
     if (editIndex !== null) {
+      // Cập nhật quy định đã có
       const updatedRules = [...groupData.rule];
       updatedRules[editIndex] = newRule;
       setGroupData((prev) => ({ ...prev, rule: updatedRules }));
       setEditIndex(null);
     } else {
+      // Thêm quy định mới vào
       setGroupData((prev) => ({ ...prev, rule: [...prev.rule, newRule] }));
     }
+  
+    // Reset input sau khi thêm
     setNewRule('');
   };
+  
 
   const handleEditRule = (index: number) => {
     setNewRule(groupData.rule[index]);

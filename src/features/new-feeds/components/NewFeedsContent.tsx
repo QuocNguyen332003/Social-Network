@@ -177,33 +177,78 @@ const NewFeedsContent = () => {
     }
   };
 
+
   const handleReportPost = async (postId: string, reason: string) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/report`, { userId: currentUserId, reason },{
-        headers: {
-          Authorization: `Bearer ${token}`, // Thêm token vào header
-        },
-      });
+      const response = await axios.post(
+        `http://localhost:3000/v1/article/${postId}/report`,
+        { userId: currentUserId, reason },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
+  
       console.log('Báo cáo thành công:', response.data);
-    } catch (error) {
-      console.error('Lỗi khi báo cáo bài viết:', error);
+      toast.success('Báo cáo bài viết thành công!', {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+    } catch (error: any) {
+      // Lấy thông tin lỗi từ response
+      const errorMessage =
+        error.response?.data?.error || 'Đã xảy ra lỗi khi báo cáo bài viết.';
+  
+      console.error('Lỗi khi báo cáo bài viết:', errorMessage);
+  
+      // Hiển thị thông báo lỗi cho người dùng
+      toast.error(errorMessage, {
+        position: 'top-right',
+        autoClose: 3000,
+      });
     }
   };
+  
 
   const handleSavePost = async (postId: string) => {
     try {
-      const response = await axios.post(`http://localhost:3000/v1/article/${postId}/save`, { userId: currentUserId,},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Thêm token vào header
-        },
-      });
+      const response = await axios.post(
+        `http://localhost:3000/v1/article/${postId}/save`,
+        { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
+  
       if (response.status === 200) {
-        alert('Lưu bài viết thành công!');
+        toast.success('Lưu bài viết thành công!', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Lỗi khi lưu bài viết:', error);
-      alert('Đã xảy ra lỗi khi lưu bài viết!');
+  
+      // Lấy thông báo lỗi từ server
+      const errorMessage =
+        error.response?.data?.error || 'Đã xảy ra lỗi khi lưu bài viết.';
+  
+      // Kiểm tra trường hợp bài viết đã có trong bộ sưu tập
+      if (errorMessage.includes('Bài viết đã có trong bộ sưu tập')) {
+        toast.error('Bài viết này đã tồn tại trong bộ sưu tập!', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
+      } else {
+        // Thông báo lỗi chung
+        toast.error('Đã xảy ra lỗi khi lưu bài viết!', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
+      }
     }
   };
 
@@ -227,29 +272,60 @@ const NewFeedsContent = () => {
   };
 
   const handleEditPost = async (postId: string, updatedContent: string, updatedScope: string) => {
+    if (!updatedContent.trim()) {
+          // Nếu không có nội dung và không có ảnh, hiển thị thông báo lỗi
+          toast.error('Vui lòng nhập nội dung bài viết', {
+            autoClose: 3000,
+          });
+          return;
+    }
     try {
-      const response = await axios.put(`http://localhost:3000/v1/article/${postId}/edit`, {
-        content: updatedContent,
-        scope: updatedScope
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Thêm token vào header
+      const response = await axios.put(
+        `http://localhost:3000/v1/article/${postId}/edit`,
+        {
+          content: updatedContent,
+          scope: updatedScope,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
+  
       if (response.status === 200) {
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
             post._id === postId ? { ...post, content: updatedContent, scope: updatedScope } : post
           )
         );
-        alert('Chỉnh sửa bài viết thành công!');
+        toast.success('Chỉnh sửa bài viết thành công!', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Lỗi khi chỉnh sửa bài viết:', error);
-      alert('Đã xảy ra lỗi khi chỉnh sửa bài viết!');
+  
+      // Kiểm tra message từ server
+      const errorMessage =
+        error.response?.data?.message || 'Đã xảy ra lỗi khi chỉnh sửa bài viết!';
+  
+      // Thêm thông báo toast khi nội dung không phù hợp
+      if (errorMessage.includes('Nội dung bài viết chứa từ ngữ không phù hợp')) {
+        toast.error(errorMessage, {
+          position: 'top-right',
+          autoClose: 3000,
+        });
+      } else {
+        toast.error('Đã xảy ra lỗi khi chỉnh sửa bài viết!', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
+      }
     }
   };
+  
   
   const handleLikeComment = async (postId: string, commentId: string) => {
     try {
@@ -331,6 +407,13 @@ const NewFeedsContent = () => {
   };
 
   const handleSharePost = async (postId: string, shareContent: string, shareScope: string) => {
+    if (!shareContent.trim()) {
+      // Nếu không có nội dung và không có ảnh, hiển thị thông báo lỗi
+      toast.error('Vui lòng nhập nội dung bài viết', {
+        autoClose: 3000,
+      });
+      return;
+}
     try {
       const response = await axios.post(
         `http://localhost:3000/v1/article/${postId}/share`, 
@@ -351,11 +434,24 @@ const NewFeedsContent = () => {
         setPosts((prevPosts) => [sharedPost, ...prevPosts]);
       } else {
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error('Lỗi khi chia sẻ bài viết:', error.response?.data || error.message);
+    } catch (error: any) {
+      console.error('Lỗi khi chỉnh sửa bài viết:', error);
+  
+      // Kiểm tra message từ server
+      const errorMessage =
+        error.response?.data?.message || 'Đã xảy ra lỗi khi chỉnh sửa bài viết!';
+  
+      // Thêm thông báo toast khi nội dung không phù hợp
+      if (errorMessage.includes('Nội dung bài viết chứa từ ngữ không phù hợp')) {
+        toast.error(errorMessage, {
+          position: 'top-right',
+          autoClose: 3000,
+        });
       } else {
-        console.error('Đã xảy ra lỗi không xác định:', error);
+        toast.error('Đã xảy ra lỗi khi chỉnh sửa bài viết!', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
       }
     }
   };
